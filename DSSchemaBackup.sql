@@ -405,10 +405,14 @@ ALTER FUNCTION public."getDoableServicesFromPlace"(p_id bigint) OWNER TO postgre
 
 CREATE FUNCTION public."getPromotions"(w_id bigint, d date) RETURNS TABLE(promotion_id bigint, service_id bigint, discount double precision, days integer[])
     LANGUAGE plpgsql
-    AS $$begin
+    AS $$/*
+	Returns Promotions for a given date and work
+*/
+
+begin
 
 return query 
-select P.promotion_id, PI.service_id, PI.discount, days
+select P.id, PI.service_id, PI.discount, P.days
 from "Promotion" as P
 join "promoIncludes" as PI on PI.promotion_id = P.id
 where P.work_id = w_id and d between P.since and P.to and extract(dow from d) in (
@@ -453,6 +457,7 @@ CREATE FUNCTION public."newAppointment"(w_id bigint, c_id bigint, services bigin
     AS $$/*
 
 Inserts a new Appointment
+and applies a promotion if available
 
 */
 declare
@@ -462,26 +467,34 @@ counter INTEGER := 1;
 new_app_id bigint;
 
 begin
-
--- TODO apply promotion
+CREATE TEMP TABLE promotions ON COMMIT DROP as
+	select * from "getPromotions"(w_id, services_time[1]::date);
 
 -- appointment insertion
 INSERT INTO "Appointment" values (DEFAULT, w_id, c_id, services_time[1]::date);
 SELECT currval('"Appointment_id_seq"') into new_app_id;
 
 -- serviceInstance insertions
-LOOP
-	EXIT WHEN counter = len;
+LOOP EXIT WHEN counter = len;
 	
 	INSERT INTO "ServiceInstance" values (new_app_id,
 										  services_time[counter],
 										  services[counter]);
+	--applying promotions
+	IF EXISTS (select * from promotions where service_id = services[counter]) THEN
+		insert into "promoApplied" values(
+			(select promotion_id from promotions where service_id = services[counter]),
+			new_app_id,
+			services_time[counter]
+		);
+	END IF;
 	
 	counter := counter + 1;
 END LOOP;
 
-return new_app_id;
 
+
+return new_app_id;
 end;$$;
 
 
@@ -519,7 +532,10 @@ ALTER FUNCTION public."newClient"(new_name character varying, new_email characte
 
 CREATE PROCEDURE public."newPromotion"(w_id bigint, services bigint[], discounts double precision[], description character varying, date_since date, date_to date, days integer[])
     LANGUAGE plpgsql
-    AS $$declare
+    AS $$/*
+	Creates a new Promotion
+*/
+declare
 
 new_promo_id bigint;
 counter integer = 1;
@@ -576,7 +592,7 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public."Appointment" (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     work_id bigint NOT NULL,
     client_id bigint NOT NULL,
     date date NOT NULL,
@@ -613,7 +629,7 @@ ALTER SEQUENCE public."Appointment_id_seq" OWNED BY public."Appointment".id;
 --
 
 CREATE TABLE public."Client" (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     name character varying NOT NULL
 );
 
@@ -749,7 +765,7 @@ ALTER TABLE public."Prefers" OWNER TO ezegi;
 --
 
 CREATE TABLE public."Promotion" (
-    id integer NOT NULL,
+    id bigint NOT NULL,
     work_id bigint NOT NULL,
     since date NOT NULL,
     "to" date NOT NULL,
