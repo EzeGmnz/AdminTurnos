@@ -1,0 +1,3 @@
+web client: Django
+android client: Android Studio
+Relational DB: PostgreSQL
