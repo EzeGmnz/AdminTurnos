@@ -1,8 +1,7 @@
-
-import java.util.*;
+package com.adminturnos.Functionality;
 
 /**
- * 
+ *
  */
 public class AppointmentManager {
 
@@ -11,10 +10,5 @@ public class AppointmentManager {
      */
     public AppointmentManager() {
     }
-
-
-
-
-
 
 }

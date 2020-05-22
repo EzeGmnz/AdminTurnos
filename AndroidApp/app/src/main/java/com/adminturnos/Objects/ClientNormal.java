@@ -1,15 +1,16 @@
+package com.adminturnos.Objects;
 
-import java.util.*;
+import com.adminturnos.ObjectInterfaces.Client;
 
 /**
- * 
+ *
  */
 public class ClientNormal implements Client {
 
     /**
      * Default constructor
      */
-    public NormalClient() {
+    public ClientNormal() {
     }
 
 }

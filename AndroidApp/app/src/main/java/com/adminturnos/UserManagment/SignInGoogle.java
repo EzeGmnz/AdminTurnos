@@ -1,8 +1,9 @@
+package com.adminturnos.UserManagment;
 
-import java.util.*;
+import com.adminturnos.ObjectInterfaces.ServiceProvider;
 
 /**
- * 
+ *
  */
 public class SignInGoogle implements SignIn {
 
@@ -12,4 +13,8 @@ public class SignInGoogle implements SignIn {
     public SignInGoogle() {
     }
 
+    @Override
+    public ServiceProvider signIn() {
+        return null;
+    }
 }

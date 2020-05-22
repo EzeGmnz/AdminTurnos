@@ -1,8 +1,9 @@
+package com.adminturnos.Objects;
 
-import java.util.*;
+import com.adminturnos.ObjectInterfaces.Job;
 
 /**
- * 
+ *
  */
 public class NormalJob implements Job {
 

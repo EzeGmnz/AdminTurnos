@@ -1,20 +1,9 @@
-
-import java.util.*;
+package com.adminturnos.ObjectInterfaces;
 
 /**
- * 
+ *
  */
 public interface ServiceProvider {
-
-    /**
-     * Default constructor
-     */
-    public ServiceProvider() {
-    }
-
-
-
-
 
 
 }

@@ -1,20 +1,17 @@
+package com.adminturnos.Objects;
 
-import java.util.*;
+import com.adminturnos.ObjectInterfaces.ServiceProvider;
 
 /**
- * 
+ *
  */
-public class ServiceProviderNormal implements ServiceProvider{
+public class ServiceProviderNormal implements ServiceProvider {
 
     /**
      * Default constructor
      */
-    public ServiceProvider() {
+    public ServiceProviderNormal() {
     }
-
-
-
-
 
 
 }

@@ -1,8 +1,7 @@
-
-import java.util.*;
+package com.adminturnos.UserManagment;
 
 /**
- * 
+ *
  */
 public class UserManagment {
 
@@ -11,9 +10,6 @@ public class UserManagment {
      */
     public UserManagment() {
     }
-
-
-
 
 
 }

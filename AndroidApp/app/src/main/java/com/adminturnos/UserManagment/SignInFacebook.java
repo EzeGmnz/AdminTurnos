@@ -1,8 +1,9 @@
+package com.adminturnos.UserManagment;
 
-import java.util.*;
+import com.adminturnos.ObjectInterfaces.ServiceProvider;
 
 /**
- * 
+ *
  */
 public class SignInFacebook implements SignIn {
 
@@ -12,4 +13,8 @@ public class SignInFacebook implements SignIn {
     public SignInFacebook() {
     }
 
+    @Override
+    public ServiceProvider signIn() {
+        return null;
+    }
 }

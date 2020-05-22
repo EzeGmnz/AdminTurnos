@@ -1,8 +1,10 @@
+package com.adminturnos.UserManagment;
 
-import java.util.*;
+import com.adminturnos.Exceptions.ExceptionEmailInUse;
+import com.adminturnos.ObjectInterfaces.ServiceProvider;
 
 /**
- * 
+ *
  */
 public class SignUpFacebook implements SignUp {
 
@@ -12,4 +14,8 @@ public class SignUpFacebook implements SignUp {
     public SignUpFacebook() {
     }
 
+    @Override
+    public ServiceProvider signUp() throws ExceptionEmailInUse {
+        return null;
+    }
 }

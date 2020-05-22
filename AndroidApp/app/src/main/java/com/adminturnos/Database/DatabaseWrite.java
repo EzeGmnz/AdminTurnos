@@ -1,8 +1,7 @@
-
-import java.util.*;
+package com.adminturnos.Database;
 
 /**
- * 
+ *
  */
 public interface DatabaseWrite {
 

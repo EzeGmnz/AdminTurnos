@@ -1,8 +1,9 @@
+package com.adminturnos.Objects;
 
-import java.util.*;
+import com.adminturnos.ObjectInterfaces.Division;
 
 /**
- * 
+ *
  */
 public class Division10min implements Division {
 

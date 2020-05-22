@@ -3,12 +3,12 @@ package com.adminturnos.Functionality;
 /**
  *
  */
-public class DatabaseBuilder {
+public class DailyGrid {
 
     /**
      * Default constructor
      */
-    public DatabaseBuilder() {
+    public DailyGrid() {
     }
 
 

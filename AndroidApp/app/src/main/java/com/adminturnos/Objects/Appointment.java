@@ -1,8 +1,7 @@
-
-import java.util.*;
+package com.adminturnos.Objects;
 
 /**
- * 
+ *
  */
 public class Appointment {
 
@@ -11,15 +10,6 @@ public class Appointment {
      */
     public Appointment() {
     }
-
-    /**
-     * 
-     */
-    public void fecha;
-
-
-
-
 
 
 }

@@ -1,8 +1,7 @@
-
-import java.util.*;
+package com.adminturnos.ObjectInterfaces;
 
 /**
- * 
+ *
  */
 public interface Division {
 

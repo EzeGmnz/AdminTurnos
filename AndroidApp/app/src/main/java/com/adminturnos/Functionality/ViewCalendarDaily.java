@@ -3,13 +3,12 @@ package com.adminturnos.Functionality;
 /**
  *
  */
-public class DatabaseBuilder {
+public class ViewCalendarDaily implements ViewCalendar {
 
     /**
      * Default constructor
      */
-    public DatabaseBuilder() {
+    public ViewCalendarDaily() {
     }
-
 
 }
