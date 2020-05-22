@@ -48,13 +48,13 @@ begin
 
 select duration
 from "Provides" as P
-where P.work_id = w_id and P.service_id = s_id and day = extract(dow from date)
+where P.job_id = w_id and P.service_id = s_id and day = extract(dow from date)
 into service_duration;
 
 select count(*)
 from "Appointment" as A
 join "ServiceInstance" as S on S.appointment_id = A.id
-where A.work_id = w_id and S.service_id = s_id and $3 between S.date and (S.date + service_duration) into o;
+where A.job_id = w_id and S.service_id = s_id and $3 between S.date and (S.date + service_duration) into o;
 
 RETURN o;
 
@@ -82,7 +82,7 @@ w_id bigint;
 
 begin
 
-select work_id
+select job_id
 from "Promotion" as P
 where P.id = p_id
 into w_id;
@@ -131,9 +131,9 @@ into service_jobtype;
 
 IF exists(
 		  (	select jobtype_type
-			from "Work" as w
-			join "PlaceDoes" as P on w.place_id = P.place_id
-			where w.id = w_id and P.jobtype_type = service_jobtype)
+			from "Job" as J
+			join "PlaceDoes" as P on J.place_id = P.place_id
+			where J.id = w_id and P.jobtype_type = service_jobtype)
 		 ) THEN
 	RETURN TRUE;
 ELSE
@@ -160,7 +160,7 @@ IF "checkProvides"(w_id, s_id) and
 
 	exists(	select *
 			from "Provides" as P
-			where P.work_id = w_id and service_id = s_id and day = dayofweek)
+			where P.job_id = w_id and service_id = s_id and day = dayofweek)
 
 THEN
 	RETURN TRUE;
@@ -186,13 +186,13 @@ parallelism integer;
 
 begin
 
-select work_id
+select job_id
 from "Appointment" as A
 where A.id = a_id into w_id;
 
 select max_parallelism
 from "Provides" as P
-where P.work_id = w_id and P.service_id = s_id and day = extract(dow from date)
+where P.job_id = w_id and P.service_id = s_id and day = extract(dow from date)
 into parallelism;
 
 IF 
@@ -245,7 +245,7 @@ begin
 select SI.appointment_id
 from "Appointment" as A
 join "ServiceInstance" as SI on SI.appointment_id = A.id
-where A.work_id = w_id and SI.date between date_since and date_to
+where A.job_id = w_id and SI.date between date_since and date_to
 group by SI.appointment_id
 into appointments;
 
@@ -259,6 +259,25 @@ end;$$;
 ALTER PROCEDURE public."dropAppointmentsInDateRange"(w_id bigint, date_since timestamp without time zone, date_to timestamp without time zone) OWNER TO postgres;
 
 --
+-- Name: dropJob(bigint); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public."dropJob"(j_id bigint)
+    LANGUAGE plpgsql
+    AS $$begin
+
+delete from "Provides"
+where job_id = j_id;
+
+delete from "Job"
+where id = j_id;
+
+end;$$;
+
+
+ALTER PROCEDURE public."dropJob"(j_id bigint) OWNER TO postgres;
+
+--
 -- Name: dropPlace(bigint); Type: PROCEDURE; Schema: public; Owner: postgres
 --
 
@@ -268,12 +287,12 @@ CREATE PROCEDURE public."dropPlace"(p_id bigint)
 
 
 delete from "Provides" as P
-where P.work_id in 
-(select work_id
-from "Work" as W
-where W.id = P.work_id and W.place_id = p_id);
+where P.job_id in 
+(select job_id
+from "Job" as J
+where J.id = P.work_id and J.place_id = p_id);
 
-delete from "Work" where place_id = p_id;
+delete from "Job" where place_id = p_id;
 
 delete from "Place" where id = p_id;
 
@@ -300,25 +319,6 @@ end$$;
 ALTER PROCEDURE public."dropPromotion"(p_id bigint) OWNER TO postgres;
 
 --
--- Name: dropWork(bigint); Type: PROCEDURE; Schema: public; Owner: postgres
---
-
-CREATE PROCEDURE public."dropWork"(w_id bigint)
-    LANGUAGE plpgsql
-    AS $$begin
-
-delete from "Provides"
-where work_id = w_id;
-
-delete from Work
-where id = w_id;
-
-end;$$;
-
-
-ALTER PROCEDURE public."dropWork"(w_id bigint) OWNER TO postgres;
-
---
 -- Name: getAppointments(bigint, date, bigint[]); Type: FUNCTION; Schema: public; Owner: ezegi
 --
 
@@ -330,7 +330,7 @@ return query
 select A.id, SI.service_id, SI.date
 from "Appointment" as A
 join "ServiceInstance" as SI on A.id = SI.appointment_id
-where A.work_id = w_id and A.date = d and SI.service_id in
+where A.job_id = w_id and A.date = d and SI.service_id in
 			(select *
 			from "ServiceProvider" as SP
 			where SP.id in (select * from unnest(services)))
@@ -352,7 +352,7 @@ CREATE FUNCTION public."getClientFrequency"(w_id bigint) RETURNS TABLE(client_id
 return query
 select A.client_id, count(id)
 from "Appointment" as A
-where A.work_id = w_id
+where A.job_id = w_id
 group by A.client_id;
 
 end;$$;
@@ -415,7 +415,7 @@ return query
 select P.id, PI.service_id, PI.discount, P.days
 from "Promotion" as P
 join "promoIncludes" as PI on PI.promotion_id = P.id
-where P.work_id = w_id and d between P.since and P.to and extract(dow from d) in (
+where P.job_id = w_id and d between P.since and P.to and extract(dow from d) in (
 	select *
 	from unnest(P.days)
 );
@@ -485,7 +485,7 @@ LOOP EXIT WHEN counter = len;
 		insert into "promoApplied" values(
 			(select promotion_id from promotions where service_id = services[counter]),
 			new_app_id,
-			services_time[counter]
+			services[counter]
 		);
 	END IF;
 	
@@ -512,19 +512,65 @@ new_client_id bigint;
 
 begin
 
-IF EXISTS (select * from "ClientAuth" where email = new_email) THEN
-	RAISE EXCEPTION 'User email already in use';
-ELSE
-	insert into "Client" values (DEFAULT, new_name);
-	select currval('"Client_id_seq"') into new_client_id;
-	insert into "ClientAuth" values (new_client_id, new_email);
-	return new_client_id;
-END IF;
+insert into "Client" values (DEFAULT, new_name);
+select currval('"Client_id_seq"') into new_client_id;
+insert into "ClientAuth" values (new_client_id, new_email);
+return new_client_id;
+
 
 end;$$;
 
 
 ALTER FUNCTION public."newClient"(new_name character varying, new_email character varying) OWNER TO ezegi;
+
+--
+-- Name: newJob(bigint, bigint); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public."newJob"(s_id bigint, p_id bigint) RETURNS bigint
+    LANGUAGE plpgsql
+    AS $$declare
+o bigint;
+begin
+
+insert into "Job" values (DEFAULT, s_id, p_id);
+select currval('"Work_id_seq"') into o;
+
+return o;
+end;$$;
+
+
+ALTER FUNCTION public."newJob"(s_id bigint, p_id bigint) OWNER TO postgres;
+
+--
+-- Name: newPlace(bigint, character varying, integer, integer, character varying, character varying, character varying, character varying, character varying, character varying); Type: FUNCTION; Schema: public; Owner: ezegi
+--
+
+CREATE FUNCTION public."newPlace"(owner_id bigint, street character varying, streetnumber integer, apnumber integer, city character varying, state character varying, country character varying, businessname character varying, phonenumber character varying, email character varying) RETURNS bigint
+    LANGUAGE plpgsql
+    AS $$declare
+
+o bigint;
+
+begin
+insert into "Place" values (
+	DEFAULT,
+	owner_id,
+	street,
+	streetnumber,
+	apnumber,
+	city,
+	state,
+	country,
+	businessname,
+	phonenumber,
+	email);
+select currval('"Place_id_seq"') into o;
+return o;
+end;$$;
+
+
+ALTER FUNCTION public."newPlace"(owner_id bigint, street character varying, streetnumber integer, apnumber integer, city character varying, state character varying, country character varying, businessname character varying, phonenumber character varying, email character varying) OWNER TO ezegi;
 
 --
 -- Name: newPromotion(bigint, bigint[], double precision[], character varying, date, date, integer[]); Type: PROCEDURE; Schema: public; Owner: postgres
@@ -559,6 +605,30 @@ end;$$;
 ALTER PROCEDURE public."newPromotion"(w_id bigint, services bigint[], discounts double precision[], description character varying, date_since date, date_to date, days integer[]) OWNER TO postgres;
 
 --
+-- Name: newProvides(bigint, bigint, integer, double precision, time without time zone, time without time zone, time without time zone, time without time zone, time without time zone, integer); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public."newProvides"(j_id bigint, s_id bigint, day integer, cost double precision, duration time without time zone, day_start time without time zone, day_end time without time zone, pause_start time without time zone, pause_end time without time zone, parallelism integer)
+    LANGUAGE plpgsql
+    AS $$begin
+
+insert into "Provides" values (j_id,
+							  s_id,
+							  day,
+							  cost,
+							  duration,
+							  day_start,
+							  day_end,
+							  pause_start,
+							  pause_end,
+							  parallelism);
+
+end;$$;
+
+
+ALTER PROCEDURE public."newProvides"(j_id bigint, s_id bigint, day integer, cost double precision, duration time without time zone, day_start time without time zone, day_end time without time zone, pause_start time without time zone, pause_end time without time zone, parallelism integer) OWNER TO postgres;
+
+--
 -- Name: newServiceProvider(character varying, character varying, date, boolean); Type: FUNCTION; Schema: public; Owner: ezegi
 --
 
@@ -570,14 +640,11 @@ new_sp_id bigint;
 
 begin
 
-IF Exists(select email from "ServiceProviderAuth" as S where S.email = new_email) THEN
-	RAISE EXCEPTION 'User email already in use';
-ELSE
-	INSERT INTO "ServiceProvider" values (DEFAULT, new_name, birth_date, is_pro);
-	select currval('"ServiceProvider_id_seq"') into new_sp_id;
-	INSERT INTO "ServiceProviderAuth" values (new_sp_id, email);
-	RETURN new_sp_id;
-END IF;
+INSERT INTO "ServiceProvider" values (DEFAULT, new_name, birth_date, is_pro);
+select currval('"ServiceProvider_id_seq"') into new_sp_id;
+INSERT INTO "ServiceProviderAuth" values (new_sp_id, new_email);
+RETURN new_sp_id;
+
 end;$$;
 
 
@@ -593,7 +660,7 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public."Appointment" (
     id bigint NOT NULL,
-    work_id bigint NOT NULL,
+    job_id bigint NOT NULL,
     client_id bigint NOT NULL,
     date date NOT NULL,
     description text
@@ -669,6 +736,19 @@ ALTER TABLE public."Client_id_seq" OWNER TO ezegi;
 
 ALTER SEQUENCE public."Client_id_seq" OWNED BY public."Client".id;
 
+
+--
+-- Name: Job; Type: TABLE; Schema: public; Owner: ezegi
+--
+
+CREATE TABLE public."Job" (
+    id bigint NOT NULL,
+    serviceprovider_id bigint NOT NULL,
+    place_id bigint NOT NULL
+);
+
+
+ALTER TABLE public."Job" OWNER TO ezegi;
 
 --
 -- Name: JobType; Type: TABLE; Schema: public; Owner: ezegi
@@ -766,7 +846,7 @@ ALTER TABLE public."Prefers" OWNER TO ezegi;
 
 CREATE TABLE public."Promotion" (
     id bigint NOT NULL,
-    work_id bigint NOT NULL,
+    job_id bigint NOT NULL,
     since date NOT NULL,
     "to" date NOT NULL,
     description text,
@@ -803,16 +883,18 @@ ALTER SEQUENCE public."Promotion_id_seq" OWNED BY public."Promotion".id;
 --
 
 CREATE TABLE public."Provides" (
-    work_id bigint NOT NULL,
+    job_id bigint NOT NULL,
     service_id bigint NOT NULL,
-    day bigint NOT NULL,
+    day integer NOT NULL,
     cost double precision NOT NULL,
-    duration time(4) without time zone NOT NULL,
-    day_start time(4) without time zone NOT NULL,
-    day_end time(4) without time zone,
-    pause_start time(4) without time zone,
-    pause_end time(4) with time zone,
-    max_parallelism integer NOT NULL
+    duration time without time zone NOT NULL,
+    day_start time without time zone NOT NULL,
+    day_end time without time zone NOT NULL,
+    pause_start time without time zone,
+    pause_end time without time zone,
+    parallelism integer NOT NULL,
+    CONSTRAINT "Provides_check" CHECK ((public."checkProvides"(job_id, service_id) = true)),
+    CONSTRAINT day_enum CHECK (((day >= 1) AND (day <= 7)))
 );
 
 
@@ -915,19 +997,6 @@ ALTER SEQUENCE public."Service_id_seq" OWNED BY public."Service".id;
 
 
 --
--- Name: Work; Type: TABLE; Schema: public; Owner: ezegi
---
-
-CREATE TABLE public."Work" (
-    id integer NOT NULL,
-    serviceprovider_id bigint NOT NULL,
-    place_id bigint NOT NULL
-);
-
-
-ALTER TABLE public."Work" OWNER TO ezegi;
-
---
 -- Name: Work_id_seq; Type: SEQUENCE; Schema: public; Owner: ezegi
 --
 
@@ -946,7 +1015,7 @@ ALTER TABLE public."Work_id_seq" OWNER TO ezegi;
 -- Name: Work_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ezegi
 --
 
-ALTER SEQUENCE public."Work_id_seq" OWNED BY public."Work".id;
+ALTER SEQUENCE public."Work_id_seq" OWNED BY public."Job".id;
 
 
 --
@@ -956,7 +1025,7 @@ ALTER SEQUENCE public."Work_id_seq" OWNED BY public."Work".id;
 CREATE TABLE public."promoApplied" (
     promotion_id bigint NOT NULL,
     appointment_id bigint NOT NULL,
-    date timestamp without time zone NOT NULL
+    service_id bigint NOT NULL
 );
 
 
@@ -990,6 +1059,13 @@ ALTER TABLE ONLY public."Client" ALTER COLUMN id SET DEFAULT nextval('public."Cl
 
 
 --
+-- Name: Job id; Type: DEFAULT; Schema: public; Owner: ezegi
+--
+
+ALTER TABLE ONLY public."Job" ALTER COLUMN id SET DEFAULT nextval('public."Work_id_seq"'::regclass);
+
+
+--
 -- Name: Place id; Type: DEFAULT; Schema: public; Owner: ezegi
 --
 
@@ -1015,13 +1091,6 @@ ALTER TABLE ONLY public."Service" ALTER COLUMN id SET DEFAULT nextval('public."S
 --
 
 ALTER TABLE ONLY public."ServiceProvider" ALTER COLUMN id SET DEFAULT nextval('public."ServiceProvider_id_seq"'::regclass);
-
-
---
--- Name: Work id; Type: DEFAULT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."Work" ALTER COLUMN id SET DEFAULT nextval('public."Work_id_seq"'::regclass);
 
 
 --
@@ -1097,19 +1166,11 @@ ALTER TABLE ONLY public."Promotion"
 
 
 --
--- Name: Provides Provides_check; Type: CHECK CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE public."Provides"
-    ADD CONSTRAINT "Provides_check" CHECK ((public."checkProvides"(work_id, service_id) = true)) NOT VALID;
-
-
---
 -- Name: Provides Provides_pkey; Type: CONSTRAINT; Schema: public; Owner: ezegi
 --
 
 ALTER TABLE ONLY public."Provides"
-    ADD CONSTRAINT "Provides_pkey" PRIMARY KEY (work_id, service_id, day);
+    ADD CONSTRAINT "Provides_pkey" PRIMARY KEY (job_id, service_id, day);
 
 
 --
@@ -1177,19 +1238,11 @@ ALTER TABLE ONLY public."Service"
 
 
 --
--- Name: Work Work_pkey; Type: CONSTRAINT; Schema: public; Owner: ezegi
+-- Name: Job Work_pkey; Type: CONSTRAINT; Schema: public; Owner: ezegi
 --
 
-ALTER TABLE ONLY public."Work"
+ALTER TABLE ONLY public."Job"
     ADD CONSTRAINT "Work_pkey" PRIMARY KEY (id);
-
-
---
--- Name: Provides day_enum; Type: CHECK CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE public."Provides"
-    ADD CONSTRAINT day_enum CHECK (((day >= 1) AND (day <= 7))) NOT VALID;
 
 
 --
@@ -1205,7 +1258,7 @@ ALTER TABLE ONLY public."Prefers"
 --
 
 ALTER TABLE ONLY public."promoApplied"
-    ADD CONSTRAINT "promoApplied_pkey" PRIMARY KEY (appointment_id, date, promotion_id);
+    ADD CONSTRAINT "promoApplied_pkey" PRIMARY KEY (service_id, appointment_id, promotion_id);
 
 
 --
@@ -1228,14 +1281,14 @@ ALTER TABLE ONLY public."promoIncludes"
 -- Name: indexAppointmentWork; Type: INDEX; Schema: public; Owner: ezegi
 --
 
-CREATE INDEX "indexAppointmentWork" ON public."Appointment" USING hash (work_id);
+CREATE INDEX "indexAppointmentWork" ON public."Appointment" USING hash (job_id);
 
 
 --
 -- Name: indexWorkServiceProvider; Type: INDEX; Schema: public; Owner: ezegi
 --
 
-CREATE INDEX "indexWorkServiceProvider" ON public."Work" USING hash (serviceprovider_id);
+CREATE INDEX "indexWorkServiceProvider" ON public."Job" USING hash (serviceprovider_id);
 
 
 --
@@ -1251,7 +1304,7 @@ ALTER TABLE ONLY public."Appointment"
 --
 
 ALTER TABLE ONLY public."Appointment"
-    ADD CONSTRAINT "Appointment_work_id_fkey" FOREIGN KEY (work_id) REFERENCES public."Work"(id);
+    ADD CONSTRAINT "Appointment_work_id_fkey" FOREIGN KEY (job_id) REFERENCES public."Job"(id);
 
 
 --
@@ -1295,19 +1348,27 @@ ALTER TABLE ONLY public."Prefers"
 
 
 --
+-- Name: Promotion Promotion_job_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
+--
+
+ALTER TABLE ONLY public."Promotion"
+    ADD CONSTRAINT "Promotion_job_id_fkey" FOREIGN KEY (job_id) REFERENCES public."Job"(id) NOT VALID;
+
+
+--
+-- Name: Provides Provides_job_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
+--
+
+ALTER TABLE ONLY public."Provides"
+    ADD CONSTRAINT "Provides_job_id_fkey" FOREIGN KEY (job_id) REFERENCES public."Job"(id);
+
+
+--
 -- Name: Provides Provides_service_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
 --
 
 ALTER TABLE ONLY public."Provides"
-    ADD CONSTRAINT "Provides_service_id_fkey" FOREIGN KEY (service_id) REFERENCES public."Service"(id) NOT VALID;
-
-
---
--- Name: Provides Provides_work_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."Provides"
-    ADD CONSTRAINT "Provides_work_id_fkey" FOREIGN KEY (work_id) REFERENCES public."Work"(id) NOT VALID;
+    ADD CONSTRAINT "Provides_service_id_fkey" FOREIGN KEY (service_id) REFERENCES public."Service"(id);
 
 
 --
@@ -1343,35 +1404,35 @@ ALTER TABLE ONLY public."Service"
 
 
 --
--- Name: Work Work_place_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
+-- Name: Job Work_place_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
 --
 
-ALTER TABLE ONLY public."Work"
+ALTER TABLE ONLY public."Job"
     ADD CONSTRAINT "Work_place_id_fkey" FOREIGN KEY (place_id) REFERENCES public."Place"(id) NOT VALID;
 
 
 --
--- Name: Work Work_serviceprovider_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
+-- Name: Job Work_serviceprovider_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
 --
 
-ALTER TABLE ONLY public."Work"
+ALTER TABLE ONLY public."Job"
     ADD CONSTRAINT "Work_serviceprovider_id_fkey" FOREIGN KEY (serviceprovider_id) REFERENCES public."ServiceProvider"(id) NOT VALID;
 
 
 --
--- Name: promoApplied promoApplied_appointment_id_date_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
+-- Name: promoApplied promoApplied_appointment_id_service_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
 --
 
 ALTER TABLE ONLY public."promoApplied"
-    ADD CONSTRAINT "promoApplied_appointment_id_date_fkey" FOREIGN KEY (appointment_id, date) REFERENCES public."ServiceInstance"(appointment_id, date);
+    ADD CONSTRAINT "promoApplied_appointment_id_service_id_fkey" FOREIGN KEY (appointment_id, service_id) REFERENCES public."ServiceInstance"(appointment_id, service_id);
 
 
 --
--- Name: promoApplied promoApplied_promotion_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
+-- Name: promoApplied promoApplied_promotion_id_service_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
 --
 
 ALTER TABLE ONLY public."promoApplied"
-    ADD CONSTRAINT "promoApplied_promotion_id_fkey" FOREIGN KEY (promotion_id) REFERENCES public."Promotion"(id);
+    ADD CONSTRAINT "promoApplied_promotion_id_service_id_fkey" FOREIGN KEY (promotion_id, service_id) REFERENCES public."promoIncludes"(promotion_id, service_id);
 
 
 --
