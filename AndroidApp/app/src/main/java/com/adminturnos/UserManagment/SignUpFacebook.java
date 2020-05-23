@@ -1,7 +1,9 @@
 package com.adminturnos.UserManagment;
 
+import android.content.Intent;
+
 import com.adminturnos.Exceptions.ExceptionEmailInUse;
-import com.adminturnos.ObjectInterfaces.ServiceProvider;
+import com.adminturnos.Listeners.ListenerUserManagement;
 
 /**
  *
@@ -14,8 +16,14 @@ public class SignUpFacebook implements SignUp {
     public SignUpFacebook() {
     }
 
+
     @Override
-    public ServiceProvider signUp() throws ExceptionEmailInUse {
-        return null;
+    public void signUp(ListenerUserManagement listener) throws ExceptionEmailInUse {
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, Intent data) {
+
     }
 }
