@@ -1,5 +1,4 @@
 from django.contrib.auth.backends import BaseBackend
-from rest_framework.authtoken.models import Token
 
 from django.contrib import auth
 from google.oauth2 import id_token
@@ -12,7 +11,7 @@ class GoogleAuth(BaseBackend):
 		try:
 			# Validating token id
 			idinfo = id_token.verify_oauth2_token(token, requests.Request(), settings.GOOGLE_OAUTH_CLIENTID)
-			
+
 			if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
 				raise ValueError('Wrong issuer.')
 
@@ -20,11 +19,8 @@ class GoogleAuth(BaseBackend):
 			userid = idinfo['sub']
 			UserModel = auth.get_user_model()
 			user, _ = UserModel.objects.get_or_create(email = idinfo['email'], isProvider=isProvider)
-			
+
 			return user
 		
 		except ValueError as err:
-			# Invalid token
-			print(err)
-			content = {'message': 'Invalid token'}
-			return Response(content)
+			raise

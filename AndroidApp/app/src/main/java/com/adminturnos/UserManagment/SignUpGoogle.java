@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.adminturnos.Builder.BuilderServiceProvider;
+import com.adminturnos.Database.AccessToken;
+import com.adminturnos.Database.ReadPostgreSQL;
 import com.adminturnos.Listeners.ListenerDatabase;
 import com.adminturnos.Listeners.ListenerUserManagement;
 import com.adminturnos.Values;
@@ -83,18 +85,11 @@ public class SignUpGoogle implements SignUp {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 final String idToken = account.getIdToken();
 
-                OkHttpClient client = new OkHttpClient();
-
                 RequestBody requestBody = new FormEncodingBuilder()
                         .add("id_token", idToken)
                         .build();
 
-                final Request request = new Request.Builder()
-                        .url(Values.DJANGO_URL_CONVERT_TOKEN)
-                        //.addHeader("Authorization", idToken)
-                        .post(requestBody)
-                        .build();
-                client.newCall(request).enqueue(new Callback() {
+                ReadPostgreSQL.getInstance().GET(Values.DJANGO_URL_CONVERT_TOKEN, requestBody, new Callback() {
                     @Override
                     public void onFailure(final Request request, final IOException e) {
                         Log.e("AAAAA", e.toString());
@@ -105,9 +100,7 @@ public class SignUpGoogle implements SignUp {
                         try {
                             JSONObject jsonObject = new JSONObject(response.body().string());
                             final String accessToken = jsonObject.getString("access_token");
-
-
-
+                            AccessToken.getInstance().setAccessToken(accessToken);
                             listener.onComplete(null);
 
                         } catch (JSONException e) {

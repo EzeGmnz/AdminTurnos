@@ -25,7 +25,7 @@ SECRET_KEY = '!zt*e&jv4129nb-=a_wm7)1jp%3(r4(b=)!vx8hadi0*z-d5xg'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-AUTH_USER_MODEL = 'adminturnosapp.CustomUser'
+AUTH_USER_MODEL = 'restauth.CustomUser'
 
 ALLOWED_HOSTS = ['0.0.0.0', '192.168.1.33', 'localhost']
 
@@ -33,20 +33,33 @@ GOOGLE_OAUTH_CLIENTID = '237762704075-5l2qu43226aik1njlue1jhd9jh7r9d2c.apps.goog
 
 # Application definition
 
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'adminturnosapp',
+    # apps
+    'restauth',
+    'android',
+    'web',
+
+    # rest
     'rest_framework',
     'rest_framework.authtoken',
-    'django.contrib.sites',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

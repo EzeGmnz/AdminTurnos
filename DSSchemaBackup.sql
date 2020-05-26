@@ -36,7 +36,8 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 CREATE FUNCTION public."cantParallelismService"(w_id bigint, s_id bigint, date timestamp without time zone) RETURNS bigint
     LANGUAGE plpgsql
-    AS $_$/*
+    AS $_$
+/*
 	returns how many appointments there are for a given service and timestamp
 */
 declare
@@ -332,8 +333,8 @@ from "Appointment" as A
 join "ServiceInstance" as SI on A.id = SI.appointment_id
 where A.job_id = w_id and A.date = d and SI.service_id in
 			(select *
-			from "ServiceProvider" as SP
-			where SP.id in (select * from unnest(services)))
+			from "restauth_customuser" as SP
+			where SP.isProvider and SP.id in (select * from unnest(services)))
 order by A.id;
 
 end;$$;
@@ -359,27 +360,6 @@ end;$$;
 
 
 ALTER FUNCTION public."getClientFrequency"(w_id bigint) OWNER TO postgres;
-
---
--- Name: getClientId(character varying); Type: FUNCTION; Schema: public; Owner: ezegi
---
-
-CREATE FUNCTION public."getClientId"(e character varying) RETURNS bigint
-    LANGUAGE plpgsql
-    AS $$declare
-o bigint;
-begin
-
-select client_id
-from "ClientAuth"
-where email = e
-into o;
-return o;
-
-end;$$;
-
-
-ALTER FUNCTION public."getClientId"(e character varying) OWNER TO ezegi;
 
 --
 -- Name: getDoableServicesFromPlace(bigint); Type: FUNCTION; Schema: public; Owner: postgres
@@ -424,29 +404,6 @@ end;$$;
 
 
 ALTER FUNCTION public."getPromotions"(w_id bigint, d date) OWNER TO ezegi;
-
---
--- Name: getServiceProviderId(character varying); Type: FUNCTION; Schema: public; Owner: ezegi
---
-
-CREATE FUNCTION public."getServiceProviderId"(e character varying) RETURNS bigint
-    LANGUAGE plpgsql
-    AS $$declare 
-
-o bigint;
-
-begin
-
-select serviceprovider_id 
-from "ServiceProviderAuth"
-where email = e 
-into o;
-return o;
-
-end;$$;
-
-
-ALTER FUNCTION public."getServiceProviderId"(e character varying) OWNER TO ezegi;
 
 --
 -- Name: newAppointment(bigint, bigint, bigint[], timestamp without time zone[]); Type: FUNCTION; Schema: public; Owner: postgres
@@ -499,29 +456,6 @@ end;$$;
 
 
 ALTER FUNCTION public."newAppointment"(w_id bigint, c_id bigint, services bigint[], services_time timestamp without time zone[]) OWNER TO postgres;
-
---
--- Name: newClient(character varying, character varying); Type: FUNCTION; Schema: public; Owner: ezegi
---
-
-CREATE FUNCTION public."newClient"(new_name character varying, new_email character varying) RETURNS bigint
-    LANGUAGE plpgsql
-    AS $$declare
-
-new_client_id bigint;
-
-begin
-
-insert into "Client" values (DEFAULT, new_name);
-select currval('"Client_id_seq"') into new_client_id;
-insert into "ClientAuth" values (new_client_id, new_email);
-return new_client_id;
-
-
-end;$$;
-
-
-ALTER FUNCTION public."newClient"(new_name character varying, new_email character varying) OWNER TO ezegi;
 
 --
 -- Name: newJob(bigint, bigint); Type: FUNCTION; Schema: public; Owner: postgres
@@ -629,32 +563,6 @@ end;$$;
 ALTER PROCEDURE public."newProvides"(j_id bigint, s_id bigint, day integer, cost double precision, duration time without time zone, day_start time without time zone, day_end time without time zone, pause_start time without time zone, pause_end time without time zone, parallelism integer) OWNER TO postgres;
 
 --
--- Name: newServiceProvider(character varying, character varying, date, boolean); Type: FUNCTION; Schema: public; Owner: ezegi
---
-
-CREATE FUNCTION public."newServiceProvider"(new_name character varying, new_email character varying, birth_date date, is_pro boolean DEFAULT false) RETURNS bigint
-    LANGUAGE plpgsql
-    AS $$declare
-
-new_sp_id bigint;
-
-begin
-
-INSERT INTO "ServiceProvider" values (DEFAULT, new_name, birth_date, is_pro);
-select currval('"ServiceProvider_id_seq"') into new_sp_id;
-INSERT INTO "ServiceProviderAuth" values (new_sp_id, new_email);
-RETURN new_sp_id;
-
-end;$$;
-
-
-ALTER FUNCTION public."newServiceProvider"(new_name character varying, new_email character varying, birth_date date, is_pro boolean) OWNER TO ezegi;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
 -- Name: Appointment; Type: TABLE; Schema: public; Owner: ezegi
 --
 
@@ -689,53 +597,6 @@ ALTER TABLE public."Appointment_id_seq" OWNER TO ezegi;
 --
 
 ALTER SEQUENCE public."Appointment_id_seq" OWNED BY public."Appointment".id;
-
-
---
--- Name: Client; Type: TABLE; Schema: public; Owner: ezegi
---
-
-CREATE TABLE public."Client" (
-    id bigint NOT NULL,
-    name character varying NOT NULL
-);
-
-
-ALTER TABLE public."Client" OWNER TO ezegi;
-
---
--- Name: ClientAuth; Type: TABLE; Schema: public; Owner: ezegi
---
-
-CREATE TABLE public."ClientAuth" (
-    client_id bigint NOT NULL,
-    email character varying NOT NULL
-);
-
-
-ALTER TABLE public."ClientAuth" OWNER TO ezegi;
-
---
--- Name: Client_id_seq; Type: SEQUENCE; Schema: public; Owner: ezegi
---
-
-CREATE SEQUENCE public."Client_id_seq"
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public."Client_id_seq" OWNER TO ezegi;
-
---
--- Name: Client_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ezegi
---
-
-ALTER SEQUENCE public."Client_id_seq" OWNED BY public."Client".id;
-
 
 --
 -- Name: Job; Type: TABLE; Schema: public; Owner: ezegi
@@ -927,54 +788,6 @@ CREATE TABLE public."ServiceInstance" (
 ALTER TABLE public."ServiceInstance" OWNER TO ezegi;
 
 --
--- Name: ServiceProvider; Type: TABLE; Schema: public; Owner: ezegi
---
-
-CREATE TABLE public."ServiceProvider" (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    birth_date date NOT NULL,
-    is_pro boolean NOT NULL
-);
-
-
-ALTER TABLE public."ServiceProvider" OWNER TO ezegi;
-
---
--- Name: ServiceProviderAuth; Type: TABLE; Schema: public; Owner: ezegi
---
-
-CREATE TABLE public."ServiceProviderAuth" (
-    serviceprovider_id bigint NOT NULL,
-    email character varying NOT NULL
-);
-
-
-ALTER TABLE public."ServiceProviderAuth" OWNER TO ezegi;
-
---
--- Name: ServiceProvider_id_seq; Type: SEQUENCE; Schema: public; Owner: ezegi
---
-
-CREATE SEQUENCE public."ServiceProvider_id_seq"
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public."ServiceProvider_id_seq" OWNER TO ezegi;
-
---
--- Name: ServiceProvider_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ezegi
---
-
-ALTER SEQUENCE public."ServiceProvider_id_seq" OWNED BY public."ServiceProvider".id;
-
-
---
 -- Name: Service_id_seq; Type: SEQUENCE; Schema: public; Owner: ezegi
 --
 
@@ -1050,14 +863,6 @@ ALTER TABLE public."promoIncludes" OWNER TO ezegi;
 
 ALTER TABLE ONLY public."Appointment" ALTER COLUMN id SET DEFAULT nextval('public."Appointment_id_seq"'::regclass);
 
-
---
--- Name: Client id; Type: DEFAULT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."Client" ALTER COLUMN id SET DEFAULT nextval('public."Client_id_seq"'::regclass);
-
-
 --
 -- Name: Job id; Type: DEFAULT; Schema: public; Owner: ezegi
 --
@@ -1085,44 +890,12 @@ ALTER TABLE ONLY public."Promotion" ALTER COLUMN id SET DEFAULT nextval('public.
 
 ALTER TABLE ONLY public."Service" ALTER COLUMN id SET DEFAULT nextval('public."Service_id_seq"'::regclass);
 
-
---
--- Name: ServiceProvider id; Type: DEFAULT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."ServiceProvider" ALTER COLUMN id SET DEFAULT nextval('public."ServiceProvider_id_seq"'::regclass);
-
-
 --
 -- Name: Appointment Appointment_pkey; Type: CONSTRAINT; Schema: public; Owner: ezegi
 --
 
 ALTER TABLE ONLY public."Appointment"
     ADD CONSTRAINT "Appointment_pkey" PRIMARY KEY (id);
-
-
---
--- Name: ClientAuth ClientAuth_email_key; Type: CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."ClientAuth"
-    ADD CONSTRAINT "ClientAuth_email_key" UNIQUE (email);
-
-
---
--- Name: ClientAuth ClientAuth_pkey; Type: CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."ClientAuth"
-    ADD CONSTRAINT "ClientAuth_pkey" PRIMARY KEY (client_id);
-
-
---
--- Name: Client Client_pkey; Type: CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."Client"
-    ADD CONSTRAINT "Client_pkey" PRIMARY KEY (id);
 
 
 --
@@ -1195,31 +968,6 @@ ALTER TABLE public."ServiceInstance"
 
 ALTER TABLE ONLY public."ServiceInstance"
     ADD CONSTRAINT "ServiceInstance_pkey" PRIMARY KEY (appointment_id, date);
-
-
---
--- Name: ServiceProviderAuth ServiceProviderAuth_email_key; Type: CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."ServiceProviderAuth"
-    ADD CONSTRAINT "ServiceProviderAuth_email_key" UNIQUE (email);
-
-
---
--- Name: ServiceProviderAuth ServiceProviderAuth_pkey; Type: CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."ServiceProviderAuth"
-    ADD CONSTRAINT "ServiceProviderAuth_pkey" PRIMARY KEY (serviceprovider_id);
-
-
---
--- Name: ServiceProvider ServiceProvider_pkey; Type: CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."ServiceProvider"
-    ADD CONSTRAINT "ServiceProvider_pkey" PRIMARY KEY (id);
-
 
 --
 -- Name: Service Service_name_jobtype_type_key; Type: CONSTRAINT; Schema: public; Owner: ezegi
@@ -1296,7 +1044,7 @@ CREATE INDEX "indexWorkServiceProvider" ON public."Job" USING hash (serviceprovi
 --
 
 ALTER TABLE ONLY public."Appointment"
-    ADD CONSTRAINT "Appointment_client_id_fkey" FOREIGN KEY (client_id) REFERENCES public."Client"(id);
+    ADD CONSTRAINT "Appointment_client_id_fkey" FOREIGN KEY (client_id) REFERENCES public."restauth_customuser"(id);
 
 
 --
@@ -1305,14 +1053,6 @@ ALTER TABLE ONLY public."Appointment"
 
 ALTER TABLE ONLY public."Appointment"
     ADD CONSTRAINT "Appointment_work_id_fkey" FOREIGN KEY (job_id) REFERENCES public."Job"(id);
-
-
---
--- Name: ClientAuth ClientAuth_client_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."ClientAuth"
-    ADD CONSTRAINT "ClientAuth_client_id_fkey" FOREIGN KEY (client_id) REFERENCES public."Client"(id) NOT VALID;
 
 
 --
@@ -1336,7 +1076,7 @@ ALTER TABLE ONLY public."PlaceDoes"
 --
 
 ALTER TABLE ONLY public."Prefers"
-    ADD CONSTRAINT "Prefers_client_id_fkey" FOREIGN KEY (client_id) REFERENCES public."Client"(id) NOT VALID;
+    ADD CONSTRAINT "Prefers_client_id_fkey" FOREIGN KEY (client_id) REFERENCES public."restauth_customuser"(id) NOT VALID;
 
 
 --
@@ -1350,7 +1090,6 @@ ALTER TABLE ONLY public."Prefers"
 --
 -- Name: Promotion Promotion_job_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
 --
-
 ALTER TABLE ONLY public."Promotion"
     ADD CONSTRAINT "Promotion_job_id_fkey" FOREIGN KEY (job_id) REFERENCES public."Job"(id) NOT VALID;
 
@@ -1388,14 +1127,6 @@ ALTER TABLE ONLY public."ServiceInstance"
 
 
 --
--- Name: ServiceProviderAuth ServiceProviderAuth_serviceprovider_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
---
-
-ALTER TABLE ONLY public."ServiceProviderAuth"
-    ADD CONSTRAINT "ServiceProviderAuth_serviceprovider_id_fkey" FOREIGN KEY (serviceprovider_id) REFERENCES public."ServiceProvider"(id) NOT VALID;
-
-
---
 -- Name: Service Service_jobtype_type_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ezegi
 --
 
@@ -1416,7 +1147,7 @@ ALTER TABLE ONLY public."Job"
 --
 
 ALTER TABLE ONLY public."Job"
-    ADD CONSTRAINT "Work_serviceprovider_id_fkey" FOREIGN KEY (serviceprovider_id) REFERENCES public."ServiceProvider"(id) NOT VALID;
+    ADD CONSTRAINT "Work_serviceprovider_id_fkey" FOREIGN KEY (serviceprovider_id) REFERENCES public."restauth_customuser"(id) NOT VALID;
 
 
 --
