@@ -1,15 +1,20 @@
 package com.adminturnos;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.adminturnos.Builder.BuilderServiceProvider;
-import com.adminturnos.Database.PostgreSQL;
-import com.adminturnos.Listeners.ListenerDatabase;
+import com.adminturnos.Exceptions.ExceptionEmailInUse;
+import com.adminturnos.Listeners.ListenerUserManagement;
+import com.adminturnos.ObjectInterfaces.ServiceProvider;
+import com.adminturnos.UserManagment.SignUp;
+import com.adminturnos.UserManagment.SignUpGoogle;
 
 public class MainActivity extends AppCompatActivity {
+    SignUp signUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,27 +22,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        PostgreSQL.getInstance().execute(
-                new ListenerDatabaseImp(),
-                String.format("select * from \"newServiceProvider\"(%1$s, %2$s)", "Ezequiel Giménez", "eze.gimenez.98@gmail.com"));
+        signUp = new SignUpGoogle(this);
+        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    signUp.signUp(new ListenerUserManagement() {
+                        @Override
+                        public void onComplete(ServiceProvider e) {
+
+                        }
+
+                        @Override
+                        public void onFailure(String message) {
+
+                        }
+                    });
+                } catch (ExceptionEmailInUse exceptionEmailInUse) {
+                    exceptionEmailInUse.printStackTrace();
+                }
+            }
+        });
     }
 
-    public class ListenerDatabaseImp implements ListenerDatabase {
-
-        @Override
-        public void onSuccess(String resultSet) {
-
-            // Building Service Provider from database
-            Log.e("AAA",
-                    new BuilderServiceProvider()
-                            .build(resultSet)
-                            .toString());
-        }
-
-        @Override
-        public void onFailure(String error) {
-            Log.e("AAA",
-                    error);
-        }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        signUp.onActivityResult(requestCode, data);
     }
 }

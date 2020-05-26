@@ -1,5 +1,5 @@
 """
-ASGI config for AdminTurnos project.
+ASGI config for adminturnos project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'AdminTurnos.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'adminturnos.settings')
 
 application = get_asgi_application()
