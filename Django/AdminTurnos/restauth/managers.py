@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib import auth
 from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
+    BaseUserManager
 )
+
 
 class CustomUserManager(BaseUserManager):
 
@@ -18,10 +18,9 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def get_or_create(self, email, isProvider):
-        UserModel = auth.get_user_model()
+    def get_or_create(self, email, is_provider):
+        user_model = auth.get_user_model()
         try:
-            return (UserModel.objects.get(email=email), False)
-        except UserModel.DoesNotExist:
-            return (self.create_user(email=email,isProvider=isProvider), True)
-
+            return user_model.objects.get(email=email), False
+        except user_model.DoesNotExist:
+            return self.create_user(email=email, isProvider=is_provider), True

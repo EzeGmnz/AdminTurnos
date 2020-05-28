@@ -1,5 +1,5 @@
 **/__pycache__
-Django/env
+Django/env/*
 **/migrations/
 AndroidApp/app/
 AndroidApp/.idea/
