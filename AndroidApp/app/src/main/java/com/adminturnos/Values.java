@@ -20,5 +20,5 @@ public interface Values {
     String CLIENT_SECRET_REST_APP = "jgFSX4SN9PGq2CK2L71KkVsJstMVYJgQGMzEnXuwyOdyxL5Q5C72U8D5rtHSy5ZlLC3irsORHdwTVIH5UK9ve3lExaJJAqeQ3PsQWvwJBFVuPw1eXUOauhuaC7ioLuum";
 
     /* DJango URL */
-    String DJANGO_URL_CONVERT_TOKEN = "http://192.168.1.33:8000/login-android-google/";
+    String DJANGO_URL_CONVERT_TOKEN = "http://192.168.1.34:8000/auth/login-android-google/";
 }

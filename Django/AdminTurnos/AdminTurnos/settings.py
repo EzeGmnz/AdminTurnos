@@ -26,7 +26,7 @@ DEBUG = True
 
 AUTH_USER_MODEL = 'restauth.CustomUser'
 
-ALLOWED_HOSTS = ['0.0.0.0', '192.168.1.33', 'localhost']
+ALLOWED_HOSTS = ['0.0.0.0', '192.168.1.34', 'localhost']
 
 GOOGLE_OAUTH_CLIENTID = '237762704075-5l2qu43226aik1njlue1jhd9jh7r9d2c.apps.googleusercontent.com'
 

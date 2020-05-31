@@ -1,8 +1,8 @@
 from django.urls import path
 
-from restauth.views import login_android_google, logout_android_google
+from restauth.views import LoginAndroidGoogle, LogoutAndroidGoogle
 
 urlpatterns = [
-    path('login-android-google/', login_android_google.as_view()),
-    path('logout-android/', logout_android_google.as_view()),
+    path('login-android-google/', LoginAndroidGoogle.as_view()),
+    path('logout-android/', LogoutAndroidGoogle.as_view()),
 ]

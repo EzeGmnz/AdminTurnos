@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from .models import Place, JobRequest
+from .models import Place, JobRequest, Service, Job
 
 
 class JobRequestSerializer(serializers.Serializer):
-    place = serializers.IntegerField()
-    serviceprovider_from = serializers.IntegerField()
+    place = serializers.PrimaryKeyRelatedField(read_only=True)
+    serviceprovider_from = serializers.PrimaryKeyRelatedField(read_only=True)
 
     def update(self, instance, validated_data):
         instance.place = validated_data.get('place', instance.place)
@@ -18,9 +18,39 @@ class JobRequestSerializer(serializers.Serializer):
         return JobRequest.objects.create(**validated_data)
 
 
+class ServiceSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField(max_length=30)
+    jobtype = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.jobtype = validated_data.get('jobtype', instance.jobtype)
+
+        return instance
+
+    def create(self, validated_data):
+        return Service.objects.create(**validated_data)
+
+
+class JobSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    serviceprovider = serializers.PrimaryKeyRelatedField(read_only=True)
+    place = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    def update(self, instance, validated_data):
+        instance.serviceprovider = validated_data.get('serviceprovider', instance.serviceprovider)
+        instance.place = validated_data.get('place', instance.place)
+
+        return instance
+
+    def create(self, validated_data):
+        return Job.objects.create(**validated_data)
+
+
 class PlaceSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    serviceprovider_owner_id = serializers.IntegerField()
+    serviceprovider_owner_id = serializers.PrimaryKeyRelatedField(read_only=True)
     street = serializers.CharField(max_length=30)
     streetnumber = serializers.IntegerField()
     apnumber = serializers.IntegerField()
@@ -32,7 +62,6 @@ class PlaceSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=30)
 
     def update(self, instance, validated_data):
-        instance.id = validated_data.get('id', instance.id)
         instance.serviceprovider_owner_id = validated_data.get('serviceprovider_owner_id',
                                                                instance.serviceprovider_owner_id)
         instance.street = validated_data.get('street', instance.street)

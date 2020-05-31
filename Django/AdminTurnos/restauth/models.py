@@ -7,9 +7,9 @@ from .managers import CustomUserManager
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    isProvider = models.BooleanField(default=False)
-    isClient = models.BooleanField(default=False)
-    isProviderPro = models.BooleanField(default=False)
+    isprovider = models.BooleanField(default=False)
+    isclient = models.BooleanField(default=False)
+    isproviderpro = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

@@ -1,12 +1,15 @@
+import json
+
+from django.http import HttpResponse
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from .models import Place, Placedoes, JobRequest
+from .models import Place, Placedoes, JobRequest, Job, Service, DaySchedule, Provides
 from .permissions import IsOwner, IsProvider
-from .serializers import PlaceSerializer, JobRequestSerializer
+from .serializers import PlaceSerializer, JobRequestSerializer, ServiceSerializer, JobSerializer
 
 
 # custom api view implementing get_object with permission check
@@ -21,6 +24,9 @@ class CustomAPIView(APIView):
     def returnOK(self):
         return JsonResponse(self.responseOK)
 
+    def returnError(self, code, message):
+        return HttpResponse(status=code, reason=message)
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserProfile(APIView):
@@ -28,8 +34,8 @@ class UserProfile(APIView):
 
     def get(self, request):
         return JsonResponse({
-            'isProvider': request.user.isProvider,
-            'isClient': request.user.isClient,
+            'isprovider': request.user.isprovider,
+            'isclient': request.user.isclient,
         })
 
 
@@ -45,6 +51,9 @@ class NewPlace(CustomAPIView):
 
         place = Place(*params)
         place.save()
+
+        job = Job(None, request.user.id, place.id)
+        job.save()
         return JsonResponse(PlaceSerializer(place).data)
 
 
@@ -86,6 +95,18 @@ class PlacesOwned(CustomAPIView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
+class JobsView(CustomAPIView):
+    permission_classes = [IsAuthenticated & IsProvider]
+
+    def get(self, request):
+        jobs = Job.objects.filter(serviceprovider_id=request.user.id)
+        output = []
+        for p in jobs:
+            output.append(JobSerializer(p).data)
+        return JsonResponse({'jobs': output})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class SearchPlace(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
@@ -97,6 +118,21 @@ class SearchPlace(CustomAPIView):
             for p in places:
                 output.append(PlaceSerializer(p).data)
         return JsonResponse({'places': output})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class NewJobRequest(CustomAPIView):
+    permission_classes = [IsAuthenticated & IsProvider]
+
+    def post(self, request):
+        place_id = request.POST.get('place_id')
+
+        if Job.objects.filter(place=place_id, serviceprovider=request.user.id).exists():
+            return self.returnError(500, 'Job already exists')
+
+        job_request = JobRequest(place_id, request.user.id)
+        job_request.save()
+        return self.returnOK()
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -117,11 +153,87 @@ class ViewJobRequests(CustomAPIView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class NewJobRequest(CustomAPIView):
-    permission_classes = [IsAuthenticated]
+class AcceptJobRequest(CustomAPIView):
+    permission_classes = [IsAuthenticated & IsOwner]
+
+    # TODO add can cancel appointments
 
     def post(self, request):
-        place_id = request.body.get('place_id')
-        job_request = JobRequest(place_id, request.user.id)
-        job_request.save()
-        return self.returnOK()
+        place_id = request.POST.get('place_id')
+        from_who = request.POST.get('serviceprovider_from')
+
+        place = self.get_object(request, Place, place_id)
+
+        try:
+            jr = JobRequest.objects.get(place=place.id, serviceprovider_from=from_who)
+            job = Job(None, from_who, place.id)
+            job.save()
+            jr.delete()
+
+            return self.returnOK()
+        except JobRequest.DoesNotExist:
+            raise
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class DoableServices(CustomAPIView):
+    permission_classes = [IsAuthenticated & IsProvider]
+
+    def get(self, request):
+        place_id = request.data.get('place_id')
+
+        output = {}
+        jobtypes = Placedoes.objects.filter(place=place_id)
+        for pd in jobtypes:
+
+            services = Service.objects.filter(jobtype_type=pd.jobtype_type.type)
+            services_json = []
+            for s in services:
+                services_json.append(ServiceSerializer(s).data)
+
+            output[pd.jobtype_type.type] = services_json
+
+        return JsonResponse(output)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class NewDaySchedule(CustomAPIView):
+    permission_classes = [IsAuthenticated & IsOwner]
+
+    def post(self, request):
+        body = json.loads(request.body)
+        job = self.get_object(request, Job, body['job_id'])
+
+        for day, config in body['days']:
+            day_schedule = DaySchedule(
+                job=job,
+                day_of_week=int(day),
+                day_start=config['day_start'],
+                day_end=config['day_end'],
+                pause_start=config['pause_start'],
+                pause_end=config['pause_end'],
+            )
+            day_schedule.save()
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class NewProvides(CustomAPIView):
+    permission_classes = [IsAuthenticated & IsOwner]
+
+    def post(self, request):
+        body = json.loads(request.body)
+        job = self.get_object(request, Job, body['job_id'])
+        day_schedule = DaySchedule.objects.get(job=job, day_of_week=body['day_of_week'])
+        if not day_schedule.exists():
+            self.returnError(500, 'Day schedule does not exist')
+
+        for service_id in body['services']:
+            p = Provides(
+                job=job,
+                day_schedule=day_schedule,
+                service=Service.objects.get(id=int(service_id)),
+                cost=body['costs'][service_id],
+                duration=body['durations'][service_id],
+                parallelism=body['parallelisms'][service_id],
+            )
+            p.save()

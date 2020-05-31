@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                             RequestBody requestBody = new FormEncodingBuilder()
                                     .build();
 
-                            String url = "http://192.168.1.33:8000/test/";
+                            String url = "http://192.168.1.34:8000/test/";
                             ReadPostgreSQL.getInstance().GET(url, requestBody, new Callback() {
                                 @Override
                                 public void onFailure(final Request request, final IOException e) {

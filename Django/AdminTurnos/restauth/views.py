@@ -10,8 +10,8 @@ from .authentification import GoogleAuth
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class login_android_google(ObtainAuthToken):
-    def post(self, request):
+class LoginAndroidGoogle(ObtainAuthToken):
+    def post(self, request, **kwargs):
         try:
             id_token = request.POST.get('id_token')
 
@@ -22,7 +22,8 @@ class login_android_google(ObtainAuthToken):
 
             return JsonResponse({'access_token': access_token.key,
                                  'user_id': user.pk,
-                                 'isProviderPro': user.isProviderPro})
+                                 'isclient': user.isclient,
+                                 'isproviderpro': user.isproviderpro})
 
         except ValueError:
             content = {'message': 'Invalid token'}
@@ -30,7 +31,7 @@ class login_android_google(ObtainAuthToken):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class logout_android_google(View):
+class LogoutAndroidGoogle(View):
 
     def post(self, request):
         token = request.POST.get('id_token')
