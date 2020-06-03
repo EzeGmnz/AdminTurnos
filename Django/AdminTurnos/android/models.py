@@ -1,6 +1,5 @@
 from django.contrib import auth
 from django.contrib.postgres.fields import ArrayField
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from rest_framework.exceptions import ValidationError
 
@@ -77,17 +76,20 @@ class Service(models.Model):
 class DaySchedule(models.Model):
     id = models.BigAutoField(primary_key=True)
     job = models.ForeignKey(Job, models.CASCADE)
-    day_of_week = models.IntegerField(validators=[MaxValueValidator(7), MinValueValidator(1)])
+    day_of_week = models.IntegerField()
     day_start = models.TimeField()
     day_end = models.TimeField()
     pause_start = models.TimeField(blank=True, null=True)
     pause_end = models.TimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(DaySchedule, self).save(*args, **kwargs)
 
     def clean(self):
-        job_schedules = DaySchedule.objects.filter(job=self.job)
-        for s in job_schedules:
-            if s.day_of_week == self.day_of_week:
-                raise ValidationError("Job already has a schedule for this day of week")
+        if self.day_of_week > 7 or self.day_of_week < 1:
+            raise ValidationError('Day of week must be an integer between 1 and 7')
 
     def service_provided_in(self, service):
         provides_list = Provides.objects.filter(day_schedule=self)
@@ -110,14 +112,19 @@ class Provides(models.Model):
     duration = models.TimeField()
     parallelism = models.IntegerField()
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(Provides, self).save(*args, **kwargs)
+
     def clean(self):
         if self.day_schedule.job != self.job:
             raise ValidationError('Day schedule does not belong to job')
 
-        job_types = Placedoes.objects.filter(job=self.job).values('jobtype')
+        job_types = Placedoes.objects.filter(place=self.job.place)
         services = []
         for j in job_types:
-            services.extend(Service.objects.filter(jobtype=j))
+            services.extend(Service.objects.filter(jobtype=j.jobtype))
+
         if self.service not in services:
             raise ValidationError('Service is not provided in job\'s place')
 
@@ -142,8 +149,11 @@ class Serviceinstance(models.Model):
     date = models.DateTimeField()
     service = models.ForeignKey(Service, models.CASCADE)
 
-    def clean(self):
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(Serviceinstance, self).save(*args, **kwargs)
 
+    def clean(self):
         weekday = self.date.weekday()
         day_schedules = Provides.objects.filter(job=self.appointment.job)
         for d in day_schedules:
@@ -195,11 +205,16 @@ class Promoincludes(models.Model):
     service = models.ForeignKey(Service, models.CASCADE)
     discount = models.FloatField(blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(Promoincludes, self).save(*args, **kwargs)
+
     def clean(self):
         schedule_ids = self.promotion.day_schedules
 
         for x in schedule_ids:
-            schedule = DaySchedule.objects.get(id=x)
+            print(x)
+            schedule = DaySchedule.objects.get(job=self.promotion.job, day_of_week=x)
             if not schedule.service_provided_in(self.service):
                 raise ValidationError('Service is not provided in promotion days')
 

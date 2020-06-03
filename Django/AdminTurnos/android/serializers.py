@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Place, JobRequest, Service, Job
+from .models import Place, JobRequest, Service, Job, Appointment, Serviceinstance
 
 
 class JobRequestSerializer(serializers.Serializer):
@@ -46,6 +46,39 @@ class JobSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return Job.objects.create(**validated_data)
+
+
+class AppointmentSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    job = serializers.PrimaryKeyRelatedField(read_only=True)
+    client = serializers.PrimaryKeyRelatedField(read_only=True)
+    date = serializers.DateField()
+    description = serializers.CharField(max_length=30)
+
+    def update(self, instance, validated_data):
+        instance.job = validated_data.get('instance.job', instance.job)
+        instance.client = validated_data.get('instance.client', instance.client)
+        instance.date = validated_data.get('instance.date', instance.date)
+        instance.description = validated_data.get('instance.description', instance.description)
+
+        return instance
+
+    def create(self, validated_data):
+        return Appointment.objects.create(**validated_data)
+
+
+class ServiceInstanceSerializer(serializers.Serializer):
+    appointment = serializers.PrimaryKeyRelatedField(read_only=True)
+    date = serializers.DateTimeField()
+    service = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    def update(self, instance, validated_data):
+        instance.appointment = validated_data.get('appointment', instance.appointment)
+        instance.date = validated_data.get('date', instance.date)
+        instance.service = validated_data.get('service', instance.service)
+
+    def create(self, validated_data):
+        return Serviceinstance.objects.create(**validated_data)
 
 
 class PlaceSerializer(serializers.Serializer):
