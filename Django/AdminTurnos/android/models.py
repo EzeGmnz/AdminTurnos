@@ -194,7 +194,7 @@ class Promotion(models.Model):
     since = models.DateField()
     to = models.DateField()
     description = models.TextField(blank=True, null=True)
-    day_schedules = ArrayField(models.IntegerField())
+    weekday_list = ArrayField(models.IntegerField())
 
     class Meta:
         db_table = 'Promotion'

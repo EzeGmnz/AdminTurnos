@@ -5,20 +5,26 @@
     <meta content="237762704075-5l2qu43226aik1njlue1jhd9jh7r9d2c.apps.googleusercontent.com"
           name="google-signin-client_id">
     <title>Admin Turnos</title>
+
     <script async defer src="https://apis.google.com/js/platform.js"></script>
 
     {% load static %}
+    <link href="{% static 'style/main.css' %}" rel='stylesheet'/>
     <script src="{% static 'func.js' %}"></script>
     <script src="{% static 'main.js' %}"></script>
     <script src="{% static 'login.js' %}"></script>
 </head>
 <body>
 
-<div class="g-signin2" data-onsuccess="onSignIn"></div>
-<button onclick="getProfile()">Show Profile</button>
+<div class="g-signin2" data-onsuccess="onSignIn" id="googleSignInBtn"></div>
 <div id="profile"></div>
+
 <input id="jobInput" placeholder="job" type="text">
 <input id="dateInput" placeholder="date" type="text">
-<button onclick="getProvidedServices();getPromotions()">getJob</button>
+<button onclick="getProvidedServices();getPromotions()">get services provided in date</button>
+<p>Available services</p>
+<div id="servicesCheckBoxes">
+</div>
+<button onclick="getAvailableAppointments()">Get Available Appointments</button>
 </body>
 </html>

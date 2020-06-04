@@ -16,12 +16,12 @@ function onSignIn(googleUser) {
     })
     .then(function(json) {
         profile.access_token = json.access_token;
-        console.log(profile.access_token);
         updateUI();
     });
 }
 
 function updateUI(){
+    document.getElementById("googleSignInBtn").style.display = "none";
     var div = document.createElement("d")
     var image = new Image()
     image.src = profile.getImageUrl();
@@ -29,5 +29,5 @@ function updateUI(){
     div.appendChild(nameText);
     div.appendChild(image);
     document.getElementById("profile").appendChild(div);
-    //console.log('Image URL: ' + profile.getImageUrl());
+    
 }

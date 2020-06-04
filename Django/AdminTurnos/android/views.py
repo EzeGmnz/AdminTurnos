@@ -115,7 +115,7 @@ class SearchPlace(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        businessname = request.data.get('businessname')
+        businessname = request.GET.get('businessname')
         output = []
         if businessname is not None and businessname.strip() != '':
             places = Place.objects.filter(businessname__contains=businessname)
@@ -184,7 +184,7 @@ class DoableServices(CustomAPIView):
     permission_classes = [IsAuthenticated & IsProvider]
 
     def get(self, request):
-        place = request.data.get('place')
+        place = request.GET.get('place')
 
         output = {}
         jobtypes = Placedoes.objects.filter(place=place)
@@ -282,8 +282,8 @@ class GetAppointments(CustomAPIView):
     permission_classes = [IsAuthenticated & IsOwner]
 
     def get(self, request):
-        job_id = request.data.get('job_id')
-        date = request.data.get('date')
+        job_id = request.GET.get('job_id')
+        date = request.GET.get('date')
         job = Job.objects.get(id=job_id)
 
         if job.serviceprovider == request.user or job.place.serviceprovider == request.user:
@@ -327,11 +327,11 @@ class NewPromotion(CustomAPIView):
             since = body['since']
             to = body['to']
             description = body['description']
-            day_schedules = body['day_schedules']
+            weekday_list = body['weekday_list']
             services_ids = body['services']
             discounts = body['discounts']
 
-            promo = Promotion(job=job, since=since, to=to, description=description, day_schedules=day_schedules)
+            promo = Promotion(job=job, since=since, to=to, description=description, weekday_list=weekday_list)
             promo.save()
             includes_list = []
             for s in services_ids:
@@ -367,7 +367,7 @@ class GetFrequency(CustomAPIView):
     permission_classes = [IsAuthenticated & IsOwner & IsProviderPro]
 
     def get(self, request):
-        job = self.get_object(request, Job, request.data.get('job_id'))
+        job = self.get_object(request, Job, request.GET.get('job_id'))
         output = {}
 
         appointments = Appointment.objects.filter(job=job, date__lte=datetime.date.today()) \
