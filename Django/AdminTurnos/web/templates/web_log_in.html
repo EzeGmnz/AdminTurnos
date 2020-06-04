@@ -6,10 +6,19 @@
           name="google-signin-client_id">
     <title>Admin Turnos</title>
     <script async defer src="https://apis.google.com/js/platform.js"></script>
+
     {% load static %}
-    <script src="{% static 'web_log_in.js' %}"></script>
+    <script src="{% static 'func.js' %}"></script>
+    <script src="{% static 'main.js' %}"></script>
+    <script src="{% static 'login.js' %}"></script>
 </head>
 <body>
+
 <div class="g-signin2" data-onsuccess="onSignIn"></div>
+<button onclick="getProfile()">Show Profile</button>
+<div id="profile"></div>
+<input id="jobInput" placeholder="job" type="text">
+<input id="dateInput" placeholder="date" type="text">
+<button onclick="getProvidedServices();getPromotions()">getJob</button>
 </body>
 </html>

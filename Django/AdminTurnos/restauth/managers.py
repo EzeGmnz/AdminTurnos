@@ -21,6 +21,12 @@ class CustomUserManager(BaseUserManager):
     def get_or_create(self, email, isprovider):
         user_model = auth.get_user_model()
         try:
-            return user_model.objects.get(email=email), False
+            user = user_model.objects.get(email=email)
+            if not user.isprovider and isprovider:
+                user.isprovider = True
+            elif not user.isclient and not isprovider:
+                user.isclient = True
+            user.save()
+            return user, False
         except user_model.DoesNotExist:
             return self.create_user(email=email, isprovider=isprovider), True

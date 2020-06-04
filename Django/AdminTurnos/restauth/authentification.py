@@ -17,7 +17,7 @@ class GoogleAuth(BaseBackend):
             # getting user id
             userid = idinfo['sub']
             user_model = auth.get_user_model()
-            user, _ = user_model.objects.get_or_create(email=idinfo['email'], isprovider=isProvider)
+            user, created = user_model.objects.get_or_create(email=idinfo['email'], isprovider=isProvider)
 
             return user
 
