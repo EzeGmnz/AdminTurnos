@@ -11,6 +11,7 @@
     {% load static %}
     <link href="{% static 'style/main.css' %}" rel='stylesheet'/>
     <script src="{% static 'func.js' %}"></script>
+    <script src="{% static 'classes.js' %}"></script>
     <script src="{% static 'main.js' %}"></script>
     <script src="{% static 'login.js' %}"></script>
 </head>
@@ -23,8 +24,11 @@
 <input id="dateInput" placeholder="date" type="text">
 <button onclick="getProvidedServices();getPromotions()">get services provided in date</button>
 <p>Available services</p>
-<div id="servicesCheckBoxes">
-</div>
+<div id="servicesCheckBoxes"></div>
 <button onclick="getAvailableAppointments()">Get Available Appointments</button>
+<div id="availableAppointmentsContainer"></div>
+<button class="btnConfirmAppointment btnConfirmAppointmentHidden" id="btnConfirmAppointment"
+        onclick="confirmAppointment()">Confirm
+</button>
 </body>
 </html>

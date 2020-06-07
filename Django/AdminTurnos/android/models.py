@@ -40,6 +40,35 @@ class Job(models.Model):
     serviceprovider = models.ForeignKey(auth.get_user_model(), models.CASCADE)
     place = models.ForeignKey(Place, models.CASCADE)
 
+    def get_current_parallelism(self, service, timestamp):
+        appointments_in_day = Appointment.objects.filter(job=self, date=timestamp.date())
+
+        curr_parallelism = 0
+        for a in appointments_in_day:
+            service_at_same_time = Serviceinstance.objects.filter(
+                appointment=a,
+                service=service,
+                timestamp=timestamp)
+            if service_at_same_time.exists():
+                curr_parallelism += 1
+
+        return curr_parallelism
+
+    def get_duration(self, service, date):
+        provides = Provides.objects.get(job=self,
+                                        service=service,
+                                        day_schedule__day_of_week=date.weekday())
+        return provides.duration
+
+    def is_at_max_parallelism(self, service, timestamp):
+        provides = Provides.objects.get(
+            job=self,
+            service=service,
+            day_schedule__day_of_week=timestamp.date().weekday())
+
+        max_parallelism = provides.parallelism
+        return self.get_current_parallelism(service, timestamp) >= max_parallelism
+
     class Meta:
         db_table = 'Job'
         unique_together = (('serviceprovider', 'place'),)
@@ -91,7 +120,7 @@ class DaySchedule(models.Model):
         if self.day_of_week > 7 or self.day_of_week < 1:
             raise ValidationError('Day of week must be an integer between 1 and 7')
 
-    def service_provided_in(self, service):
+    def is_service_in_schedule(self, service):
         provides_list = Provides.objects.filter(day_schedule=self)
         for p in provides_list:
             if p.service == service:
@@ -138,15 +167,15 @@ class Appointment(models.Model):
     job = models.ForeignKey(Job, models.CASCADE)
     client = models.ForeignKey(auth.get_user_model(), models.CASCADE)
     date = models.DateField()
-    description = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'Appointment'
 
 
 class Serviceinstance(models.Model):
-    appointment = models.OneToOneField(Appointment, models.CASCADE, primary_key=True)
-    date = models.DateTimeField()
+    id = models.BigAutoField(primary_key=True, default=None)
+    appointment = models.ForeignKey(Appointment, models.CASCADE)
+    timestamp = models.DateTimeField()
     service = models.ForeignKey(Service, models.CASCADE)
 
     def save(self, *args, **kwargs):
@@ -154,38 +183,36 @@ class Serviceinstance(models.Model):
         return super(Serviceinstance, self).save(*args, **kwargs)
 
     def clean(self):
-        weekday = self.date.weekday()
-        day_schedules = Provides.objects.filter(job=self.appointment.job)
-        for d in day_schedules:
-            if d.day_of_week == weekday:
-                if not d.service_provided_in(self.service):
-                    raise ValidationError('Service is not provided in given day')
+        if not self.is_provided():
+            raise ValidationError('Service is not provided in given day')
+        if self.is_at_max_parallelism():
+            raise ValidationError('Service currently at maximum parallelism')
+        if not self.date_equals_appointment_one():
+            raise ValidationError('Date doesnt match appointment\'s date')
 
-        appointments_in_day = Appointment.objects.filter(job=self.appointment.job, date=self.date.date())
-        duration, max_parallelism = self.get_duration_parallelism()
-        curr_parallelism = 0
-        for a in appointments_in_day:
-            service_at_same_time = Serviceinstance.objects.get(
-                appointment=a,
-                service=self.service,
-                date__range=[self.date, self.date + duration])
+    def date_equals_appointment_one(self):
+        appointment_date = self.appointment.date
+        if self.timestamp.date() != appointment_date:
+            return False
+        return True
 
-            if service_at_same_time.exists():
-                curr_parallelism += 1
+    def is_at_max_parallelism(self):
+        if self.appointment.job.is_at_max_parallelism(self.service, self.timestamp):
+            return True
+        return False
 
-        if curr_parallelism >= max_parallelism:
-            raise ValidationError('Max parallelism for service reached')
-
-    def get_duration_parallelism(self):
-        # getting duration for that day
-        provides = Provides.objects.get(job=self.appointment.job, service=self.service)
-        for d in provides:
-            if provides.day_schedule.day_of_week == self.date.weekday():
-                return d.duration, d.parallelism
+    def is_provided(self):
+        weekday = self.timestamp.weekday()
+        day_schedules = DaySchedule.objects.filter(job=self.appointment.job)
+        for schedule in day_schedules:
+            if schedule.day_of_week == weekday:
+                if not schedule.is_service_in_schedule(self.service):
+                    return False
+        return True
 
     class Meta:
         db_table = 'ServiceInstance'
-        unique_together = (('appointment', 'service'), ('appointment', 'date'),)
+        unique_together = (('appointment', 'service'), ('appointment', 'timestamp'),)
 
 
 class Promotion(models.Model):
@@ -215,7 +242,7 @@ class Promoincludes(models.Model):
         for x in schedule_ids:
             print(x)
             schedule = DaySchedule.objects.get(job=self.promotion.job, day_of_week=x)
-            if not schedule.service_provided_in(self.service):
+            if not schedule.is_service_in_schedule(self.service):
                 raise ValidationError('Service is not provided in promotion days')
 
     class Meta:

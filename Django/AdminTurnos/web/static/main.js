@@ -1,9 +1,19 @@
+var services = {}
+var appointmentsAvailable = {}
+var selector;
+
+function clearDiv(div) {
+    while (div.firstChild) {
+        div.removeChild(div.lastChild);
+    }
+}
+
 function getProvidedServices() {
     let job = document.getElementById("jobInput").value;
     let date = document.getElementById("dateInput").value;
 
     let callback = function(json) {
-        populateAvailableServices(json);
+        displayProvidedServices(json);
     }
 
     GET("/web/get-provided-services/", [
@@ -12,19 +22,18 @@ function getProvidedServices() {
     ], callback);
 }
 
-function populateAvailableServices(json) {
+function displayProvidedServices(json) {
     var checkboxes_div = document.getElementById("servicesCheckBoxes");
 
-    while (checkboxes_div.firstChild) {
-        checkboxes_div.removeChild(checkboxes_div.lastChild);
-    }
+    clearDiv(checkboxes_div);
     for (var key in json) {
+        services[key] = json[key]["name"];
         checkboxes_div.appendChild(createServiceDiv(key, json[key]["name"]))
     }
 
 }
 
-function createServiceDiv(id, name){
+function createServiceDiv(id, name) {
     var div = document.createElement("div");
     div.classList.add('service');
     var checkBox = document.createElement("input");
@@ -43,7 +52,7 @@ function getPromotions() {
     let date = document.getElementById("dateInput").value;
 
     let callback = function(json) {
-        //console.log(json);
+        //TODO populate promotions
     }
 
     GET("/web/get-promotions/", [
@@ -58,27 +67,75 @@ function getAvailableAppointments() {
     let selectedServices = getSelectedServices();
 
     let callback = function(json) {
-        //console.log(json);
+        displayAvailableAppointments(json);
     }
-
-    GET("/web/get-available-appointments/", [
-        ["job_id", job],
-        ["date", date],
-        ["services", selectedServices]
-    ], callback);
+    if (selectedServices.length > 0) {
+        GET("/web/get-available-appointments/", [
+            ["job_id", job],
+            ["date", date],
+            ["services", selectedServices]
+        ], callback);
+    } else {
+        console.log("No service selected");
+    }
 }
 
-function getSelectedServices(){
+function getSelectedServices() {
     selectedServices = [];
     var childs = document.getElementById("servicesCheckBoxes")
-    .getElementsByTagName("div");
-    
-    for (i = 0; i < childs.length; i++){
+        .getElementsByTagName("div");
+
+    for (i = 0; i < childs.length; i++) {
         let checkbox = childs[i].firstChild;
 
-        if(checkbox.checked){
+        if (checkbox.checked) {
             selectedServices.push(checkbox.value);
         }
     }
     return selectedServices;
+}
+
+function displayAvailableAppointments(json) {
+    let divisions = json["divisions"];
+    appointmentsContainer = document.getElementById("availableAppointmentsContainer");
+
+    timeDivisions = [];
+    for (var x in divisions) {
+        timeDivisions.push(new TimeDivision(services, divisions[x]));
+    }
+
+    selector = new Selector(timeDivisions, onAppointmentSelected);
+
+    clearDiv(appointmentsContainer);
+    appointmentsContainer.appendChild(selector.getDiv());
+}
+
+function onAppointmentSelected() {
+    selector.select(this.id);
+    let btnConfirm = document.getElementById("btnConfirmAppointment");
+    if (selector.getSelected() != null) {
+        if (btnConfirm.classList.contains("btnConfirmAppointmentHidden")) {
+            btnConfirm.classList.remove("btnConfirmAppointmentHidden");
+        }
+    } else {
+        btnConfirm.classList.add("btnConfirmAppointmentHidden");
+    }
+}
+
+function confirmAppointment() {
+    let callback = function(json) {
+        console.log(json);
+    }
+
+    let job = document.getElementById("jobInput").value;
+    let appointment = selector.getSelected().getAppointment();
+    let date = document.getElementById("dateInput").value;
+    
+    body = {
+        job_id: job,
+        date: date,
+        appointment: appointment
+    }
+
+    POST("/web/new-appointment/", body, callback);
 }
