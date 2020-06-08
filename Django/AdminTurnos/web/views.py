@@ -100,14 +100,14 @@ class GetAvailableAppointments(CustomAPIView):
         services_timestamps_lists = self.get_div_lists(job, date, services)
         possible_appointments = self.get_adjacent_divs_posibilities(services_timestamps_lists)
 
-        return JsonResponse({"divisions": self.serialize_divisions(service_ids, possible_appointments)})
+        return JsonResponse({"divisions": self.serialize_divisions(services, possible_appointments)})
 
-    def serialize_divisions(self, service_ids, divisions):
+    def serialize_divisions(self, services, divisions):
         output = []
         for x in divisions:
-            tup = {}
+            tup = []
             for i, y in enumerate(x):
-                tup[service_ids[i]] = y.serialize()
+                tup.append({services[i].id: y.serialize()})
             output.append(tup)
         return output
 
@@ -162,6 +162,7 @@ class GetAvailableAppointments(CustomAPIView):
                                            minutes=duration.minute)
 
         last_appointment_time = datetime.datetime.combine(date, day_end) - durationdelta
+
         while current_time <= last_appointment_time:
             end = current_time + durationdelta
             start = current_time
@@ -170,6 +171,7 @@ class GetAvailableAppointments(CustomAPIView):
                 division = self.Division(
                     start.time(),
                     end.time())
+
                 output.append(division)
 
             current_time = end
@@ -216,16 +218,17 @@ class NewAppointment(CustomAPIView):
         service_instance_list = []
         appointment_data = body['appointment']
 
-        for x in body['appointment']:
-            time = datetime.datetime.strptime(appointment_data[x]['start'], '%H:%M:%S').time()
-            timestamp = datetime.datetime.combine(date, time)
-            service_instance = Serviceinstance(
-                appointment=appointment,
-                timestamp=timestamp,
-                service_id=x
-            )
+        for x in appointment_data:
+            for y in x:
+                time = datetime.datetime.strptime(x[y]['start'], '%H:%M:%S').time()
+                timestamp = datetime.datetime.combine(date, time)
+                service_instance = Serviceinstance(
+                    appointment=appointment,
+                    timestamp=timestamp,
+                    service_id=y
+                )
 
-            service_instance_list.append(service_instance)
+                service_instance_list.append(service_instance)
 
         try:
             for x in service_instance_list:

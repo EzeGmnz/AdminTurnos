@@ -240,7 +240,6 @@ class Promoincludes(models.Model):
         schedule_ids = self.promotion.day_schedules
 
         for x in schedule_ids:
-            print(x)
             schedule = DaySchedule.objects.get(job=self.promotion.job, day_of_week=x)
             if not schedule.is_service_in_schedule(self.service):
                 raise ValidationError('Service is not provided in promotion days')

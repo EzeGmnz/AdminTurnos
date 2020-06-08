@@ -23,21 +23,24 @@ function getProvidedServices() {
 }
 
 function displayProvidedServices(json) {
-    var checkboxes_div = document.getElementById("servicesCheckBoxes");
+    let checkboxes_div = document.getElementById("divProvidedServices");
+    let btnGetAvailableAppointments = document.getElementById("btnGetAvailableAppointments");
 
+    checkboxes_div.style.visibility = "visible";
+    btnGetAvailableAppointments.style.visibility = "visible";
     clearDiv(checkboxes_div);
-    for (var key in json) {
+    
+    for (let key in json) {
         services[key] = json[key]["name"];
         checkboxes_div.appendChild(createServiceDiv(key, json[key]["name"]))
     }
-
 }
 
 function createServiceDiv(id, name) {
-    var div = document.createElement("div");
+    let div = document.createElement("div");
     div.classList.add('service');
-    var checkBox = document.createElement("input");
-    var label = document.createElement("label");
+    let checkBox = document.createElement("input");
+    let label = document.createElement("label");
     checkBox.type = "checkbox";
     checkBox.value = id;
     label.appendChild(document.createTextNode(name));
@@ -46,19 +49,22 @@ function createServiceDiv(id, name) {
     return div;
 }
 
-
 function getPromotions() {
     let job = document.getElementById("jobInput").value;
     let date = document.getElementById("dateInput").value;
 
     let callback = function(json) {
-        //TODO populate promotions
+        displayPromotions(json);
     }
 
     GET("/web/get-promotions/", [
         ["job_id", job],
         ["date", date]
     ], callback);
+}
+
+function displayPromotions(json){
+    
 }
 
 function getAvailableAppointments() {
@@ -82,8 +88,7 @@ function getAvailableAppointments() {
 
 function getSelectedServices() {
     selectedServices = [];
-    var childs = document.getElementById("servicesCheckBoxes")
-        .getElementsByTagName("div");
+    let childs = document.getElementById("divProvidedServices").getElementsByTagName("div");
 
     for (i = 0; i < childs.length; i++) {
         let checkbox = childs[i].firstChild;
@@ -97,7 +102,12 @@ function getSelectedServices() {
 
 function displayAvailableAppointments(json) {
     let divisions = json["divisions"];
-    appointmentsContainer = document.getElementById("availableAppointmentsContainer");
+    let btnConfirm = document.getElementById("btnConfirmAppointment");
+
+    divAvailableAppointments = document.getElementById("divAvailableAppointments");
+    divAvailableAppointments.style.visibility = "visible";
+    btnConfirm.style.visibility = "visible";
+    clearDiv(divAvailableAppointments);
 
     timeDivisions = [];
     for (var x in divisions) {
@@ -105,32 +115,32 @@ function displayAvailableAppointments(json) {
     }
 
     selector = new Selector(timeDivisions, onAppointmentSelected);
-
-    clearDiv(appointmentsContainer);
-    appointmentsContainer.appendChild(selector.getDiv());
+    divAvailableAppointments.appendChild(selector.getDiv());
 }
+
 
 function onAppointmentSelected() {
     selector.select(this.id);
     let btnConfirm = document.getElementById("btnConfirmAppointment");
     if (selector.getSelected() != null) {
-        if (btnConfirm.classList.contains("btnConfirmAppointmentHidden")) {
-            btnConfirm.classList.remove("btnConfirmAppointmentHidden");
-        }
+        btnConfirm.style.visibility = "visible";
     } else {
-        btnConfirm.classList.add("btnConfirmAppointmentHidden");
+        btnConfirm.style.visibility = "hidden";
     }
 }
 
 function confirmAppointment() {
     let callback = function(json) {
         console.log(json);
+        updateUIAfterConfirm();
     }
 
     let job = document.getElementById("jobInput").value;
     let appointment = selector.getSelected().getAppointment();
     let date = document.getElementById("dateInput").value;
-    
+
+    console.log(selector.getSelected().toString());
+
     body = {
         job_id: job,
         date: date,
@@ -138,4 +148,27 @@ function confirmAppointment() {
     }
 
     POST("/web/new-appointment/", body, callback);
+}
+
+function updateUIAfterConfirm(){
+    hideAvailableAppointments();
+    hideProvidedServices();
+}
+
+function hideProvidedServices(){
+    let checkboxes_div = document.getElementById("divProvidedServices");
+    let btnGetAvailableAppointments = document.getElementById("btnGetAvailableAppointments");
+
+    clearDiv(checkboxes_div);
+    checkboxes_div.style.visibility = "hidden";
+    btnGetAvailableAppointments.style.visibility = "hidden";
+}
+
+function hideAvailableAppointments(){
+    let divAvailableAppointments = document.getElementById("divAvailableAppointments")
+    let btnConfirm = document.getElementById("btnConfirmAppointment");
+
+    clearDiv(divAvailableAppointments);
+    divAvailableAppointments.style.visibility = "hidden";
+    btnConfirm.style.visibility = "hidden";
 }

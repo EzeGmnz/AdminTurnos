@@ -7,8 +7,10 @@ class TimeDivision {
 
     toString() {
         let output = "";
-        for (var service in this.appointment) {
-            output = output + this.services_name[service] + " " + this.appointment[service]["start"] + "\n";
+        for (let index in this.appointment) {
+            for (let service in this.appointment[index]) {
+                output += this.services_name[service] + " " + this.appointment[index][service]["start"] + " ";
+            }
         }
         return output;
     }
@@ -21,7 +23,6 @@ class TimeDivision {
         var startLabel = document.createElement("label");
         startLabel.appendChild(document.createTextNode(this.toString()));
         div.appendChild(startLabel);
-
     }
 }
 
