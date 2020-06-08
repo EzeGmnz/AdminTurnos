@@ -232,7 +232,7 @@ class NewProvides(CustomAPIView):
         job = self.get_object(request, Job, body['job_id'])
         try:
             day_schedule = DaySchedule.objects.get(job=job, day_of_week=body['day_of_week'])
-            print(body['day_of_week'])
+
             provides_list = []
             for service_id in body['services']:
                 p = Provides(

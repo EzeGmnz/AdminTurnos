@@ -18,7 +18,7 @@ function POST(relative_url, body, callback) {
         })
         .then((json) => {
             callback(json);
-        }).catch(function(error) {
+        }).catch((error) => {
             console.log(error);
         });
 }
