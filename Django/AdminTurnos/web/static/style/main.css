@@ -14,13 +14,24 @@
     width:fit-content;
 }
 
-#servicesCheckBoxes{
+#divServiceSelection{
+    visibility: hidden;
+}
+
+#divProvidedServices{
+    visibility:hidden;
     border: 4px solid #000000;
     border-radius: 10px;
     float:left;
 }
 
-#availableAppointmentsContainer{
+
+#btnGetAvailableAppointments{
+    visibility:hidden;
+}
+
+#divAppointmentSelection{
+    visibility:hidden;
     border: 4px solid #000000;
     border-radius: 10px;
     float:left;
@@ -52,13 +63,10 @@
 }
 
 #btnGetAvailableAppointments{
+    visibility:hidden;
     float:left;
 }
 
-.btnConfirmAppointment{
-    visibility = visible;
-}
-
-.btnConfirmAppointmentHidden{
-    visibility: hidden
+#btnConfirmAppointment{
+    visibility: hidden;
 }

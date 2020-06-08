@@ -215,9 +215,15 @@ class NewAppointment(CustomAPIView):
         )
 
         appointment.save()
-        service_instance_list = []
-        appointment_data = body['appointment']
 
+        appointment_data = body['appointment']
+        service_instance_list = self.create_service_instances(appointment_data, appointment, date)
+        self.save_appointment(appointment, service_instance_list)
+
+        return self.returnOK()
+
+    def create_service_instances(self, appointment_data, appointment, date):
+        output = []
         for x in appointment_data:
             for y in x:
                 time = datetime.datetime.strptime(x[y]['start'], '%H:%M:%S').time()
@@ -227,14 +233,13 @@ class NewAppointment(CustomAPIView):
                     timestamp=timestamp,
                     service_id=y
                 )
+                output.append(service_instance)
+        return output
 
-                service_instance_list.append(service_instance)
-
+    def save_appointment(self, appointment, service_instance_list):
         try:
             for x in service_instance_list:
                 x.save()
         except ValidationError:
             appointment.delete()
             raise
-
-        return JsonResponse({})

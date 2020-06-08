@@ -11,7 +11,7 @@ function POST(relative_url, body, callback) {
             body: JSON.stringify(body)
         })
         .then((response) => {
-             if (!response.ok) {
+            if (!response.ok) {
                 throw Error(response.statusText);
             }
             return response.json();

@@ -12,23 +12,38 @@
     <link href="{% static 'style/main.css' %}" rel='stylesheet'/>
     <script src="{% static 'func.js' %}"></script>
     <script src="{% static 'classes.js' %}"></script>
+    <script src="{% static 'userinterface.js' %}"></script>
     <script src="{% static 'main.js' %}"></script>
     <script src="{% static 'login.js' %}"></script>
 </head>
 <body>
 
-<div class="g-signin2" data-onsuccess="onSignIn" id="googleSignInBtn"></div>
-<div id="profile"></div>
+<div id="divJobSelection">
 
-<input id="jobInput" placeholder="job" type="text">
-<input id="dateInput" placeholder="date" type="text">
-<button onclick="getProvidedServices();getPromotions()">get services provided in date</button>
-<p>Available services</p>
-<div id="servicesCheckBoxes"></div>
-<button onclick="getAvailableAppointments()">Get Available Appointments</button>
-<div id="availableAppointmentsContainer"></div>
-<button class="btnConfirmAppointment btnConfirmAppointmentHidden" id="btnConfirmAppointment"
-        onclick="confirmAppointment()">Confirm
-</button>
+    <div class="g-signin2" data-onsuccess="onSignIn" id="googleSignInBtn"></div>
+    <div id="profile"></div>
+
+    <input id="jobInput" placeholder="job" type="text">
+    <input id="dateInput" placeholder="date" type="text">
+    <button onclick="getProvidedServices();getPromotions()">get services provided in date</button>
+
+</div>
+
+<div id="divServiceSelection">
+    <p>Available services</p>
+    <div id="divProvidedServices">
+
+    </div>
+    <button id="btnGetAvailableAppointments" onclick="getAvailableAppointments()">Get Available Appointments</button>
+</div>
+
+<div id="divAppointmentSelection">
+
+    <div id="divAvailableAppointments"></div>
+    <button id="btnConfirmAppointment"
+            onclick="confirmAppointment()">Confirm
+    </button>
+
+</div>
 </body>
 </html>
