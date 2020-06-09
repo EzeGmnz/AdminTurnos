@@ -10,22 +10,48 @@
 
     {% load static %}
     <link href="{% static 'style/main.css' %}" rel='stylesheet'/>
+    <link href="{% static 'style/vanilla-calendar-min.css' %}" rel='stylesheet'/>
     <script src="{% static 'func.js' %}"></script>
     <script src="{% static 'classes.js' %}"></script>
+    <script src="{% static 'calendar.js' %}"></script>
     <script src="{% static 'userinterface.js' %}"></script>
     <script src="{% static 'main.js' %}"></script>
     <script src="{% static 'login.js' %}"></script>
 </head>
 <body>
 
+<header id="divAccount">
+
+    <div class="g-signin2" data-onsuccess="onSignIn" id="divGoogleSignIn" id="googleSignInBtn"></div>
+    <div id="profile">
+        <img id="imgProfilePic" src=""/>
+        <label id="labelProfileName"></label>
+    </div>
+
+</header>
+
 <div id="divJobSelection">
 
-    <div class="g-signin2" data-onsuccess="onSignIn" id="googleSignInBtn"></div>
-    <div id="profile"></div>
+    <div class="content">
 
-    <input id="jobInput" placeholder="job" type="text">
-    <input id="dateInput" placeholder="date" type="text">
-    <button onclick="getProvidedServices();getPromotions()">get services provided in date</button>
+        <div>
+            <div class="vanilla-calendar" id="calendar" style="margin-bottom: 20px"></div>
+        </div>
+
+    </div>
+
+    <script>
+        let calendar = new VanillaCalendar({
+            selector: "#calendar",
+            onSelect: (data, elem) => {
+                console.log(data, elem)
+            }
+        });
+
+
+    </script>
+
+    <button id="btnGetServices" onclick="getProvidedServices();getPromotions()">get services provided in date</button>
 
 </div>
 

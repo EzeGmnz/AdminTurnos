@@ -16,18 +16,8 @@ function onSignIn(googleUser) {
     })
     .then(function(json) {
         profile.access_token = json.access_token;
-        updateUI();
+        displayProfile();
     });
 }
 
-function updateUI(){
-    document.getElementById("googleSignInBtn").style.display = "none";
-    var div = document.createElement("d")
-    var image = new Image()
-    image.src = profile.getImageUrl();
-    var nameText = document.createTextNode("Welcome "+ profile.getGivenName())
-    div.appendChild(nameText);
-    div.appendChild(image);
-    document.getElementById("profile").appendChild(div);
-    
-}
+

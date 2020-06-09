@@ -1,8 +1,22 @@
+function displayProfile(){
+    let div = document.createElement("d");
+    let imgProfilePic = document.getElementById("imgProfilePic");
+    let labelProfileName = document.getElementById("labelProfileName");
+    labelProfileName.innerHTML = "Hola " + profile.getGivenName();
+    
+    document.getElementById("divGoogleSignIn").style.display = "none";
+    imgProfilePic.src = profile.getImageUrl();
+    
+    div.appendChild(labelProfileName);
+    div.appendChild(imgProfilePic);
+    document.getElementById("profile").appendChild(div);
+    
+}
+
 function displayServiceSelection(json) {
     let divServiceSelection = document.getElementById("divServiceSelection");
     let divProvidedServices = document.getElementById("divProvidedServices");
     let btnGetAvailableAppointments = document.getElementById("btnGetAvailableAppointments");
-    let divAvailableAppointments = document.getElementById("divAvailableAppointments");
 
     divServiceSelection.style.visibility = "visible";
     divProvidedServices.style.visibility = "visible";
@@ -46,7 +60,9 @@ function displayAppointmentSelection(json) {
     let divisions = json["divisions"];
     let btnConfirm = document.getElementById("btnConfirmAppointment");
     let divAppointmentSelection = document.getElementById("divAppointmentSelection");
+    let divAvailableAppointments = document.getElementById("divAvailableAppointments");
 
+    divAppointmentSelection.style.visibility = "visible";
     divAvailableAppointments.style.visibility = "visible";
     btnConfirm.style.visibility = "visible";
     clearDiv(divAvailableAppointments);
@@ -61,8 +77,9 @@ function displayAppointmentSelection(json) {
 }
 
 function onAppointmentSelected() {
-    selector.select(this.id);
     let btnConfirm = document.getElementById("btnConfirmAppointment");
+
+    selector.select(this.id);
     if (selector.getSelected() != null) {
         btnConfirm.style.visibility = "visible";
     } else {
@@ -71,10 +88,12 @@ function onAppointmentSelected() {
 }
 
 function hideAppointmentSelection(){
-    let divAvailableAppointments = document.getElementById("divAvailableAppointments")
     let btnConfirm = document.getElementById("btnConfirmAppointment");
+    let divAppointmentSelection = document.getElementById("divAppointmentSelection");
+    let divAvailableAppointments = document.getElementById("divAvailableAppointments");
 
-    clearDiv(divAvailableAppointments);
-    divAvailableAppointments.style.visibility = "hidden";
     btnConfirm.style.visibility = "hidden";
+    divAppointmentSelection.style.visibility = "hidden";
+    divAvailableAppointments.style.visibility = "hidden";
+    clearDiv(divAvailableAppointments);
 }

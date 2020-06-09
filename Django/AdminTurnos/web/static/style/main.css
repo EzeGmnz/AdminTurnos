@@ -1,5 +1,17 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+* {
+  margin: 0;
+  font-family: 'Open Sans';
+}
+
+body {
+    text-align:center;
+    font-size: 1.5rem;
+    background-color:#222222;
+    color:#222222;
+}
+
 .service {
-    font-family: "Courier New", Courier, monospace;
     font-size: 18px;
     letter-spacing: 2px;
     float:left;
@@ -10,11 +22,67 @@
     font-style: normal;
     font-variant: small-caps;
     text-transform: lowercase;
-
     width:fit-content;
 }
 
+
+#divAccount{
+   text-align:center;
+   border-radius:10px;
+   width:calc(100% - 60px);
+   margin:20px;
+   padding:10px;
+   display:inline-block;
+   #background-color:#aaacda63;
+}
+
+#divGoogleSignIn{
+    display:inline-block;
+}
+
+#labelProfileName{
+    display:inline-block;
+    text-align:center;
+    height:100%;
+    margin:10px;
+    color:white;
+}
+
+#profile{
+    display:inline-block;
+    align-items:center;
+    text-align:center;
+}
+
+#imgProfilePic{
+    border-radius:150px;
+    width:50px;
+    float:left;
+}
+
+#divJobSelection{
+    width:100%;
+    border-top-width: 1px;
+    text-align:center;
+}
+
+#btnGetServices{
+    display:inline-block;
+    border-radius: 10px;
+    border-style:solid;
+    border: none;
+    background:transparent;
+    color: #121212;
+    width:150px;
+    font-weight:bold;
+    height:75px;
+    text-transform:uppercase;
+    background-color:#f2a365; 
+}
+
 #divServiceSelection{
+    float:left;
+    #background-color:red;
     visibility: hidden;
 }
 
@@ -24,7 +92,6 @@
     border-radius: 10px;
     float:left;
 }
-
 
 #btnGetAvailableAppointments{
     visibility:hidden;
@@ -36,6 +103,11 @@
     border-radius: 10px;
     float:left;
     width:fit-content;
+    background-color:#ff704a;
+}
+
+#divAvailableAppointments{
+    visibility:hidden;
 }
 
 .element{
