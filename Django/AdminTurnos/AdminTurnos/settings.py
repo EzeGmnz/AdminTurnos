@@ -26,9 +26,9 @@ DEBUG = True
 
 AUTH_USER_MODEL = 'restauth.CustomUser'
 
-ALLOWED_HOSTS = ['0.0.0.0', '192.168.1.34', 'localhost']
+ALLOWED_HOSTS = ['www.adminturnos.com', '0.0.0.0', '192.168.1.50', 'localhost']
 
-GOOGLE_OAUTH_CLIENTID = '237762704075-5l2qu43226aik1njlue1jhd9jh7r9d2c.apps.googleusercontent.com'
+GOOGLE_OAUTH_CLIENTID = '237762704075-uokqack5o2rdqd2ju15uprcc2ttkoo5j.apps.googleusercontent.com'
 
 # Application definition
 

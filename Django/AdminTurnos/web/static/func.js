@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "http://www.adminturnos.com:8000";
 
 function POST(relative_url, body, callback) {
     fetch(BASE_URL + relative_url, {
