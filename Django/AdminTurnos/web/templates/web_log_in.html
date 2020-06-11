@@ -21,7 +21,14 @@
 <body>
 
 <header id="divAccount">
-
+    <div id="goBackButtonContainer">
+        <button id="btnGoBack" onclick="goBack()">
+            <svg height="24" version="1.1" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z">
+                </path>
+            </svg>
+        </button>
+    </div>
     <div class="g-signin2" data-onsuccess="onSignIn" id="divGoogleSignIn" id="googleSignInBtn"></div>
     <div id="profile">
         <img id="imgProfilePic" src=""/>
@@ -30,7 +37,7 @@
 
 </header>
 
-<div id="divJobSelection">
+<div id="divDateSelection">
 
     <div class="content">
 
@@ -44,10 +51,9 @@
         let calendar = new VanillaCalendar({
             selector: "#calendar",
             onSelect: (data, elem) => {
-                console.log(data, elem)
+                onDateSelected(data);
             }
         });
-
 
     </script>
 
@@ -56,11 +62,17 @@
 </div>
 
 <div id="divServiceSelection">
-    <p>Available services</p>
-    <div id="divProvidedServices">
+    <div id="servicesContainer">
+        <div id="divProvidedServices">
+        </div>
 
     </div>
-    <button id="btnGetAvailableAppointments" onclick="getAvailableAppointments()">Get Available Appointments</button>
+
+    <div id="btnAppointmentsContainer">
+        <button id="btnGetAvailableAppointments" onclick="getAvailableAppointments()">Get Available Appointments
+        </button>
+    </div>
+
 </div>
 
 <div id="divAppointmentSelection">
@@ -71,5 +83,6 @@
     </button>
 
 </div>
+
 </body>
 </html>

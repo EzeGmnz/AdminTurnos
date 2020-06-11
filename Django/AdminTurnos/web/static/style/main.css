@@ -5,26 +5,10 @@
 }
 
 body {
-    text-align:center;
     font-size: 1.5rem;
     background-color:#222222;
     color:#222222;
 }
-
-.service {
-    font-size: 18px;
-    letter-spacing: 2px;
-    float:left;
-    clear:left;
-    word-spacing: 2px;
-    color: #2c2c2c;
-    font-weight: 400;
-    font-style: normal;
-    font-variant: small-caps;
-    text-transform: lowercase;
-    width:fit-content;
-}
-
 
 #divAccount{
    text-align:center;
@@ -33,11 +17,32 @@ body {
    margin:20px;
    padding:10px;
    display:inline-block;
-   #background-color:#aaacda63;
 }
 
 #divGoogleSignIn{
     display:inline-block;
+}
+
+#goBackButtonContainer{
+    display:inline-block;
+    text-align:center;
+    height:100%;
+    margin:10px;
+    float:left;
+}
+
+#btnGoBack {
+    background-color:transparent;
+    cursor:pointer;
+    fill: #ececec;
+    border:none;
+    visibility:hidden;
+}
+
+#profile{
+    display:inline-block;
+    align-items:center;
+    text-align:center;
 }
 
 #labelProfileName{
@@ -48,30 +53,24 @@ body {
     color:white;
 }
 
-#profile{
-    display:inline-block;
-    align-items:center;
-    text-align:center;
-}
-
 #imgProfilePic{
     border-radius:150px;
     width:50px;
     float:left;
 }
 
-#divJobSelection{
+#divDateSelection{
     width:100%;
     border-top-width: 1px;
     text-align:center;
 }
 
 #btnGetServices{
+    visibility:hidden;
     display:inline-block;
     border-radius: 10px;
     border-style:solid;
     border: none;
-    background:transparent;
     color: #121212;
     width:150px;
     font-weight:bold;
@@ -81,64 +80,110 @@ body {
 }
 
 #divServiceSelection{
-    float:left;
-    #background-color:red;
-    visibility: hidden;
+    display:none;
+    padding:10px;
+    margin-top:10px;
+    width:calc(100% - 20px);
+    overflow:hidden;
+    border-top-width: 1px;
+    text-align:center;
+}
+
+#servicesContainer{
+    display:inline-block;
+    color:#ececec;
+    background-color:#30475e;
+    width:calc(100% - 20px);
+    border-radius: 10px;
+    text-align:center;
+    padding:10px;
 }
 
 #divProvidedServices{
-    visibility:hidden;
-    border: 4px solid #000000;
-    border-radius: 10px;
-    float:left;
-}
-
-#btnGetAvailableAppointments{
-    visibility:hidden;
-}
-
-#divAppointmentSelection{
-    visibility:hidden;
-    border: 4px solid #000000;
-    border-radius: 10px;
-    float:left;
+    display:none;
     width:fit-content;
-    background-color:#ff704a;
+}
+
+.service {
+    text-align:left;
+    font-size:1.2rem;
+}
+
+.service label {
+    padding:10px;
+}
+
+#btnAppointmentsContainer {
+    #float:right;
+    display:inline-block;
+    margin:10px;
+}
+
+#btnGetAvailableAppointments {
+    visibility:hidden;
+    width:150px;
+    height:75px;
+    border-radius: 10px;
+    border-style:solid;
+    border: none;
+    background-color:#f2a365; 
+    color: #121212;
+    font-weight:bold;
+    text-transform:uppercase;
+}
+
+#divAppointmentSelection {
+    display:none;
+  
+    float:left;
+    text-align:center;
+    width:100%;
+    
 }
 
 #divAvailableAppointments{
-    visibility:hidden;
+    margin:10px;
+    display:none;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    padding:10px;
+    background-color:#30475e;
 }
 
 .element{
+    color:#ececec;
     border: 4px solid #000000;
     border-radius: 10px;
     margin-top: 10px;
+    text-align:center;
+    padding: 5px;
 }
 
 .element:hover{
-    border: 4px solid #db0606;
+    border: 4px solid #f2a365;
     border-radius: 10px;
 }
 
 .elementSelected{
     margin-top: 10px;
-    color: red;
-    border: 4px solid #db0606;
+    color: #f2a365;
+    border: 4px solid #f2a365;
     border-radius: 10px;
 }
 
 .appointmentService{
-    font-family: "Verdana", Courier, monospace;
-    font-size: 18px;
-    text-transform: lowercase;
-}
-
-#btnGetAvailableAppointments{
-    visibility:hidden;
-    float:left;
+   
 }
 
 #btnConfirmAppointment{
     visibility: hidden;
+    width:150px;
+    height:75px;
+    border-radius: 10px;
+    border-style:solid;
+    border: none;
+    background-color:#f2a365; 
+    color: #121212;
+    font-weight:bold;
+    text-transform:uppercase;
 }

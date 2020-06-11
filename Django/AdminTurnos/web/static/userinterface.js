@@ -13,16 +13,71 @@ function displayProfile(){
     
 }
 
+function goBack(){
+  
+    let divAppointmentSelection = document.getElementById("divAppointmentSelection");
+    let isSelectingAppointment = divAppointmentSelection.style.display == "block";
+
+    if(!isSelectingAppointment) {
+        hideBtnGoBack();
+        displayDateSelection();
+        hideServiceSelection();
+    } else {
+        hideAppointmentSelection();
+        displayServiceSelection();
+    }
+}
+
+function displayBtnGoBack(){
+    let btnGoBack = document.getElementById("btnGoBack");
+    btnGoBack.style.visibility = "visible";
+}
+
+function hideBtnGoBack(){
+    let btnGoBack = document.getElementById("btnGoBack");
+    btnGoBack.style.visibility = "hidden";
+}
+
+function displayBtnGetProvidedServices(){
+    let btnGetServices = document.getElementById("btnGetServices");
+    btnGetServices.style.visibility = "visible";
+}
+
+function hideBtnGetProvidedServices(){
+    let btnGetServices = document.getElementById("btnGetServices");
+    btnGetServices.style.visibility = "hidden";
+}
+
+function displayDateSelection(){
+    displayBtnGetProvidedServices();
+    let divDateSelection = document.getElementById("divDateSelection");
+    divDateSelection.style.display = "block";
+}
+
+function hideDateSelection(){
+    hideBtnGetProvidedServices();
+    let divDateSelection = document.getElementById("divDateSelection");
+    divDateSelection.style.display = "none";
+}
+
 function displayServiceSelection(json) {
+    hideDateSelection();
+    displayBtnGoBack();
+    let btnGetAvailableAppointments = document.getElementById("btnGetAvailableAppointments");
+    if (getSelectedServices().length == 0){
+       hideBtnGetAvailableAppointments();
+    }else{
+       displayBtnGetAvailableAppointments();
+    }
+
     let divServiceSelection = document.getElementById("divServiceSelection");
     let divProvidedServices = document.getElementById("divProvidedServices");
-    let btnGetAvailableAppointments = document.getElementById("btnGetAvailableAppointments");
+    
 
-    divServiceSelection.style.visibility = "visible";
-    divProvidedServices.style.visibility = "visible";
-    btnGetAvailableAppointments.style.visibility = "visible";
+    divServiceSelection.style.display = "inline-block";
+    divProvidedServices.style.display = "inline-block";
+    
 
-    clearDiv(divProvidedServices);
     for (let key in json) {
         services[key] = json[key]["name"];
         divProvidedServices.appendChild(createServiceDiv(key, json[key]["name"]))
@@ -37,6 +92,7 @@ function createServiceDiv(id, name) {
     div.classList.add('service');
     checkBox.value = id;
     checkBox.type = "checkbox";
+    checkBox.addEventListener("click", onServiceCheckBoxClicked, false);
     
     label.appendChild(document.createTextNode(name));
     div.appendChild(checkBox);
@@ -45,15 +101,24 @@ function createServiceDiv(id, name) {
     return div;
 }
 
+function displayBtnGetAvailableAppointments(){
+    let btnGetAvailableAppointments = document.getElementById("btnGetAvailableAppointments");
+    btnGetAvailableAppointments.style.visibility = "visible";
+}
+
+function hideBtnGetAvailableAppointments(){
+    let btnGetAvailableAppointments = document.getElementById("btnGetAvailableAppointments");
+    btnGetAvailableAppointments.style.visibility = "hidden";
+}
+
 function hideServiceSelection(){
     let divServiceSelection = document.getElementById("divServiceSelection")
     let divProvidedServices = document.getElementById("divProvidedServices");
-    let btnGetAvailableAppointments = document.getElementById("btnGetAvailableAppointments");
+    hideBtnGetAvailableAppointments();
 
-    clearDiv(divProvidedServices);
-    divServiceSelection.style.visibility = "hidden"
-    divProvidedServices.style.visibility = "hidden";
-    btnGetAvailableAppointments.style.visibility = "hidden";
+    divServiceSelection.style.display = "none";
+    divProvidedServices.style.display = "none";
+    
 }
 
 function displayAppointmentSelection(json) {
@@ -62,8 +127,8 @@ function displayAppointmentSelection(json) {
     let divAppointmentSelection = document.getElementById("divAppointmentSelection");
     let divAvailableAppointments = document.getElementById("divAvailableAppointments");
 
-    divAppointmentSelection.style.visibility = "visible";
-    divAvailableAppointments.style.visibility = "visible";
+    divAppointmentSelection.style.display = "block";
+    divAvailableAppointments.style.display = "block";
     btnConfirm.style.visibility = "visible";
     clearDiv(divAvailableAppointments);
 
@@ -92,8 +157,9 @@ function hideAppointmentSelection(){
     let divAppointmentSelection = document.getElementById("divAppointmentSelection");
     let divAvailableAppointments = document.getElementById("divAvailableAppointments");
 
+    clearDiv(divAvailableAppointments);
     btnConfirm.style.visibility = "hidden";
-    divAppointmentSelection.style.visibility = "hidden";
-    divAvailableAppointments.style.visibility = "hidden";
+    divAvailableAppointments.style.display = "none";
+    divAppointmentSelection.style.display = "none";
     clearDiv(divAvailableAppointments);
 }

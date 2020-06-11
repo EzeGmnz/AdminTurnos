@@ -1,6 +1,7 @@
 var services = {}
 var appointmentsAvailable = {}
 var selector;
+var selectedDate;
 
 function clearDiv(div) {
     while (div.firstChild) {
@@ -8,32 +9,41 @@ function clearDiv(div) {
     }
 }
 
+function onDateSelected(date){
+    this.selectedDate = date.date + "/" + date.month + "/" + date.year;
+    displayBtnGetProvidedServices();
+}
+
 function getProvidedServices() {
-    let job = document.getElementById("jobInput").value;
-    let date = document.getElementById("dateInput").value;
-
     let callback = function(json) {
+        clearDiv(divProvidedServices);
         displayServiceSelection(json);
-        hideAppointmentSelection();
+        hideDateSelection();
     }
-
+    
     GET("/web/get-provided-services/", [
-        ["job_id", job],
-        ["date", date]
+        ["job_id", /*TODO*/1/**/],
+        ["date", selectedDate]
     ], callback);
 }
 
-function getPromotions() {
-    let job = document.getElementById("jobInput").value;
-    let date = document.getElementById("dateInput").value;
+function onServiceCheckBoxClicked(){
+    let btnGetAvailableAppointments = document.getElementById("btnGetAvailableAppointments");
+    if (getSelectedServices().length == 0){
+       hideBtnGetAvailableAppointments();
+    }else{
+       displayBtnGetAvailableAppointments();
+    }
+}
 
+function getPromotions() {
     let callback = function(json) {
         displayPromotions(json);
     }
 
     GET("/web/get-promotions/", [
-        ["job_id", job],
-        ["date", date]
+        ["job_id", /*TODO*/1/**/],
+        ["date", selectedDate]
     ], callback);
 }
 
@@ -42,8 +52,8 @@ function displayPromotions(json){
 }
 
 function getAvailableAppointments() {
-    let job = document.getElementById("jobInput").value;
-    let date = document.getElementById("dateInput").value;
+    let job = 1 /*TODO*/;
+
     let selectedServices = getSelectedServices();
 
     let callback = function(json) {
@@ -53,7 +63,7 @@ function getAvailableAppointments() {
     if (selectedServices.length > 0) {
         GET("/web/get-available-appointments/", [
             ["job_id", job],
-            ["date", date],
+            ["date", selectedDate],
             ["services", selectedServices]
         ], callback);
     } else {
@@ -81,13 +91,12 @@ function confirmAppointment() {
         hideAppointmentSelection();
     }
 
-    let job = document.getElementById("jobInput").value;
+    let job = 1; /*TODO*/
     let appointment = selector.getSelected().getAppointment();
-    let date = document.getElementById("dateInput").value;
 
     body = {
         job_id: job,
-        date: date,
+        date: selectedDate,
         appointment: appointment
     }
 
