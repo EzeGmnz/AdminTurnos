@@ -40,6 +40,11 @@ class Job(models.Model):
     serviceprovider = models.ForeignKey(auth.get_user_model(), models.CASCADE)
     place = models.ForeignKey(Place, models.CASCADE)
 
+    def clean(self):
+        places = Job.objects.filter(serviceprovider=self.serviceprovider, place=self.place)
+        if len(places) > 0:
+            raise ValidationError("Job for this service provider already exists in this place")
+
     def get_current_parallelism(self, service, timestamp):
         appointments_in_day = Appointment.objects.filter(job=self, date=timestamp.date())
 

@@ -1,7 +1,5 @@
 package com.adminturnos.UserManagment;
 
-import com.adminturnos.Listeners.ListenerAuthenticator;
-
 /**
  *
  */
@@ -9,7 +7,6 @@ public class UserManagment {
 
     private static UserManagment instance;
     private String accessToken;
-    private ListenerAuthenticator listener;
 
     private UserManagment() {
         accessToken = null;
@@ -29,4 +26,5 @@ public class UserManagment {
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
+
 }

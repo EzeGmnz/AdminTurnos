@@ -19,7 +19,6 @@ class ExchangeForAccessTokenAndroid(ObtainAuthToken):
 
             user = GoogleAuth().authenticate(request, True, id_token)
             login(request, user)
-
             access_token, _ = Token.objects.get_or_create(user=user)
 
             return JsonResponse({'access_token': access_token.key,
@@ -49,7 +48,8 @@ class ExchangeForAccessTokenWeb(ObtainAuthToken):
                                  'isclient': user.isclient,
                                  'isproviderpro': user.isproviderpro})
 
-        except ValueError:
+        except ValueError as e:
+            print(e)
             raise
 
 

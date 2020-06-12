@@ -1,11 +1,12 @@
 package com.adminturnos.Database;
 
 import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.RequestBody;
+
+import java.util.Map;
 
 /**
  *
  */
 public interface DatabaseRead {
-    void GET(String subDirURL, RequestBody requestBody, Callback callback);
+    void GET(String subDirURL, Map<String, String> params, Callback callback);
 }

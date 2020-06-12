@@ -1,6 +1,7 @@
 package com.adminturnos.Builder;
 
-import com.adminturnos.Exceptions.ExceptionCouldNotBuild;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public interface ObjectBuilder<E> {
 
@@ -10,6 +11,6 @@ public interface ObjectBuilder<E> {
      * @param json json to build object from
      * @return object built
      */
-    public abstract E build(String json) throws ExceptionCouldNotBuild;
+    public abstract E build(JSONObject json) throws JSONException;
 
 }

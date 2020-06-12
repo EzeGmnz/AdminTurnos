@@ -15,11 +15,11 @@ class GoogleAuth(BaseBackend):
                 raise ValueError('Wrong issuer.')
 
             # getting user id
-            userid = idinfo['sub']
             user_model = auth.get_user_model()
             user, created = user_model.objects.get_or_create(email=idinfo['email'], isprovider=isProvider)
 
             return user
 
-        except ValueError as err:
+        except ValueError as e:
+            print(e)
             raise

@@ -2,14 +2,13 @@ package com.adminturnos.Builder;
 
 import com.adminturnos.ObjectInterfaces.ServiceProvider;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class BuilderServiceProvider implements ObjectBuilder<ServiceProvider> {
 
-    public BuilderServiceProvider() {
-
-    }
-
     @Override
-    public ServiceProvider build(String json) {
+    public ServiceProvider build(JSONObject json) throws JSONException {
         return null;
     }
 }

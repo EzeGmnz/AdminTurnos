@@ -33,19 +33,20 @@ class ServiceSerializer(serializers.Serializer):
         return Service.objects.create(**validated_data)
 
 
-class JobSerializer(serializers.Serializer):
+class PlaceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Place
+        fields = ['id', 'street', 'streetnumber', 'businessname']
+
+
+class JobSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
-    serviceprovider = serializers.PrimaryKeyRelatedField(read_only=True)
-    place = serializers.PrimaryKeyRelatedField(read_only=True)
+    place = PlaceSerializer()
 
-    def update(self, instance, validated_data):
-        instance.serviceprovider = validated_data.get('serviceprovider', instance.serviceprovider)
-        instance.place = validated_data.get('place', instance.place)
-
-        return instance
-
-    def create(self, validated_data):
-        return Job.objects.create(**validated_data)
+    class Meta:
+        model = Job
+        fields = ['id', 'place']
 
 
 class AppointmentSerializer(serializers.Serializer):

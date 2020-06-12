@@ -1,17 +1,17 @@
 package com.adminturnos.MainScreen;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.adminturnos.Listeners.ListenerAuthenticator;
 import com.adminturnos.R;
 import com.adminturnos.UserManagment.ActivitySignIn;
 import com.adminturnos.UserManagment.Authenticator;
-import com.adminturnos.UserManagment.AuthenticatorGoogle;
+import com.adminturnos.UserManagment.UserManagment;
 import com.adminturnos.Values;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkUserIsAuthenticated() {
         GoogleSignInAccount account = getAuthenticatedUser();
         if (account != null) {
-            refreshAccessToken(account);
+            retrieveAccessToken();
         } else {
             displayUILogIn();
         }
@@ -47,9 +47,12 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, Values.RC_SIGN_IN_ACTIVITY);
     }
 
-    public void refreshAccessToken(GoogleSignInAccount account) {
-        authenticator = new AuthenticatorGoogle(this, new ListenerUserManagementRefresh());
-        authenticator.exchangeTokenID(account.getIdToken());
+    public void retrieveAccessToken() {
+        SharedPreferences sharedPreferences = getSharedPreferences(Values.SHARED_PREF_NAME, MODE_PRIVATE);
+        String accessToken = sharedPreferences.getString(Values.SHARED_PREF_ACCESS_TOKEN, null);
+        UserManagment.getInstance().setAccessToken(accessToken);
+
+        displayUIAuthenticated();
     }
 
     @Override
@@ -67,12 +70,4 @@ public class MainActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    private class ListenerUserManagementRefresh implements ListenerAuthenticator {
-
-        @Override
-        public void onComplete(int resultCode) {
-            displayUIAuthenticated();
-        }
-
-    }
 }
