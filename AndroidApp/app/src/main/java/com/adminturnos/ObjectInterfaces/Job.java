@@ -1,13 +1,13 @@
 package com.adminturnos.ObjectInterfaces;
 
-import com.adminturnos.Objects.Place;
+import java.io.Serializable;
 
 /**
  *
  */
-public interface Job {
+public interface Job extends Serializable {
 
-    public String getId();
+    String getId();
 
-    public Place getPlace();
+    Place getPlace();
 }

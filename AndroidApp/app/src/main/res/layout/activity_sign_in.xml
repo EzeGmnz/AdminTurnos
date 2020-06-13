@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UserManagment.ActivitySignIn">
+    tools:context=".Activities.SignIn.ActivitySignIn">
 
     <fragment
         android:id="@+id/fragment_sign_in"
-        android:name="com.adminturnos.UserManagment.FragmentUserManagement"
+        android:name="com.adminturnos.Activities.SignIn.FragmentUserManagement"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -14,16 +14,22 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".UserManagment.ActivitySignIn" />
-
-        <activity android:name=".MainScreen.MainActivity">
+            android:name=".Activities.NewPlace.NewPlaceActivity"
+            android:theme="@style/AppThemeActionBar" />
+        <activity
+            android:name=".Activities.Place.ViewPlaceActivity"
+            android:theme="@style/AppThemeActionBar" />
+        <activity
+            android:name=".Activities.Job.ViewJobActivity"
+            android:theme="@style/AppThemeActionBar" />
+        <activity android:name=".Activities.SignIn.ActivitySignIn" />
+        <activity android:name=".Activities.MainScreen.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

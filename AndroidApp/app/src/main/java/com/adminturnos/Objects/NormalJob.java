@@ -1,6 +1,7 @@
 package com.adminturnos.Objects;
 
 import com.adminturnos.ObjectInterfaces.Job;
+import com.adminturnos.ObjectInterfaces.Place;
 
 /**
  *

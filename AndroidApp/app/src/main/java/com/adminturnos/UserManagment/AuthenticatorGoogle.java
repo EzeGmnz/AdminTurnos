@@ -13,6 +13,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
@@ -70,13 +71,17 @@ public class AuthenticatorGoogle implements Authenticator {
         try {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             GoogleSignInAccount account = task.getResult(ApiException.class);
-
             exchangeTokenID(account.getIdToken());
         } catch (ApiException e) {
             e.printStackTrace();
             listener.onComplete(Activity.RESULT_CANCELED);
         }
 
+    }
+
+    public void signOut(OnCompleteListener<Void> listener) {
+        googleSignInClient.signOut()
+                .addOnCompleteListener(activity, listener);
     }
 
     @Override
