@@ -5,6 +5,7 @@ public interface Values {
     /* USER MANAGEMENT */
     int RC_SIGN_UP = 1;
     int RC_SIGN_IN_ACTIVITY = 2;
+    int RC_NEW_PLACE = 3;
 
     /* Shared Preferences */
     String SHARED_PREF_NAME = "SharedPref";
@@ -18,4 +19,6 @@ public interface Values {
     String DJANGO_URL_CONVERT_TOKEN = "/auth/login-android-google/";
     String DJANGO_URL_GET_JOBS = "/android/profile/jobs/";
     String DJANGO_URL_GET_OWNED_PLACES = "/android/profile/places/";
+    String DJANGO_URL_NEW_PLACE = "/android/new-place/";
+
 }

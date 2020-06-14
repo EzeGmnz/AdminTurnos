@@ -14,14 +14,18 @@
         android:usesCleartextTraffic="true">
 
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".Activities.NewPlace.NewPlaceActivity"
             android:theme="@style/AppThemeActionBar" />
+
         <activity
             android:name=".Activities.Place.ViewPlaceActivity"
             android:theme="@style/AppThemeActionBar" />
+
         <activity
             android:name=".Activities.Job.ViewJobActivity"
             android:theme="@style/AppThemeActionBar" />
+
         <activity android:name=".Activities.SignIn.ActivitySignIn" />
         <activity android:name=".Activities.MainScreen.MainActivity">
             <intent-filter>

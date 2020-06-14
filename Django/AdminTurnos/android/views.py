@@ -49,16 +49,27 @@ class NewPlace(CustomAPIView):
 
     # street, streetnumber, apnumber, city, state, country, businessname, phonenumber, email
     def post(self, request):
-        params = list(request.POST.values())
-        params.insert(0, None)  # Autoincrement field
-        params.insert(1, request.user.id)
+        params = request.POST
 
-        place = Place(*params)
+        place = Place()
+        place.serviceprovider = request.user
+        place.street = params.get('street')
+        place.streetnumber = params.get('streetnumber')
+        place.city = params.get('city')
+        place.state = params.get('state')
+        place.country = params.get('country')
+        place.businessname = params.get('businessname')
+        place.phonenumber = params.get('phonenumber')
+        place.email = ""
+
         place.save()
 
-        job = Job(None, request.user.id, place.id)
+        job = Job()
+        job.serviceprovider = request.user
+        job.place = place
         job.save()
-        return JsonResponse(PlaceSerializer(place).data)
+
+        return self.returnOK()
 
 
 @method_decorator(csrf_exempt, name='dispatch')

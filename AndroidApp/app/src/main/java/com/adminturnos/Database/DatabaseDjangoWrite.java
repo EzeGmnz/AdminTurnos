@@ -25,15 +25,14 @@ public class DatabaseDjangoWrite implements DatabaseWrite {
      * Default constructor
      */
     private DatabaseDjangoWrite() {
-        this.database = new DatabaseDjango();
+        database = new DatabaseDjango();
         client = new OkHttpClient();
         client.setAuthenticator(new Authenticator() {
             @Override
             public Request authenticate(Proxy proxy, Response response) {
 
-                response.request().newBuilder().header("Authorization",
-                        UserManagment.getInstance().getAccessToken()).build();
-                return null;
+                return response.request().newBuilder().header("Authorization",
+                        "Token " + UserManagment.getInstance().getAccessToken()).build();
             }
 
             @Override
