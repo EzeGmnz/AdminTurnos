@@ -38,6 +38,7 @@ public class ObjectConfiguratorCoordinator {
         this.fragments = fragments;
         this.listener = listener;
         this.adapter = new ObjectConfigPagerAdapter(fragmentManager, fragments);
+        this.bundle = new Bundle();
 
         btnConfirm.setOnClickListener(new BtnConfirmClickListener());
         viewPager.setAdapter(adapter);
@@ -64,7 +65,7 @@ public class ObjectConfiguratorCoordinator {
         Bundle currentFragBundle = fragments.get(viewPager.getCurrentItem()).getData();
 
         for (String key : currentFragBundle.keySet()) {
-            bundle.putString(key, currentFragBundle.getString(key));
+            bundle.putSerializable(key, currentFragBundle.getSerializable(key));
         }
 
     }

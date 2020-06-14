@@ -107,9 +107,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshContent() {
-
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.fragment_main_screen, new FragmentMain());
+        transaction.replace(R.id.fragment_main_screen, new FragmentMain());
         transaction.commit();
     }
 

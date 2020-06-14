@@ -9,6 +9,7 @@ urlpatterns = [
     path('profile/job-requests/', ViewJobRequests.as_view()),
     path('new-place/', NewPlace.as_view()),
     path('drop-place/', DropPlace.as_view()),
+    path('jobtypes/', JobTypesView.as_view()),
     path('profile/place-does/', PlaceDoes.as_view()),
     path('search-place/', SearchPlace.as_view()),
     path('new-job-request/', NewJobRequest.as_view()),

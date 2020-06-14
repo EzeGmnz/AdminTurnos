@@ -3,7 +3,6 @@ package com.adminturnos.UserManagment;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.adminturnos.Database.DatabaseDjangoWrite;
 import com.adminturnos.Listeners.ListenerAuthenticator;
@@ -15,16 +14,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import cz.msebera.android.httpclient.Header;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -92,22 +90,17 @@ public class AuthenticatorGoogle implements Authenticator {
         DatabaseDjangoWrite.getInstance().POST(Values.DJANGO_URL_CONVERT_TOKEN, body, new CallbackExchangeTokenId());
     }
 
-    private class CallbackExchangeTokenId implements Callback {
+    private class CallbackExchangeTokenId extends JsonHttpResponseHandler {
         @Override
-        public void onResponse(Response response) throws IOException {
+        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
-                JSONObject jsonObject = new JSONObject(response.body().string());
+
                 SharedPreferences sharedPreferences = activity.getSharedPreferences(Values.SHARED_PREF_NAME, MODE_PRIVATE);
-                sharedPreferences.edit().putString(Values.SHARED_PREF_ACCESS_TOKEN, jsonObject.getString("access_token")).apply();
+                sharedPreferences.edit().putString(Values.SHARED_PREF_ACCESS_TOKEN, response.getString("access_token")).apply();
                 listener.onComplete(Activity.RESULT_OK);
             } catch (JSONException e) {
                 listener.onComplete(Activity.RESULT_CANCELED);
             }
-        }
-
-        @Override
-        public void onFailure(final Request request, final IOException e) {
-            Log.e("FAILED", e.toString());
         }
     }
 

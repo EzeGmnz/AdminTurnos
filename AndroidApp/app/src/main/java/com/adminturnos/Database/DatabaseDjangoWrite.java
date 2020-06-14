@@ -1,16 +1,18 @@
 package com.adminturnos.Database;
 
-import com.adminturnos.UserManagment.UserManagment;
-import com.squareup.okhttp.Authenticator;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.HttpUrl;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import android.content.Context;
 
-import java.net.Proxy;
+import com.adminturnos.UserManagment.UserManagment;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
+
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 /**
  *
@@ -18,7 +20,7 @@ import java.util.Map;
 public class DatabaseDjangoWrite implements DatabaseWrite {
 
     private static DatabaseDjangoWrite instance;
-    private static OkHttpClient client;
+    private static AsyncHttpClient client;
     private static Database database;
 
     /**
@@ -26,20 +28,8 @@ public class DatabaseDjangoWrite implements DatabaseWrite {
      */
     private DatabaseDjangoWrite() {
         database = new DatabaseDjango();
-        client = new OkHttpClient();
-        client.setAuthenticator(new Authenticator() {
-            @Override
-            public Request authenticate(Proxy proxy, Response response) {
-
-                return response.request().newBuilder().header("Authorization",
-                        "Token " + UserManagment.getInstance().getAccessToken()).build();
-            }
-
-            @Override
-            public Request authenticateProxy(Proxy proxy, Response response) {
-                return null;
-            }
-        });
+        client = new AsyncHttpClient();
+        client.addHeader("Authorization", "Token " + UserManagment.getInstance().getAccessToken());
     }
 
     public static DatabaseDjangoWrite getInstance() {
@@ -49,21 +39,42 @@ public class DatabaseDjangoWrite implements DatabaseWrite {
         return instance;
     }
 
-    public void POST(String subDirURL, Map<String, String> body, Callback callback) {
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(database.getUrl() + subDirURL).newBuilder();
-        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+    public void POST(String subDirURL, Map<String, String> body, JsonHttpResponseHandler callback) {
 
+        RequestParams params = new RequestParams();
         if (body != null) {
             for (Map.Entry<String, String> entry : body.entrySet()) {
-                requestBodyBuilder.add(entry.getKey(), entry.getValue());
+                params.put(entry.getKey(), entry.getValue());
             }
         }
-        String url = urlBuilder.build().toString();
-        final Request request = new Request.Builder()
-                .url(url)
-                .post(requestBodyBuilder.build())
-                .build();
-        client.newCall(request).enqueue(callback);
+
+        String url = database.getUrl() + subDirURL;
+
+        client.post(
+                url,
+                params,
+                callback
+        );
+    }
+
+    public void POSTJSON(Context context, String subDirURL, JSONObject json, JsonHttpResponseHandler callback) {
+        StringEntity entity = null;
+
+        try {
+            entity = new StringEntity(json.toString());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        String url = database.getUrl() + subDirURL;
+
+        client.post(
+                context,
+                url,
+                entity,
+                "application/json",
+                callback
+        );
     }
 
 }

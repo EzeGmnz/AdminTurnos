@@ -23,17 +23,16 @@ import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.ObjectInterfaces.Place;
 import com.adminturnos.R;
 import com.adminturnos.Values;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 
 public class FragmentMain extends Fragment {
@@ -101,18 +100,12 @@ public class FragmentMain extends Fragment {
         recyclerViewJob.setAdapter(adapterJob);
     }
 
-    private class CallbackGetJobs implements Callback {
+    private class CallbackGetJobs extends JsonHttpResponseHandler {
 
         @Override
-        public void onFailure(Request request, IOException e) {
-
-        }
-
-        @Override
-        public void onResponse(Response response) throws IOException {
+        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
-                JSONObject jsonObject = new JSONObject(response.body().string());
-                JSONArray jobs = (JSONArray) jsonObject.get("jobs");
+                JSONArray jobs = (JSONArray) response.get("jobs");
 
                 ObjectBuilder<Job> builder = new BuilderJob();
                 for (int i = 0; i < jobs.length(); i++) {
@@ -132,18 +125,12 @@ public class FragmentMain extends Fragment {
         }
     }
 
-    private class CallbackGetOwnedPlaces implements Callback {
+    private class CallbackGetOwnedPlaces extends JsonHttpResponseHandler {
 
         @Override
-        public void onFailure(Request request, IOException e) {
-
-        }
-
-        @Override
-        public void onResponse(Response response) throws IOException {
+        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
-                JSONObject jsonObject = new JSONObject(response.body().string());
-                JSONArray places = (JSONArray) jsonObject.get("places");
+                JSONArray places = (JSONArray) response.get("places");
 
                 ObjectBuilder<Place> builder = new BuilderPlace();
                 for (int i = 0; i < places.length(); i++) {

@@ -20,5 +20,8 @@ public interface Values {
     String DJANGO_URL_GET_JOBS = "/android/profile/jobs/";
     String DJANGO_URL_GET_OWNED_PLACES = "/android/profile/places/";
     String DJANGO_URL_NEW_PLACE = "/android/new-place/";
+    String DJANGO_URL_JOBTYPES = "/android/jobtypes/";
+    String DJANGO_URL_PLACE_DOES = "/android/profile/place-does/";
+
 
 }

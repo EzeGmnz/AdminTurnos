@@ -2,15 +2,17 @@ import datetime
 import json
 
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.db.models import Count
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from .models import Place, Placedoes, JobRequest, Job, Service, DaySchedule, Provides, Appointment, Serviceinstance, \
-    Promotion, Promoincludes
+    Promotion, Promoincludes, Jobtype
 from .permissions import IsOwner, IsProvider, IsProviderPro
 from .serializers import PlaceSerializer, JobRequestSerializer, ServiceSerializer, JobSerializer, \
     ServiceInstanceSerializer
@@ -18,6 +20,7 @@ from .serializers import PlaceSerializer, JobRequestSerializer, ServiceSerialize
 
 # custom api view implementing get_object with permission check
 class CustomAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
     responseOK = {'result': 'OK'}
 
     def get_object(self, request, obj_model, pk):
@@ -64,12 +67,13 @@ class NewPlace(CustomAPIView):
 
         place.save()
 
-        job = Job()
-        job.serviceprovider = request.user
-        job.place = place
-        job.save()
+        if params.get('works_here') == "true":
+            job = Job()
+            job.serviceprovider = request.user
+            job.place = place
+            job.save()
 
-        return self.returnOK()
+        return JsonResponse({'place_id': place.id})
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -85,14 +89,46 @@ class DropPlace(CustomAPIView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
+class JobTypesView(CustomAPIView):
+    # permission_classes = [IsAuthenticated & IsOwner]
+
+    def get(self, request):
+        jobtypes_list = Jobtype.objects.all()
+
+        name_list = []
+        for x in jobtypes_list:
+            name_list.append(x.type)
+
+        return JsonResponse({'jobtypes': name_list})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class PlaceDoes(CustomAPIView):
     permission_classes = [IsAuthenticated & IsOwner]
 
     # place, jobtype
     def post(self, request):
-        place = self.get_object(request, Place, request.POST.get('place'))
-        place_does = Placedoes(place.id, request.POST.get('jobtype'))
-        place_does.save()
+        body = json.loads(request.body)
+        place = self.get_object(request, Place, body['place'])
+        jobtypes = body['jobtypes']
+
+        print(jobtypes)
+        placedoes_created = []
+        for x in jobtypes:
+            placedoes = Placedoes()
+            jobtype = Jobtype.objects.get(type=x)
+            placedoes.jobtype = jobtype
+            placedoes.place = place
+
+            try:
+                placedoes.full_clean()
+                placedoes_created.append(placedoes)
+            except IntegrityError:
+                return self.returnError(400, x)
+
+        for x in placedoes_created:
+            print(x.jobtype)
+            x.save()
 
         return self.returnOK()
 
