@@ -11,6 +11,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
+from restauth.models import CustomUser
 from .models import Place, Placedoes, JobRequest, Job, Service, DaySchedule, Provides, Appointment, Serviceinstance, \
     Promotion, Promoincludes, Jobtype
 from .permissions import IsOwner, IsProvider, IsProviderPro
@@ -112,7 +113,6 @@ class PlaceDoes(CustomAPIView):
         place = self.get_object(request, Place, body['place'])
         jobtypes = body['jobtypes']
 
-        print(jobtypes)
         placedoes_created = []
         for x in jobtypes:
             placedoes = Placedoes()
@@ -127,7 +127,6 @@ class PlaceDoes(CustomAPIView):
                 return self.returnError(400, x)
 
         for x in placedoes_created:
-            print(x.jobtype)
             x.save()
 
         return self.returnOK()
@@ -140,6 +139,7 @@ class PlacesOwned(CustomAPIView):
     def get(self, request):
         places = Place.objects.filter(serviceprovider=request.user.id)
         output = []
+
         for p in places:
             output.append(PlaceSerializer(p).data)
         return JsonResponse({'places': output})
@@ -191,7 +191,7 @@ class ViewJobRequests(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        places = Place.objects.filter(serviceprovider_owner_id=request.user.id)
+        places = Place.objects.filter(serviceprovider=request.user.id)
         output = {}
         for p in places:
             job_requests = JobRequest.objects.filter(place=p.id)
@@ -207,18 +207,41 @@ class ViewJobRequests(CustomAPIView):
 class AcceptJobRequest(CustomAPIView):
     permission_classes = [IsAuthenticated & IsOwner]
 
-    # TODO add can cancel appointments
+    def post(self, request):
+        place_id = request.POST.get('place_id')
+        from_who = request.POST.get('serviceprovider_from')
+
+        user_from = CustomUser.objects.get(email=from_who)
+        place = self.get_object(request, Place, place_id)
+
+        try:
+            jr = JobRequest.objects.get(place=place, serviceprovider_from=user_from)
+
+            job = Job()
+            job.serviceprovider = user_from
+            job.place = place
+
+            job.save()
+            jr.delete()
+
+            return self.returnOK()
+        except JobRequest.DoesNotExist:
+            raise
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CancelJobRequest(CustomAPIView):
+    permission_classes = [IsAuthenticated & IsOwner]
 
     def post(self, request):
         place_id = request.POST.get('place_id')
         from_who = request.POST.get('serviceprovider_from')
 
+        user_from = CustomUser.objects.get(email=from_who)
         place = self.get_object(request, Place, place_id)
 
         try:
-            jr = JobRequest.objects.get(place=place.id, serviceprovider_from=from_who)
-            job = Job(None, from_who, place.id)
-            job.save()
+            jr = JobRequest.objects.get(place=place, serviceprovider_from=user_from)
             jr.delete()
 
             return self.returnOK()

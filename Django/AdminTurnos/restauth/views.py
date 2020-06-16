@@ -13,11 +13,13 @@ from .authentification import GoogleAuth
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ExchangeForAccessTokenAndroid(ObtainAuthToken):
+
     def post(self, request, **kwargs):
         try:
             id_token = request.POST.get('id_token')
 
             user = GoogleAuth().authenticate(request, True, id_token)
+
             login(request, user)
             access_token, _ = Token.objects.get_or_create(user=user)
 

@@ -2,16 +2,17 @@ package com.adminturnos.Activities.NewPlace;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.adminturnos.Activities.ObjectConfigurator;
 import com.adminturnos.Activities.ObjectConfiguratorCoordinator;
+import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoWrite;
 import com.adminturnos.R;
 import com.adminturnos.Values;
-import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,7 +30,7 @@ public class NewPlaceActivity extends AppCompatActivity {
 
     private ObjectConfiguratorCoordinator coordinator;
     private Bundle bundle;
-
+    private List<ObjectConfigurator> fragments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,24 +41,37 @@ public class NewPlaceActivity extends AppCompatActivity {
         getSupportActionBar().setBackgroundDrawable(getDrawable(R.color.white));
         getSupportActionBar().setElevation(0);
 
+
+        fragments = new ArrayList<>();
+        fragments.add(new NewPlaceAFragment());
+        fragments.add(new NewPlaceBFragment());
+        fragments.add(new NewPlaceCFragment());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         initUI();
     }
 
     private void initUI() {
         setTitle("");
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                coordinator = new ObjectConfiguratorCoordinator(
+                        getSupportFragmentManager(),
+                        findViewById(android.R.id.content).getRootView(),
+                        fragments,
+                        new NewPlaceCoordinatorListener()
+                );
+            }
 
-        List<ObjectConfigurator> fragments = new ArrayList<>();
-        fragments.add(new NewPlaceAFragment());
-        fragments.add(new NewPlaceBFragment());
-        fragments.add(new NewPlaceCFragment());
+        }, 100);
 
-        this.coordinator = new ObjectConfiguratorCoordinator(
-                getSupportFragmentManager(),
-                findViewById(android.R.id.content).getRootView(),
-                fragments,
-                new NewPlaceCoordinatorListener()
-        );
     }
+
 
     private void returnCancel() {
         setResult(Activity.RESULT_CANCELED);
@@ -146,7 +160,7 @@ public class NewPlaceActivity extends AppCompatActivity {
         }
     }
 
-    private class CallbackNewPlace extends JsonHttpResponseHandler {
+    private class CallbackNewPlace extends DatabaseCallback {
 
         @Override
         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
@@ -176,7 +190,7 @@ public class NewPlaceActivity extends AppCompatActivity {
         }
     }
 
-    private class CallbackPlaceDoes extends JsonHttpResponseHandler {
+    private class CallbackPlaceDoes extends DatabaseCallback {
 
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

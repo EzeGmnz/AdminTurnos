@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoWrite;
 import com.adminturnos.Listeners.ListenerAuthenticator;
 import com.adminturnos.Values;
@@ -14,7 +15,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,7 +90,7 @@ public class AuthenticatorGoogle implements Authenticator {
         DatabaseDjangoWrite.getInstance().POST(Values.DJANGO_URL_CONVERT_TOKEN, body, new CallbackExchangeTokenId());
     }
 
-    private class CallbackExchangeTokenId extends JsonHttpResponseHandler {
+    private class CallbackExchangeTokenId extends DatabaseCallback {
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {

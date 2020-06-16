@@ -18,12 +18,12 @@ import com.adminturnos.Activities.Place.ViewPlaceActivity;
 import com.adminturnos.Builder.BuilderJob;
 import com.adminturnos.Builder.BuilderPlace;
 import com.adminturnos.Builder.ObjectBuilder;
+import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoRead;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.ObjectInterfaces.Place;
 import com.adminturnos.R;
 import com.adminturnos.Values;
-import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -100,7 +100,7 @@ public class FragmentMain extends Fragment {
         recyclerViewJob.setAdapter(adapterJob);
     }
 
-    private class CallbackGetJobs extends JsonHttpResponseHandler {
+    private class CallbackGetJobs extends DatabaseCallback {
 
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -125,7 +125,7 @@ public class FragmentMain extends Fragment {
         }
     }
 
-    private class CallbackGetOwnedPlaces extends JsonHttpResponseHandler {
+    private class CallbackGetOwnedPlaces extends DatabaseCallback {
 
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

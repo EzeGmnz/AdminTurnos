@@ -80,7 +80,8 @@ class Job(models.Model):
 
 
 class Placedoes(models.Model):
-    place = models.OneToOneField(Place, models.CASCADE, primary_key=True)
+    id = models.BigAutoField(primary_key=True)
+    place = models.OneToOneField(Place, models.CASCADE)
     jobtype = models.ForeignKey(Jobtype, models.CASCADE, db_column='jobtype')
 
     class Meta:

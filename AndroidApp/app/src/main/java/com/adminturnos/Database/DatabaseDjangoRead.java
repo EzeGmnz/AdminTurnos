@@ -2,7 +2,6 @@ package com.adminturnos.Database;
 
 import com.adminturnos.UserManagment.UserManagment;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import java.util.Map;
@@ -32,7 +31,8 @@ public class DatabaseDjangoRead implements DatabaseRead {
         return instance;
     }
 
-    public void GET(String subDirURL, Map<String, String> body, JsonHttpResponseHandler callback) {
+    @Override
+    public void GET(String subDirURL, Map<String, String> body, DatabaseCallback callback) {
 
         RequestParams params = new RequestParams();
         if (body != null) {

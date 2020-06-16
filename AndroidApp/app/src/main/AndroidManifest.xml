@@ -12,16 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-
         <activity
-            android:windowSoftInputMode="adjustResize"
-            android:name=".Activities.NewPlace.NewPlaceActivity"
+            android:name=".Activities.JobRequest.JobRequestActivity"
             android:theme="@style/AppThemeActionBar" />
-
+        <activity
+            android:name=".Activities.NewPlace.NewPlaceActivity"
+            android:theme="@style/AppThemeActionBar"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".Activities.Place.ViewPlaceActivity"
             android:theme="@style/AppThemeActionBar" />
-
         <activity
             android:name=".Activities.Job.ViewJobActivity"
             android:theme="@style/AppThemeActionBar" />
@@ -34,6 +34,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

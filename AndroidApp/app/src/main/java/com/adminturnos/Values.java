@@ -22,6 +22,7 @@ public interface Values {
     String DJANGO_URL_NEW_PLACE = "/android/new-place/";
     String DJANGO_URL_JOBTYPES = "/android/jobtypes/";
     String DJANGO_URL_PLACE_DOES = "/android/profile/place-does/";
-
-
+    String DJANGO_URL_JOB_REQUEST = "/android/profile/job-requests/";
+    String DJANGO_URL_ACCEPT_JOB_REQUEST = "/android/profile/accept-job-request/";
+    String DJANGO_URL_CANCEL_JOB_REQUEST = "/android/profile/cancel-job-request/";
 }

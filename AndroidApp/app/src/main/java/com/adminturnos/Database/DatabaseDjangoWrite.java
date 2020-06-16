@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.adminturnos.UserManagment.UserManagment;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
@@ -39,7 +38,8 @@ public class DatabaseDjangoWrite implements DatabaseWrite {
         return instance;
     }
 
-    public void POST(String subDirURL, Map<String, String> body, JsonHttpResponseHandler callback) {
+    @Override
+    public void POST(String subDirURL, Map<String, String> body, DatabaseCallback callback) {
 
         RequestParams params = new RequestParams();
         if (body != null) {
@@ -57,7 +57,7 @@ public class DatabaseDjangoWrite implements DatabaseWrite {
         );
     }
 
-    public void POSTJSON(Context context, String subDirURL, JSONObject json, JsonHttpResponseHandler callback) {
+    public void POSTJSON(Context context, String subDirURL, JSONObject json, DatabaseCallback callback) {
         StringEntity entity = null;
 
         try {

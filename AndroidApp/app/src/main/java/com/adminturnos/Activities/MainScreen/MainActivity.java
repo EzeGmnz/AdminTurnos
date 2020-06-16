@@ -15,6 +15,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.adminturnos.Activities.JobRequest.JobRequestActivity;
 import com.adminturnos.Activities.NewPlace.NewPlaceActivity;
 import com.adminturnos.Activities.SignIn.ActivitySignIn;
 import com.adminturnos.R;
@@ -121,6 +122,11 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, Values.RC_NEW_PLACE);
     }
 
+    private void startJobRequestsActivity() {
+        Intent intent = new Intent(this, JobRequestActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -151,6 +157,9 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.nav_new_place:
                     startNewPlaceActivity();
+                    break;
+                case R.id.nav_job_request:
+                    startJobRequestsActivity();
                     break;
                 case R.id.nav_sign_out:
                     signOut();

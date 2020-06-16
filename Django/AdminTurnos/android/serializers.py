@@ -1,21 +1,7 @@
 from rest_framework import serializers
 
+from restauth.serializers import CustomUserSerializer
 from .models import Place, JobRequest, Service, Job, Appointment, Serviceinstance
-
-
-class JobRequestSerializer(serializers.Serializer):
-    place = serializers.PrimaryKeyRelatedField(read_only=True)
-    serviceprovider_from = serializers.PrimaryKeyRelatedField(read_only=True)
-
-    def update(self, instance, validated_data):
-        instance.place = validated_data.get('place', instance.place)
-        instance.serviceprovider_from = validated_data.get('serviceprovider_from',
-                                                           instance.serviceprovider_from)
-
-        return instance
-
-    def create(self, validated_data):
-        return JobRequest.objects.create(**validated_data)
 
 
 class ServiceSerializer(serializers.Serializer):
@@ -37,6 +23,15 @@ class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place
         fields = ['id', 'street', 'streetnumber', 'businessname']
+
+
+class JobRequestSerializer(serializers.ModelSerializer):
+    place = PlaceSerializer()
+    serviceprovider_from = CustomUserSerializer()
+
+    class Meta:
+        model = JobRequest
+        fields = ['place', 'serviceprovider_from']
 
 
 class JobSerializer(serializers.ModelSerializer):
