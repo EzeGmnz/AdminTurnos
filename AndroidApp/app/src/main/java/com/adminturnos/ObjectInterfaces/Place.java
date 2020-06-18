@@ -12,4 +12,6 @@ public interface Place extends Serializable {
     String getBusinessName();
 
     String getAddress();
+
+    CustomUser getOwner();
 }

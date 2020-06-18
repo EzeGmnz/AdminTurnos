@@ -25,4 +25,7 @@ public interface Values {
     String DJANGO_URL_JOB_REQUEST = "/android/profile/job-requests/";
     String DJANGO_URL_ACCEPT_JOB_REQUEST = "/android/profile/accept-job-request/";
     String DJANGO_URL_CANCEL_JOB_REQUEST = "/android/profile/cancel-job-request/";
+    String DJANGO_URL_SEARCH_PLACE = "/android/search-place/";
+    String DJANGO_URL_NEW_JOB_REQUEST = "/android/new-job-request/";
+    String DJANGO_URL_GET_APPOINTMENTS = "/android/get-appointments/";
 }

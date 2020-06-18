@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_new_place"
+        android:title="Crear Lugar" />
+
+    <item
+        android:id="@+id/nav_job_request"
+        android:title="Solicitudes de Trabajo" />
+
+    <item
+        android:id="@+id/configuration_section"
+        android:title="Configuración">
+        <menu>
+            <item
+                android:id="@+id/nav_sign_out"
+                android:icon="@android:drawable/ic_lock_power_off"
+                android:title="Cerrar Sesion" />
+        </menu>
+    </item>
+</menu>

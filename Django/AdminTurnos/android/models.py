@@ -81,8 +81,8 @@ class Job(models.Model):
 
 class Placedoes(models.Model):
     id = models.BigAutoField(primary_key=True)
-    place = models.OneToOneField(Place, models.CASCADE)
-    jobtype = models.ForeignKey(Jobtype, models.CASCADE, db_column='jobtype')
+    place = models.ForeignKey(Place, models.CASCADE)
+    jobtype = models.ForeignKey(Jobtype, models.CASCADE)
 
     class Meta:
         db_table = 'PlaceDoes'
@@ -266,9 +266,10 @@ class Promoapplied(models.Model):
 
 
 class JobRequest(models.Model):
-    place = models.OneToOneField(Place, models.CASCADE, primary_key=True)
-    serviceprovider_from = models.ForeignKey(auth.get_user_model(), models.CASCADE)
+    id = models.BigAutoField(primary_key=True)
+    place = models.ForeignKey(Place, models.CASCADE)
+    serviceprovider = models.ForeignKey(auth.get_user_model(), models.CASCADE)
 
     class Meta:
         db_table = 'JobRequest'
-        unique_together = (('place', 'serviceprovider_from'),)
+        unique_together = (('place', 'serviceprovider'),)

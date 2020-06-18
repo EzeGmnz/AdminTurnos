@@ -15,7 +15,7 @@
         android:layout_marginTop="128dp"
         android:fontFamily="@font/productsans_black"
         android:text="Bienvenido\na\nadmin turnos."
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="50sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

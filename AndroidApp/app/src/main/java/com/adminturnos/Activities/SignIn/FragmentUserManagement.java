@@ -29,6 +29,7 @@ public class FragmentUserManagement extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Authenticator authenticatorGoogle = new AuthenticatorGoogle(getActivity(), new ListenerAuthenticatorGoogle());
+        //TODO
         UserManagment.getInstance().setAuthenticator(authenticatorGoogle);
     }
 

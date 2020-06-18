@@ -14,9 +14,11 @@ class GoogleAuth(BaseBackend):
             if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
                 raise ValueError('Wrong issuer.')
 
-            # getting user id
+            # get or create user
             user_model = auth.get_user_model()
-            user, created = user_model.objects.get_or_create(email=idinfo['email'], isprovider=isProvider)
+            user, created = user_model.objects.get_or_create(email=idinfo['email'],
+                                                             isprovider=isProvider,
+                                                             idinfo=idinfo)
 
             return user
 

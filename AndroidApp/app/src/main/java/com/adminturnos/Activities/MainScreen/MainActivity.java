@@ -1,5 +1,6 @@
 package com.adminturnos.Activities.MainScreen;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -133,10 +134,16 @@ public class MainActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case Values.RC_SIGN_IN_ACTIVITY:
-                checkUserIsAuthenticated();
+                if (resultCode == Activity.RESULT_OK) {
+                    checkUserIsAuthenticated();
+                } else {
+                    finish();
+                }
                 break;
             case Values.RC_NEW_PLACE:
-                refreshContent();
+                if (resultCode == Activity.RESULT_OK) {
+                    refreshContent();
+                }
                 break;
         }
     }

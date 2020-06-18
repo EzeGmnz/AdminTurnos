@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.NewPlace.NewPlaceCFragment">
+
+    <TextView
+        android:id="@+id/textViewInfoNewPlace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="¿Trabajás en este lugar?"
+        android:textSize="25sp" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/checkboxNewPlace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/textViewInfoNewPlace"
+        android:layout_alignBottom="@id/textViewInfoNewPlace"
+        android:layout_centerHorizontal="true"
+        android:layout_toEndOf="@id/textViewInfoNewPlace" />
+
+</RelativeLayout>

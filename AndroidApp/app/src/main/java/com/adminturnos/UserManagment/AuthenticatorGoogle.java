@@ -72,7 +72,7 @@ public class AuthenticatorGoogle implements Authenticator {
             exchangeTokenID(account.getIdToken());
         } catch (ApiException e) {
             e.printStackTrace();
-            listener.onComplete(Activity.RESULT_CANCELED);
+            listener.onComplete(Activity.RESULT_OK);
         }
 
     }
@@ -99,7 +99,7 @@ public class AuthenticatorGoogle implements Authenticator {
                 sharedPreferences.edit().putString(Values.SHARED_PREF_ACCESS_TOKEN, response.getString("access_token")).apply();
                 listener.onComplete(Activity.RESULT_OK);
             } catch (JSONException e) {
-                listener.onComplete(Activity.RESULT_CANCELED);
+                listener.onComplete(Activity.RESULT_OK);
             }
         }
     }

@@ -1,14 +1,12 @@
 package com.adminturnos.Functionality;
 
-/**
- *
- */
-public class AppointmentManager {
+import com.adminturnos.ObjectInterfaces.Appointment;
 
-    /**
-     * Default constructor
-     */
-    public AppointmentManager() {
-    }
+import java.util.Calendar;
+import java.util.List;
+
+public interface AppointmentManager {
+
+    List<Appointment> getAppointmentsInDate(Calendar date);
 
 }

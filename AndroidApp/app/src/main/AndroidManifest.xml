@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".Activities.Job.EditJobActivity" />
+        <activity
+            android:name=".Activities.JobRequest.NewJobRequestActivity"
+            android:theme="@style/AppThemeActionBar" />
         <activity
             android:name=".Activities.JobRequest.JobRequestActivity"
             android:theme="@style/AppThemeActionBar" />
@@ -25,7 +29,6 @@
         <activity
             android:name=".Activities.Job.ViewJobActivity"
             android:theme="@style/AppThemeActionBar" />
-
         <activity android:name=".Activities.SignIn.ActivitySignIn" />
         <activity android:name=".Activities.MainScreen.MainActivity">
             <intent-filter>
@@ -34,7 +37,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

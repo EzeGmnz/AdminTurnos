@@ -11,6 +11,7 @@ import com.adminturnos.Activities.ObjectConfigurator;
 import com.adminturnos.Activities.ObjectConfiguratorCoordinator;
 import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoWrite;
+import com.adminturnos.ObjectInterfaces.JobType;
 import com.adminturnos.R;
 import com.adminturnos.Values;
 
@@ -72,7 +73,6 @@ public class NewPlaceActivity extends AppCompatActivity {
 
     }
 
-
     private void returnCancel() {
         setResult(Activity.RESULT_CANCELED);
         finish();
@@ -121,18 +121,18 @@ public class NewPlaceActivity extends AppCompatActivity {
         );
     }
 
-    private void createPlaceDoes(String id) {
+    private void createPlaceDoes(String placeId) {
         JSONObject json = new JSONObject();
         JSONArray jsonArray = new JSONArray();
-        List<String> jobtypes = (List<String>) bundle.getSerializable("jobtypes");
+        List<JobType> jobtypes = (List<JobType>) bundle.getSerializable("jobtypes");
 
-        for (String type : jobtypes) {
-            jsonArray.put(type);
+        for (JobType type : jobtypes) {
+            jsonArray.put(type.getType());
         }
 
         try {
             json.put("jobtypes", jsonArray);
-            json.put("place", id);
+            json.put("place", placeId);
 
             DatabaseDjangoWrite.getInstance().POSTJSON(
                     this,
@@ -163,25 +163,10 @@ public class NewPlaceActivity extends AppCompatActivity {
     private class CallbackNewPlace extends DatabaseCallback {
 
         @Override
-        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-            super.onFailure(statusCode, headers, throwable, errorResponse);
-        }
-
-        @Override
-        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-            super.onFailure(statusCode, headers, throwable, errorResponse);
-        }
-
-        @Override
-        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-            super.onFailure(statusCode, headers, responseString, throwable);
-        }
-
-        @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
-                String id = response.getString("place_id");
-                createPlaceDoes(id);
+                String placeId = response.getString("place_id");
+                createPlaceDoes(placeId);
 
             } catch (JSONException ignored) {
 

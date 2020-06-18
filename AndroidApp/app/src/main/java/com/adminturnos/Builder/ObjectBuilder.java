@@ -11,6 +11,6 @@ public interface ObjectBuilder<E> {
      * @param json json to build object from
      * @return object built
      */
-    public abstract E build(JSONObject json) throws JSONException;
+    E build(JSONObject json) throws JSONException;
 
 }

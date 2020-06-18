@@ -15,17 +15,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.adminturnos.Activities.Job.ViewJobActivity;
 import com.adminturnos.Activities.Place.ViewPlaceActivity;
-import com.adminturnos.Builder.BuilderJob;
-import com.adminturnos.Builder.BuilderPlace;
-import com.adminturnos.Builder.ObjectBuilder;
+import com.adminturnos.Builder.BuilderListJob;
+import com.adminturnos.Builder.BuilderListPlace;
 import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoRead;
+import com.adminturnos.Functionality.JobAppointmentHolderWrapper;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.ObjectInterfaces.Place;
 import com.adminturnos.R;
 import com.adminturnos.Values;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -100,25 +99,22 @@ public class FragmentMain extends Fragment {
         recyclerViewJob.setAdapter(adapterJob);
     }
 
+    private void fetchAppointmentsInBackground() {
+        for (Job j : jobList) {
+            JobAppointmentHolderWrapper.getInstance().getAppointmentManager(j.getId(), null);
+        }
+    }
+
     private class CallbackGetJobs extends DatabaseCallback {
 
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
-                JSONArray jobs = (JSONArray) response.get("jobs");
 
-                ObjectBuilder<Job> builder = new BuilderJob();
-                for (int i = 0; i < jobs.length(); i++) {
-                    jobList.add(builder.build(jobs.getJSONObject(i)));
-                }
+                jobList.addAll(new BuilderListJob().build(response));
+                adapterJob.notifyDataSetChanged();
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapterJob.notifyDataSetChanged();
-                    }
-                });
-
+                fetchAppointmentsInBackground();
             } catch (JSONException ignored) {
 
             }
@@ -130,26 +126,17 @@ public class FragmentMain extends Fragment {
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
-                JSONArray places = (JSONArray) response.get("places");
 
-                ObjectBuilder<Place> builder = new BuilderPlace();
-                for (int i = 0; i < places.length(); i++) {
-                    ownedPlacesList.add(builder.build(places.getJSONObject(i)));
-                }
+                ownedPlacesList.addAll(new BuilderListPlace().build(response));
+                adapterOwnedPlaces.notifyDataSetChanged();
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapterOwnedPlaces.notifyDataSetChanged();
-                    }
-                });
             } catch (JSONException ignored) {
 
             }
         }
     }
 
-    public class AdapterRecyclerViewJobs extends RecyclerView.Adapter<AdapterRecyclerViewJobs.ViewHolderJob> {
+    private class AdapterRecyclerViewJobs extends RecyclerView.Adapter<AdapterRecyclerViewJobs.ViewHolderJob> {
         private List<Job> jobList;
 
         public AdapterRecyclerViewJobs(List<Job> jobList) {
@@ -191,7 +178,7 @@ public class FragmentMain extends Fragment {
         }
     }
 
-    public class AdapterRecyclerViewOwnedPlaces extends RecyclerView.Adapter<AdapterRecyclerViewOwnedPlaces.ViewHolderOwnedPlaces> {
+    private class AdapterRecyclerViewOwnedPlaces extends RecyclerView.Adapter<AdapterRecyclerViewOwnedPlaces.ViewHolderOwnedPlaces> {
         private List<Place> ownedPlaceList;
 
         public AdapterRecyclerViewOwnedPlaces(List<Place> ownedPlaces) {

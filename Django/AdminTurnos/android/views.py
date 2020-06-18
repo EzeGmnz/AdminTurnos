@@ -16,7 +16,7 @@ from .models import Place, Placedoes, JobRequest, Job, Service, DaySchedule, Pro
     Promotion, Promoincludes, Jobtype
 from .permissions import IsOwner, IsProvider, IsProviderPro
 from .serializers import PlaceSerializer, JobRequestSerializer, ServiceSerializer, JobSerializer, \
-    ServiceInstanceSerializer
+    ServiceInstanceSerializer, AppointmentSerializer
 
 
 # custom api view implementing get_object with permission check
@@ -161,13 +161,19 @@ class JobsView(CustomAPIView):
 class SearchPlace(CustomAPIView):
     permission_classes = [IsAuthenticated]
 
+    def apply_transformation(self, string):
+        return string.strip().lower()
+
     def get(self, request):
-        businessname = request.GET.get('businessname')
+        businessname = request.GET.get('searchquery')
+        businessname = self.apply_transformation(businessname)
         output = []
-        if businessname is not None and businessname.strip() != '':
-            places = Place.objects.filter(businessname__contains=businessname)
+        print(businessname)
+        if businessname is not None and businessname != '':
+            places = Place.objects.filter(businessname__icontains=businessname)
             for p in places:
-                output.append(PlaceSerializer(p).data)
+                if p.serviceprovider != request.user:
+                    output.append(PlaceSerializer(p).data)
         return JsonResponse({'places': output})
 
 
@@ -181,7 +187,11 @@ class NewJobRequest(CustomAPIView):
         if Job.objects.filter(place=place_id, serviceprovider=request.user.id).exists():
             return self.returnError(500, 'Job already exists')
 
-        job_request = JobRequest(place_id, request.user.id)
+        place = Place.objects.get(id=place_id)
+
+        job_request = JobRequest()
+        job_request.place = place
+        job_request.serviceprovider = request.user
         job_request.save()
         return self.returnOK()
 
@@ -209,13 +219,13 @@ class AcceptJobRequest(CustomAPIView):
 
     def post(self, request):
         place_id = request.POST.get('place_id')
-        from_who = request.POST.get('serviceprovider_from')
+        from_who = request.POST.get('serviceprovider')
 
         user_from = CustomUser.objects.get(email=from_who)
         place = self.get_object(request, Place, place_id)
 
         try:
-            jr = JobRequest.objects.get(place=place, serviceprovider_from=user_from)
+            jr = JobRequest.objects.get(place=place, serviceprovider=user_from)
 
             job = Job()
             job.serviceprovider = user_from
@@ -235,13 +245,13 @@ class CancelJobRequest(CustomAPIView):
 
     def post(self, request):
         place_id = request.POST.get('place_id')
-        from_who = request.POST.get('serviceprovider_from')
+        from_who = request.POST.get('serviceprovider')
 
         user_from = CustomUser.objects.get(email=from_who)
         place = self.get_object(request, Place, place_id)
 
         try:
-            jr = JobRequest.objects.get(place=place, serviceprovider_from=user_from)
+            jr = JobRequest.objects.get(place=place, serviceprovider=user_from)
             jr.delete()
 
             return self.returnOK()
@@ -343,7 +353,7 @@ class DropJob(CustomAPIView):
 
     def post(self, request):
         job = Job.objects.get(id=request.POST.get('job_id'))
-        place = self.get_object(request, Place, job.place)
+        self.get_object(request, Place, job.place)
         job.delete()
 
 
@@ -353,19 +363,22 @@ class GetAppointments(CustomAPIView):
 
     def get(self, request):
         job_id = request.GET.get('job_id')
-        date = request.GET.get('date')
         job = Job.objects.get(id=job_id)
 
         if job.serviceprovider == request.user or job.place.serviceprovider == request.user:
             output = {}
-
-            appointments = Appointment.objects.filter(job=job, date=date)
+            # TODO provide only future appointments
+            appointments = Appointment.objects.filter(job=job)
             for a in appointments:
                 services = {}
                 service_instances = Serviceinstance.objects.filter(appointment=a)
                 for i, s in enumerate(service_instances):
-                    services[i] = ServiceInstanceSerializer()
-                output[a.id] = services
+                    services[i] = ServiceInstanceSerializer(s).data
+
+                output[a.id] = {
+                    'appointment': AppointmentSerializer(a).data,
+                    'services': services
+                }
 
             return JsonResponse(output)
 

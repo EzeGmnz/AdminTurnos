@@ -10,6 +10,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     isprovider = models.BooleanField(default=False)
     isclient = models.BooleanField(default=False)
     isproviderpro = models.BooleanField(default=False)
+    given_name = models.CharField(max_length=30)
+    family_name = models.CharField(max_length=30)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
