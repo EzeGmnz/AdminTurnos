@@ -20,7 +20,7 @@ public class BuilderObjectJobRequest implements ObjectBuilder<JobRequest> {
         JSONObject jsonServiceProvider = json.getJSONObject("serviceprovider");
 
         Place place = new BuilderObjectPlace().build(jsonPlace);
-        CustomUser serviceProvider = new BuilderObjectServiceProvider().build(jsonServiceProvider);
+        CustomUser serviceProvider = new BuilderObjectCustomUser().build(jsonServiceProvider);
 
         out = new JobRequestNormal(place, serviceProvider);
 

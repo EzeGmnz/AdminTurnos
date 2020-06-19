@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from restauth.serializers import CustomUserSerializer
-from .models import Place, JobRequest, Service, Job, Appointment, Serviceinstance
+from .models import Place, JobRequest, Service, Job, Appointment, Serviceinstance, DaySchedule, Provides
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -50,3 +50,17 @@ class ServiceInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Serviceinstance
         fields = ['id', 'timestamp', 'service']
+
+
+class DayScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DaySchedule
+        fields = ['id', 'day_of_week', 'day_start', 'day_end', 'pause_start', 'pause_end']
+
+
+class ProvidesSerializer(serializers.ModelSerializer):
+    service = ServiceSerializer()
+
+    class Meta:
+        model = Provides
+        fields = ['id', 'service', 'cost', 'duration', 'parallelism']

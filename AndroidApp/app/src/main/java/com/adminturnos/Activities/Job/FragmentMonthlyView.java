@@ -21,8 +21,9 @@ import com.adminturnos.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 public class FragmentMonthlyView extends Fragment {
 
@@ -32,11 +33,15 @@ public class FragmentMonthlyView extends Fragment {
     private Calendar todayCalendar;
     private Job job;
     private List<CalendarDay> calendarDaysList;
+    private Map<ViewGroup, Calendar> mapViewCalendar;
+    private ListenerChangeDay listenerChangeDay;
 
-    public FragmentMonthlyView(Job job) {
+    public FragmentMonthlyView(Job job, ListenerChangeDay listener) {
         this.job = job;
+        this.listenerChangeDay = listener;
         todayCalendar = Calendar.getInstance();
         calendarDaysList = new ArrayList<>();
+        mapViewCalendar = new HashMap<>();
     }
 
     @Override
@@ -58,22 +63,34 @@ public class FragmentMonthlyView extends Fragment {
         ViewGroup currentWeekRow = newWeekRow();
         addPastDays(currentWeekRow);
 
-        Calendar currentCalendar = Calendar.getInstance();
+
+        final Calendar currentCalendar = Calendar.getInstance();
         CalendarDay currentCalendarDay;
         for (int i = 0; i < MAX_DISPLAYED_WEEKS; i++) {
             if (i > 0) {
                 currentWeekRow = newWeekRow();
             }
 
+            int j = 0;
             while (currentWeekRow.getChildCount() < 7) {
+
                 currentCalendarDay = new CalendarDayMonthly(currentCalendar);
                 currentCalendarDay.setAppointmentList(appointmentManager.getAppointmentsInDate(currentCalendar));
 
                 ViewGroup dayView = newDayView(currentWeekRow);
-                currentCalendarDay.populateView(dayView);
+                currentCalendarDay.populateView(dayView, getLayoutInflater());
                 calendarDaysList.add(currentCalendarDay);
 
+                mapViewCalendar.put(dayView, (Calendar) currentCalendar.clone());
+                dayView.setOnClickListener(new ListenerDayClick());
+
+                if (j == 0) {
+                    dayView.setBackground(getResources().getDrawable(R.drawable.monthly_border_rectangle_leftmost));
+                }
+                j++;
+
                 currentCalendar.add(Calendar.DATE, 1);
+
             }
         }
 
@@ -89,6 +106,7 @@ public class FragmentMonthlyView extends Fragment {
 
     private ViewGroup newDayView(ViewGroup weekRow) {
         RelativeLayout relativeLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.monthly_day_layout, weekRow, false);
+
         weekRow.addView(relativeLayout);
         return relativeLayout;
     }
@@ -99,6 +117,10 @@ public class FragmentMonthlyView extends Fragment {
         return weekRowView;
     }
 
+    public interface ListenerChangeDay {
+        void onMonthDayClicked(Calendar day);
+    }
+
     private class ListenerGetAppointments implements ListenerAppointmentHolder {
 
         @Override
@@ -106,5 +128,15 @@ public class FragmentMonthlyView extends Fragment {
             appointmentManager = manager;
             populateWeekRows();
         }
+    }
+
+    private class ListenerDayClick implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            Calendar calendar = mapViewCalendar.get(v);
+            listenerChangeDay.onMonthDayClicked(calendar);
+        }
+
     }
 }

@@ -3,15 +3,17 @@
     android:layout_width="0dp"
     android:layout_height="match_parent"
     android:layout_weight="1"
-    android:background="@drawable/border_rectangle_gray">
+    android:background="@drawable/monthly_border_rectangle_rightmost">
 
     <TextView
+        android:layout_marginTop="8dp"
         android:id="@+id/textViewDayNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_margin="4dp"
+        android:layout_marginBottom="8dp"
+        android:textSize="13sp"
         android:text="25" />
 
     <LinearLayout
@@ -19,7 +21,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/textViewDayNumber"
-        android:layout_marginTop="4dp"
         android:orientation="vertical" />
 
 </RelativeLayout>

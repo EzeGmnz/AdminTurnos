@@ -1,11 +1,11 @@
 package com.adminturnos.Builder;
 
 import com.adminturnos.ObjectInterfaces.Appointment;
+import com.adminturnos.ObjectInterfaces.CustomUser;
 import com.adminturnos.ObjectInterfaces.Service;
 import com.adminturnos.ObjectInterfaces.ServiceInstance;
 import com.adminturnos.Objects.ServiceAppointment;
 import com.adminturnos.Objects.ServiceAppointmentInstance;
-import com.adminturnos.Objects.ServiceNamed;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +32,7 @@ public class BuilderListAppointment {
         //"date":"2020-06-18"
         //"timestamp":"2020-06-18T13:00:00"
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("y-m-d", Locale.ENGLISH);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
 
         for (Iterator<String> itAppointments = json.keys(); itAppointments.hasNext(); ) {
@@ -48,8 +48,9 @@ public class BuilderListAppointment {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            CustomUser client = new BuilderObjectCustomUser().build(jsonAppointment.getJSONObject("client"));
 
-            appointment = new ServiceAppointment(appointmentId, appointmentDate);
+            appointment = new ServiceAppointment(client, appointmentId, appointmentDate);
             for (Iterator<String> itServices = jsonServices.keys(); itServices.hasNext(); ) {
                 String serviceNumber = itServices.next();
 
@@ -65,20 +66,21 @@ public class BuilderListAppointment {
 
                 String serviceId = jsonServiceData.getJSONObject("service").getString("id");
 
-
                 Service service;
                 if (!serviceMap.containsKey(serviceId)) {
                     JSONObject serviceData = jsonServiceData.getJSONObject("service");
-                    String serviceName = serviceData.getString("name");
-                    String serviceJobType = serviceData.getString("jobtype");
-
-                    service = new ServiceNamed(serviceId, serviceJobType, serviceName);
+                    service = new BuilderObjectService().build(serviceData);
                     serviceMap.put(serviceId, service);
                 } else {
                     service = serviceMap.get(serviceId);
                 }
 
-                serviceInstance = new ServiceAppointmentInstance(serviceInstanceId, serviceInstanceDateTime, service);
+                serviceInstance = new ServiceAppointmentInstance(
+                        serviceInstanceId,
+                        serviceInstanceDateTime,
+                        service
+
+                );
                 appointment.addService(serviceInstance);
             }
 

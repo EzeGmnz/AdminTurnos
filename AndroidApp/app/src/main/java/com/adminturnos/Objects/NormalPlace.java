@@ -9,7 +9,7 @@ public class NormalPlace implements Place {
     private CustomUser owner;
     private String address;
 
-    public NormalPlace(String id, ServiceProvider owner, String businessName, String address) {
+    public NormalPlace(String id, CustomUser owner, String businessName, String address) {
         this.id = id;
         this.owner = owner;
         this.businessName = businessName;

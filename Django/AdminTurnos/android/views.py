@@ -16,7 +16,7 @@ from .models import Place, Placedoes, JobRequest, Job, Service, DaySchedule, Pro
     Promotion, Promoincludes, Jobtype
 from .permissions import IsOwner, IsProvider, IsProviderPro
 from .serializers import PlaceSerializer, JobRequestSerializer, ServiceSerializer, JobSerializer, \
-    ServiceInstanceSerializer, AppointmentSerializer
+    ServiceInstanceSerializer, AppointmentSerializer, DayScheduleSerializer, ProvidesSerializer
 
 
 # custom api view implementing get_object with permission check
@@ -150,10 +150,28 @@ class JobsView(CustomAPIView):
     permission_classes = [IsAuthenticated & IsProvider]
 
     def get(self, request):
-        jobs = Job.objects.filter(serviceprovider_id=request.user.id)
-        output = []
-        for p in jobs:
-            output.append(JobSerializer(p).data)
+        jobs = Job.objects.filter(serviceprovider=request.user)
+        output = {}
+        for j in jobs:
+            schedules_list = {}
+            day_schedules = DaySchedule.objects.filter(job=j)
+            for ds in day_schedules:
+                provides_list = []
+                provides = Provides.objects.filter(job=j, day_schedule=ds)
+
+                for p in provides:
+                    provides_list.append(ProvidesSerializer(p).data)
+
+                schedules_list[ds.day_of_week] = {
+                    "day_schedule": DayScheduleSerializer(ds).data,
+                    "provides": provides_list
+                }
+
+            output[j.id] = {
+                "job": JobSerializer(j).data,
+                "day_schedules": schedules_list
+            }
+
         return JsonResponse({'jobs': output})
 
 
@@ -368,7 +386,7 @@ class GetAppointments(CustomAPIView):
         if job.serviceprovider == request.user or job.place.serviceprovider == request.user:
             output = {}
             # TODO provide only future appointments
-            appointments = Appointment.objects.filter(job=job)
+            appointments = Appointment.objects.filter(job=job, date__gte=datetime.date.today())
             for a in appointments:
                 services = {}
                 service_instances = Serviceinstance.objects.filter(appointment=a)

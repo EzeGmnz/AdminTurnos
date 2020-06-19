@@ -11,19 +11,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
-import com.adminturnos.CustomViews.NonSwipeableViewPager;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.R;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class ViewJobActivity extends AppCompatActivity {
     private Job job;
-    private NonSwipeableViewPager viewPager;
+    private ViewPager viewPager;
     private TabLayout tabLayout;
+    private FragmentDailyView fragmentDailyView;
+    private FragmentMonthlyView fragmentMonthlyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +59,14 @@ public class ViewJobActivity extends AppCompatActivity {
     private void populateContainer() {
         AdapterTab adapter = new AdapterTab(getSupportFragmentManager());
 
-        adapter.addFragment(new FragmentDailyView(job), "Diario");
-        adapter.addFragment(new FragmentWeeklyView(job), "Semanal");
-        adapter.addFragment(new FragmentMonthlyView(job), "Mensual");
+        this.fragmentDailyView = new FragmentDailyView(job);
+        this.fragmentMonthlyView = new FragmentMonthlyView(job, new ListenerOnDayClicked());
+
+        adapter.addFragment(fragmentDailyView, "Diario");
+        adapter.addFragment(fragmentMonthlyView, "Mensual");
 
         viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(2);
         tabLayout.setupWithViewPager(viewPager);
     }
 
@@ -118,6 +124,15 @@ public class ViewJobActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             return fragmentList.size();
+        }
+    }
+
+    private class ListenerOnDayClicked implements FragmentMonthlyView.ListenerChangeDay {
+
+        @Override
+        public void onMonthDayClicked(Calendar day) {
+            fragmentDailyView.setDay(day);
+            viewPager.setCurrentItem(0);
         }
     }
 }

@@ -13,53 +13,33 @@
         android:weightSum="7">
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Do" />
+
+            style="@style/day_indicator"
+            android:text="D" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Lu" />
+            style="@style/day_indicator"
+            android:text="L" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Ma" />
+            style="@style/day_indicator"
+            android:text="M" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Mi" />
+            style="@style/day_indicator"
+            android:text="M" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Ju" />
+            style="@style/day_indicator"
+            android:text="J" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Vi" />
+            style="@style/day_indicator"
+            android:text="V" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Sa" />
+            style="@style/day_indicator"
+            android:text="S" />
 
     </LinearLayout>
 

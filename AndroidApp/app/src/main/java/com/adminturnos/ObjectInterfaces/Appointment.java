@@ -7,9 +7,15 @@ public interface Appointment {
 
     String getId();
 
-    List<ServiceInstance> getServices();
+    CustomUser getClient();
+
+    List<ServiceInstance> getServiceInstances();
 
     void addService(ServiceInstance serviceInstance);
 
     Calendar getDate();
+
+    Calendar getStartTime();
+
+    Calendar getEndTime();
 }

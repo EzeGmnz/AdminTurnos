@@ -5,11 +5,11 @@ import com.adminturnos.ObjectInterfaces.CustomUser;
 /**
  *
  */
-public class ServiceProvider implements CustomUser {
+public class CustomUserImpl implements CustomUser {
 
     private String givenName, familyName, email, id;
 
-    public ServiceProvider(String id, String givenName, String familyName, String email) {
+    public CustomUserImpl(String id, String givenName, String familyName, String email) {
         this.givenName = givenName;
         this.familyName = familyName;
         this.email = email;

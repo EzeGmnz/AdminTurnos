@@ -1,9 +1,9 @@
 package com.adminturnos.Builder;
 
 
+import com.adminturnos.ObjectInterfaces.CustomUser;
 import com.adminturnos.ObjectInterfaces.Place;
 import com.adminturnos.Objects.NormalPlace;
-import com.adminturnos.Objects.ServiceProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,10 +16,10 @@ public class BuilderObjectPlace implements ObjectBuilder<Place> {
         Place out;
 
         JSONObject jsonOwner = json.getJSONObject("serviceprovider");
-        ServiceProvider serviceProvider = new BuilderObjectServiceProvider().build(jsonOwner);
+        CustomUser customUserImpl = new BuilderObjectCustomUser().build(jsonOwner);
         out = new NormalPlace(
                 json.getString("id"),
-                serviceProvider,
+                customUserImpl,
                 json.getString("businessname"),
                 json.getString("street") + " " + json.getString("streetnumber"));
 
