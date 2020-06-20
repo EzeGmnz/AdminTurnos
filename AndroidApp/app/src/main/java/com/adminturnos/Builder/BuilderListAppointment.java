@@ -29,9 +29,6 @@ public class BuilderListAppointment {
         Appointment appointment;
         ServiceInstance serviceInstance;
 
-        //"date":"2020-06-18"
-        //"timestamp":"2020-06-18T13:00:00"
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
 
@@ -50,7 +47,8 @@ public class BuilderListAppointment {
             }
             CustomUser client = new BuilderObjectCustomUser().build(jsonAppointment.getJSONObject("client"));
 
-            appointment = new ServiceAppointment(client, appointmentId, appointmentDate);
+
+            List<ServiceInstance> serviceInstanceList = new ArrayList<>();
             for (Iterator<String> itServices = jsonServices.keys(); itServices.hasNext(); ) {
                 String serviceNumber = itServices.next();
 
@@ -81,9 +79,9 @@ public class BuilderListAppointment {
                         service
 
                 );
-                appointment.addService(serviceInstance);
+                serviceInstanceList.add(serviceInstance);
             }
-
+            appointment = new ServiceAppointment(client, appointmentId, appointmentDate, serviceInstanceList);
             out.add(appointment);
         }
         return out;

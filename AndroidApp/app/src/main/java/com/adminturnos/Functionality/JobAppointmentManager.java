@@ -52,6 +52,7 @@ public class JobAppointmentManager implements AppointmentManager {
 
         try {
             appointments = new BuilderListAppointment().build(response);
+            appointments.sort(new AppointmentComparator());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -80,6 +81,14 @@ public class JobAppointmentManager implements AppointmentManager {
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             populateAppointments(response);
             notifyListener();
+        }
+    }
+
+    private class AppointmentComparator implements java.util.Comparator<Appointment> {
+
+        @Override
+        public int compare(Appointment o1, Appointment o2) {
+            return o1.getServiceInstances().get(0).getDateTime().compareTo(o2.getServiceInstances().get(0).getDateTime());
         }
     }
 }

@@ -38,7 +38,8 @@ public class CalendarDayMonthly extends CalendarDay {
         TextView textViewAppointmentData = appointmentView.findViewById(R.id.textViewAppointmentData);
         TextView textViewAppointmentTime = appointmentView.findViewById(R.id.textViewAppointmentTime);
 
-        String timeStr = String.format("%02d:%02d", a.getEndTime().get(Calendar.HOUR_OF_DAY), a.getEndTime().get(Calendar.MINUTE));
+        Calendar last = a.getServiceInstances().get(a.getServiceInstances().size() - 1).getDateTime();
+        String timeStr = String.format("%02d:%02d", last.get(Calendar.HOUR_OF_DAY), last.get(Calendar.MINUTE));
         textViewAppointmentTime.setText(timeStr);
         textViewAppointmentData.setText(a.getClient().getName());
     }

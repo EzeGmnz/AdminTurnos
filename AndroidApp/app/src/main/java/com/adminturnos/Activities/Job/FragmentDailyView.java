@@ -1,5 +1,6 @@
 package com.adminturnos.Activities.Job;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,10 +45,12 @@ public class FragmentDailyView extends Fragment {
     private LinearLayout timesContainer, containerServiceSeparation, serviceNameContainer, timeLineContainer;
     private AppointmentManager appointmentManager;
     private Map<String, ViewGroup> mapServiceViewGroup;
+    private Map<View, Appointment> mapAppointmentViewGroup;
 
     public FragmentDailyView(Job job) {
         this.currentDay = Calendar.getInstance();
         this.mapServiceViewGroup = new HashMap<>();
+        this.mapAppointmentViewGroup = new HashMap<>();
         this.job = job;
     }
 
@@ -87,7 +90,7 @@ public class FragmentDailyView extends Fragment {
         TextView textViewDayNumberIndicator = getView().findViewById(R.id.textViewDayNumberIndicator);
         TextView textViewDayIndicator = getView().findViewById(R.id.textViewDayIndicator);
 
-        textViewDayNumberIndicator.setText(currentDay.get(Calendar.DATE) + "");
+        textViewDayNumberIndicator.setText(currentDay.get(Calendar.DATE) + "/" + (1 + currentDay.get(Calendar.MONTH)));
         textViewDayIndicator.setText(mapNumberDay.get(currentDay.get(Calendar.DAY_OF_WEEK)));
 
         DaySchedule daySchedule = job.getDaySchedule(currentDay.get(Calendar.DAY_OF_WEEK));
@@ -191,7 +194,7 @@ public class FragmentDailyView extends Fragment {
         }
     }
 
-    private void newServiceInstanceView(Appointment a, ServiceInstance si) {
+    private void newServiceInstanceView(final Appointment a, ServiceInstance si) {
         ViewGroup correspServiceSeparation = mapServiceViewGroup.get(si.getService().getId());
         LinearLayout view = (LinearLayout) getLayoutInflater().inflate(R.layout.daily_appointment_layout, correspServiceSeparation, false);
 
@@ -203,12 +206,17 @@ public class FragmentDailyView extends Fragment {
         TextView textViewAppointmentTime = view.findViewById(R.id.textViewAppointmentTime);
         TextView textViewClient = view.findViewById(R.id.textViewClient);
 
+        mapAppointmentViewGroup.put(view, a);
+
+        view.setOnClickListener(new ListenerAppointmentClick());
+
         String timeStr = String.format("%02d:%02d", si.getDateTime().get(Calendar.HOUR_OF_DAY), si.getDateTime().get(Calendar.MINUTE));
         textViewAppointmentTime.setText(timeStr);
         textViewClient.setText(a.getClient().getName());
 
         correspServiceSeparation.addView(view);
     }
+
 
     private int getHeightPixels(ServiceInstance si) {
 
@@ -252,13 +260,26 @@ public class FragmentDailyView extends Fragment {
         return out;
     }
 
-
     private class ListenerGetAppointments implements ListenerAppointmentHolder {
 
         @Override
         public void onFetch(AppointmentManager manager) {
             appointmentManager = manager;
             populateDay();
+        }
+    }
+
+    private class ListenerAppointmentClick implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(getContext(), ViewAppointmentActivity.class);
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("appointment", mapAppointmentViewGroup.get(v));
+            bundle.putSerializable("job", job);
+
+            intent.putExtras(bundle);
+            startActivity(intent);
         }
     }
 }

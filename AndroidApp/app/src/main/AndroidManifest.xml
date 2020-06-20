@@ -12,25 +12,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".Activities.Job.ViewAppointmentActivity" />
         <activity android:name=".Activities.Job.EditJobActivity" />
-        <activity
-            android:name=".Activities.JobRequest.NewJobRequestActivity"
-            android:theme="@style/AppThemeActionBar" />
-        <activity
-            android:name=".Activities.JobRequest.JobRequestActivity"
-            android:theme="@style/AppThemeActionBar" />
+        <activity android:name=".Activities.JobRequest.NewJobRequestActivity" />
+        <activity android:name=".Activities.JobRequest.JobRequestActivity" />
         <activity
             android:name=".Activities.NewPlace.NewPlaceActivity"
-            android:theme="@style/AppThemeActionBar"
             android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".Activities.Place.ViewPlaceActivity" />
+        <activity android:name=".Activities.Job.ViewJobActivity" />
         <activity
-            android:name=".Activities.Place.ViewPlaceActivity"
-            android:theme="@style/AppThemeActionBar" />
+            android:name=".Activities.SignIn.ActivitySignIn"
+            android:theme="@style/AppThemeNoActionBar" />
         <activity
-            android:name=".Activities.Job.ViewJobActivity"
-            android:theme="@style/AppThemeActionBar" />
-        <activity android:name=".Activities.SignIn.ActivitySignIn" />
-        <activity android:name=".Activities.MainScreen.MainActivity">
+            android:name=".Activities.MainScreen.MainActivity"
+            android:theme="@style/AppThemeNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

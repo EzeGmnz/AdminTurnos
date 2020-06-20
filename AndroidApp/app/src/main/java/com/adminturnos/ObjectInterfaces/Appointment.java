@@ -1,9 +1,10 @@
 package com.adminturnos.ObjectInterfaces;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.List;
 
-public interface Appointment {
+public interface Appointment extends Serializable {
 
     String getId();
 
@@ -11,11 +12,7 @@ public interface Appointment {
 
     List<ServiceInstance> getServiceInstances();
 
-    void addService(ServiceInstance serviceInstance);
+    void setServiceInstances(List<ServiceInstance> list);
 
     Calendar getDate();
-
-    Calendar getStartTime();
-
-    Calendar getEndTime();
 }
