@@ -20,6 +20,10 @@ public class NormalJob implements Job {
         this.place = place;
     }
 
+    public void setDayScheduleList(List<DaySchedule> dayScheduleList) {
+        this.dayScheduleList = dayScheduleList;
+    }
+
     public String getId() {
         return id;
     }

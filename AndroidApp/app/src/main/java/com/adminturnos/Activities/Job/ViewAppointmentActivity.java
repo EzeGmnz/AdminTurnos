@@ -117,7 +117,13 @@ public class ViewAppointmentActivity extends AppCompatActivity {
 
             Provides p = job.getDaySchedule(appointment.getDate().get(Calendar.DAY_OF_WEEK)).getProvidedService(si.getService().getId());
             String strStart = String.format("%02d:%02d", si.getDateTime().get(Calendar.HOUR_OF_DAY), si.getDateTime().get(Calendar.MINUTE));
-            String strDuration = String.format("%02d:%02d", p.getDuration().get(Calendar.HOUR_OF_DAY), p.getDuration().get(Calendar.MINUTE));
+            String strDuration = "";
+            if (p.getDuration().get(Calendar.HOUR_OF_DAY) > 0) {
+                strDuration += String.format("%dh %02dm", p.getDuration().get(Calendar.HOUR_OF_DAY), p.getDuration().get(Calendar.MINUTE));
+            } else {
+                strDuration += String.format("%02dm", p.getDuration().get(Calendar.MINUTE));
+            }
+
             holder.labelServiceInstanceStart.setText(strStart);
             holder.labelServiceInstanceName.setText(si.getService().getName());
             holder.labelServiceInstanceCost.setText("$" + p.getCost());

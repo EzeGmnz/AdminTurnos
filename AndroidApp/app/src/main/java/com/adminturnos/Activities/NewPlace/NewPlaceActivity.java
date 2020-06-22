@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,6 +34,7 @@ public class NewPlaceActivity extends AppCompatActivity {
     private ObjectConfiguratorCoordinator coordinator;
     private Bundle bundle;
     private List<ObjectConfigurator> fragments;
+    private Button btnConfirm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +45,12 @@ public class NewPlaceActivity extends AppCompatActivity {
         getSupportActionBar().setBackgroundDrawable(getDrawable(R.color.white));
         getSupportActionBar().setElevation(0);
 
-
         fragments = new ArrayList<>();
         fragments.add(new NewPlaceAFragment());
         fragments.add(new NewPlaceBFragment());
         fragments.add(new NewPlaceCFragment());
+
+        this.btnConfirm = findViewById(R.id.btn_confirm);
     }
 
     @Override
@@ -56,6 +60,8 @@ public class NewPlaceActivity extends AppCompatActivity {
     }
 
     private void initUI() {
+        btnConfirm.setOnClickListener(new BtnConfirmClickListener());
+
         setTitle("");
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -67,10 +73,19 @@ public class NewPlaceActivity extends AppCompatActivity {
                         fragments,
                         new NewPlaceCoordinatorListener()
                 );
+                updateButton();
             }
 
         }, 100);
 
+    }
+
+    private void updateButton() {
+        if (!coordinator.hasNext()) {
+            btnConfirm.setText("Confirmar");
+        } else {
+            btnConfirm.setText("Siguiente");
+        }
     }
 
     private void returnCancel() {
@@ -86,6 +101,7 @@ public class NewPlaceActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         coordinator.prev();
+        updateButton();
     }
 
     @Override
@@ -180,6 +196,15 @@ public class NewPlaceActivity extends AppCompatActivity {
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             returnOK();
+        }
+    }
+
+    private class BtnConfirmClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            coordinator.next();
+            updateButton();
         }
     }
 }

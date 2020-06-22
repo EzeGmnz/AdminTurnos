@@ -13,10 +13,11 @@ from rest_framework.views import APIView
 
 from restauth.models import CustomUser
 from .models import Place, Placedoes, JobRequest, Job, Service, DaySchedule, Provides, Appointment, Serviceinstance, \
-    Promotion, Promoincludes, Jobtype
+    Promotion, Promoincludes, Jobtype, ScheduleTemplate
 from .permissions import IsOwner, IsProvider, IsProviderPro
 from .serializers import PlaceSerializer, JobRequestSerializer, ServiceSerializer, JobSerializer, \
-    ServiceInstanceSerializer, AppointmentSerializer, DayScheduleSerializer, ProvidesSerializer
+    ServiceInstanceSerializer, AppointmentSerializer, DayScheduleSerializer, ProvidesSerializer, \
+    ScheduleTemplateSerializer
 
 
 # custom api view implementing get_object with permission check
@@ -282,10 +283,10 @@ class DoableServices(CustomAPIView):
     permission_classes = [IsAuthenticated & IsProvider]
 
     def get(self, request):
-        place = request.GET.get('place')
+        place_id = request.GET.get('place_id')
 
         output = {}
-        jobtypes = Placedoes.objects.filter(place=place)
+        jobtypes = Placedoes.objects.filter(place_id=place_id)
         for pd in jobtypes:
 
             services = Service.objects.filter(jobtype=pd.jobtype.type)
@@ -308,13 +309,17 @@ class NewDaySchedule(CustomAPIView):
 
         for day in body['days']:
             config = body['days'][day]
+
+            pause_start = config['pause_start'] if 'pause_start' in config else None
+            pause_end = config['pause_end'] if 'pause_end' in config else None
+
             day_schedule = DaySchedule(
                 job=job,
                 day_of_week=int(day),
                 day_start=config['day_start'],
                 day_end=config['day_end'],
-                pause_start=config['pause_start'],
-                pause_end=config['pause_end'],
+                pause_start=pause_start,
+                pause_end=pause_end,
             )
             day_schedule.save()
 
@@ -496,3 +501,14 @@ class DropAppointmentsRange(CustomAPIView):
             a.delete()
 
         return self.returnOK()
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ScheduleTemplateView(CustomAPIView):
+
+    def get(self, request):
+        output = []
+        schedule_templates = ScheduleTemplate.objects.all()
+        for x in schedule_templates:
+            output.append(ScheduleTemplateSerializer(x).data)
+        return JsonResponse({'schedule_templates': output})

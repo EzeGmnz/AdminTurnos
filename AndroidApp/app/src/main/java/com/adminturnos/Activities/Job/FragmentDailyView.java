@@ -93,8 +93,7 @@ public class FragmentDailyView extends Fragment {
         textViewDayNumberIndicator.setText(currentDay.get(Calendar.DATE) + "/" + (1 + currentDay.get(Calendar.MONTH)));
         textViewDayIndicator.setText(mapNumberDay.get(currentDay.get(Calendar.DAY_OF_WEEK)));
 
-        DaySchedule daySchedule = job.getDaySchedule(currentDay.get(Calendar.DAY_OF_WEEK));
-        if (daySchedule != null) {
+        if (hasWorkThisDay()) {
             displayHasWorkThisDay();
             populateTimesContainer();
             populateServiceSeparations();
@@ -102,6 +101,11 @@ public class FragmentDailyView extends Fragment {
         } else {
             displayNoWorkThisDay();
         }
+    }
+
+    private boolean hasWorkThisDay() {
+        DaySchedule daySchedule = job.getDaySchedule(currentDay.get(Calendar.DAY_OF_WEEK));
+        return daySchedule != null;
     }
 
     private void displayHasWorkThisDay() {
@@ -216,7 +220,6 @@ public class FragmentDailyView extends Fragment {
 
         correspServiceSeparation.addView(view);
     }
-
 
     private int getHeightPixels(ServiceInstance si) {
 

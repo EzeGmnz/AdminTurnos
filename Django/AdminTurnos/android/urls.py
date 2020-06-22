@@ -27,4 +27,5 @@ urlpatterns = [
     path('profile/drop-promotion/', NewPromotion.as_view()),
     path('get-frequency/', GetFrequency.as_view()),
     path('drop-appointments-range/', DropAppointmentsRange.as_view()),
+    path('schedule-templates/', ScheduleTemplateView.as_view()),
 ]

@@ -37,6 +37,7 @@ public class FragmentMonthlyView extends Fragment {
     private ListenerChangeDay listenerChangeDay;
 
     public FragmentMonthlyView(Job job, ListenerChangeDay listener) {
+
         this.job = job;
         this.listenerChangeDay = listener;
         todayCalendar = Calendar.getInstance();
@@ -62,7 +63,6 @@ public class FragmentMonthlyView extends Fragment {
     private void populateWeekRows() {
         ViewGroup currentWeekRow = newWeekRow();
         addPastDays(currentWeekRow);
-
 
         final Calendar currentCalendar = Calendar.getInstance();
         CalendarDay currentCalendarDay;

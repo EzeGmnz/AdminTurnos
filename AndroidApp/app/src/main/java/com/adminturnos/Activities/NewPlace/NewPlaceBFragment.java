@@ -94,6 +94,11 @@ public class NewPlaceBFragment extends ObjectConfigurator {
     }
 
     @Override
+    public void setExtras(Bundle bundle) {
+
+    }
+
+    @Override
     public Bundle getData() {
         Bundle bundle = new Bundle();
 

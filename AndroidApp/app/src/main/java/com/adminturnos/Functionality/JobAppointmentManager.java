@@ -28,6 +28,7 @@ public class JobAppointmentManager implements AppointmentManager {
     public JobAppointmentManager(String jobId, ListenerAppointmentHolder listener) {
         this.jobId = jobId;
         this.listener = listener;
+        this.appointments = new ArrayList<>();
         fetchAppointments();
     }
 

@@ -77,5 +77,4 @@ public class DayScheduleNormal implements DaySchedule {
         return id;
     }
 
-
 }

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="100dp"
+    android:layout_height="300dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="8dp"
+    app:cardElevation="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/labelDay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:text="DOM"
+            android:textAllCaps="true"
+            android:textColor="@android:color/tab_indicator_text" />
+
+        <TextView
+            android:id="@+id/labelClosed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/labelDay"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:text="Cerrado"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/labelStart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/labelDay"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:text="08:00"
+            android:textAllCaps="true"
+            android:textColor="@android:color/tab_indicator_text" />
+
+        <LinearLayout
+            android:id="@+id/recyclerViewServices"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/labelEnd"
+            android:layout_below="@id/labelStart"
+            android:layout_margin="8dp"
+            android:orientation="vertical" />
+
+        <TextView
+            android:id="@+id/labelEnd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:text="16:00"
+            android:textAllCaps="true"
+            android:textColor="@android:color/tab_indicator_text" />
+
+    </RelativeLayout>
+
+
+</androidx.cardview.widget.CardView>

@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from restauth.serializers import CustomUserSerializer
-from .models import Place, JobRequest, Service, Job, Appointment, Serviceinstance, DaySchedule, Provides
+from .models import Place, JobRequest, Service, Job, Appointment, Serviceinstance, DaySchedule, Provides, \
+    ScheduleTemplate
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -64,3 +65,9 @@ class ProvidesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Provides
         fields = ['id', 'service', 'cost', 'duration', 'parallelism']
+
+
+class ScheduleTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = ScheduleTemplate

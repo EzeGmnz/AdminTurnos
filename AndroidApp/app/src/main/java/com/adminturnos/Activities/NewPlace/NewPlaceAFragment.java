@@ -40,6 +40,11 @@ public class NewPlaceAFragment extends ObjectConfigurator {
     }
 
     @Override
+    public void setExtras(Bundle bundle) {
+
+    }
+
+    @Override
     public Bundle getData() {
         String name = etName.getText().toString();
         String address = etAddress.getText().toString();

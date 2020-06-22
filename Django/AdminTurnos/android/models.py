@@ -273,3 +273,14 @@ class JobRequest(models.Model):
     class Meta:
         db_table = 'JobRequest'
         unique_together = (('place', 'serviceprovider'),)
+
+
+class ScheduleTemplate(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=30)
+    open = models.TimeField()
+    close = models.TimeField()
+    days = ArrayField(models.IntegerField())
+
+    class Meta:
+        db_table = 'ScheduleTemplate'

@@ -13,7 +13,9 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity android:name=".Activities.Job.ViewAppointmentActivity" />
-        <activity android:name=".Activities.Job.EditJobActivity" />
+        <activity
+            android:name=".Activities.Job.edit.EditJobActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".Activities.JobRequest.NewJobRequestActivity" />
         <activity android:name=".Activities.JobRequest.JobRequestActivity" />
         <activity

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardElevation="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/labelTemplateName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="Semana Hábil"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/labelTemplateInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/labelTemplateName"
+            android:layout_margin="8dp"
+            android:text="LUN MAR MIE JUE VIE"
+            android:textAllCaps="true"
+            android:textColor="@android:color/tab_indicator_text" />
+
+        <TextView
+            android:id="@+id/labelTemplateApertura"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/labelTemplateName"
+            android:layout_alignBottom="@id/labelTemplateName"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:text="Apertura 8:00"
+            android:textAllCaps="true"
+            android:textColor="@android:color/tab_indicator_text" />
+
+        <TextView
+            android:id="@+id/labelTemplateCierre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/labelTemplateApertura"
+            android:layout_alignTop="@id/labelTemplateInfo"
+            android:layout_alignBottom="@id/labelTemplateInfo"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:text="Cierre 16:00"
+            android:textAllCaps="true"
+            android:textColor="@android:color/tab_indicator_text" />
+
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

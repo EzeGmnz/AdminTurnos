@@ -34,38 +34,33 @@ public class ObjectConfiguratorCoordinator {
                                          ListenerCoordinator listener) {
 
         this.viewPager = rootView.findViewById(R.id.view_pager);
-        this.btnConfirm = rootView.findViewById(R.id.btn_confirm);
         this.fragments = fragments;
         this.listener = listener;
         this.adapter = new ObjectConfigPagerAdapter(fragmentManager, fragments);
         this.bundle = new Bundle();
 
-        btnConfirm.setOnClickListener(new BtnConfirmClickListener());
         viewPager.setAdapter(adapter);
-        updateButton();
     }
 
-    private void updateButton() {
-        if (!hasNext()) {
-            btnConfirm.setText("Confirmar");
-        } else {
-            btnConfirm.setText("Siguiente");
-        }
+    public void setInitialExtras(Bundle bundle) {
+        fragments.get(0).setExtras(bundle);
     }
 
-    private boolean hasNext() {
+    public boolean hasNext() {
         return viewPager.getCurrentItem() < adapter.getCount() - 1;
     }
 
-    private boolean hasPrev() {
+    public boolean hasPrev() {
         return viewPager.getCurrentItem() > 0;
     }
 
     private void updateBundle() {
         Bundle currentFragBundle = fragments.get(viewPager.getCurrentItem()).getData();
 
-        for (String key : currentFragBundle.keySet()) {
-            bundle.putSerializable(key, currentFragBundle.getSerializable(key));
+        if (currentFragBundle != null) {
+            for (String key : currentFragBundle.keySet()) {
+                bundle.putSerializable(key, currentFragBundle.getSerializable(key));
+            }
         }
 
     }
@@ -74,11 +69,11 @@ public class ObjectConfiguratorCoordinator {
         if (fragments.get(viewPager.getCurrentItem()).validateData()) {
             updateBundle();
             if (hasNext()) {
+                fragments.get(viewPager.getCurrentItem() + 1).setExtras(bundle);
                 viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
             } else {
                 listener.onFinish(bundle);
             }
-            updateButton();
         }
     }
 
@@ -88,7 +83,6 @@ public class ObjectConfiguratorCoordinator {
         } else {
             listener.onCanceled();
         }
-        updateButton();
     }
 
     public interface ListenerCoordinator {
@@ -117,11 +111,4 @@ public class ObjectConfiguratorCoordinator {
         }
     }
 
-    private class BtnConfirmClickListener implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            next();
-        }
-    }
 }

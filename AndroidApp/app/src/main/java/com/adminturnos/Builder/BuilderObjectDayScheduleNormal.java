@@ -25,7 +25,7 @@ public class BuilderObjectDayScheduleNormal implements ObjectBuilder<DaySchedule
         SimpleDateFormat dateTimeFormat = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
         DaySchedule daySchedule = null;
 
-        Calendar dayStart, dayEnd, pauseStart, pauseEnd;
+        Calendar dayStart, dayEnd, pauseStart = null, pauseEnd = null;
         try {
             dayStart = Calendar.getInstance();
             dayStart.setTime(dateTimeFormat.parse(jsonDaySchedule.getString("day_start")));
@@ -33,11 +33,13 @@ public class BuilderObjectDayScheduleNormal implements ObjectBuilder<DaySchedule
             dayEnd = Calendar.getInstance();
             dayEnd.setTime(dateTimeFormat.parse(jsonDaySchedule.getString("day_end")));
 
-            pauseStart = Calendar.getInstance();
-            pauseStart.setTime(dateTimeFormat.parse(jsonDaySchedule.getString("pause_start")));
+            if (!jsonDaySchedule.getString("pause_start").equals("null")) {
+                pauseStart = Calendar.getInstance();
+                pauseStart.setTime(dateTimeFormat.parse(jsonDaySchedule.getString("pause_start")));
 
-            pauseEnd = Calendar.getInstance();
-            pauseEnd.setTime(dateTimeFormat.parse(jsonDaySchedule.getString("pause_end")));
+                pauseEnd = Calendar.getInstance();
+                pauseEnd.setTime(dateTimeFormat.parse(jsonDaySchedule.getString("pause_end")));
+            }
 
             List<Provides> providesList = new ArrayList<>();
 

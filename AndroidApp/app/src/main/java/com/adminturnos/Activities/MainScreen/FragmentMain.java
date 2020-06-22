@@ -1,5 +1,6 @@
 package com.adminturnos.Activities.MainScreen;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -102,6 +103,14 @@ public class FragmentMain extends Fragment {
     private void fetchAppointmentsInBackground() {
         for (Job j : jobList) {
             JobAppointmentHolderWrapper.getInstance().getAppointmentManager(j.getId(), null);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Values.RC_EDIT_JOB && resultCode == Activity.RESULT_OK) {
+            getJobs();
         }
     }
 
@@ -232,7 +241,7 @@ public class FragmentMain extends Fragment {
 
             Intent intent = new Intent(getActivity(), ViewJobActivity.class);
             intent.putExtras(bundle);
-            startActivity(intent);
+            startActivityForResult(intent, Values.RC_EDIT_JOB);
         }
     }
 
