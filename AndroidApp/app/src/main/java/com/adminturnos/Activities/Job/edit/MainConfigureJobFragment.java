@@ -81,10 +81,10 @@ public class MainConfigureJobFragment extends ObjectConfigurator {
         LinearLayoutManager layoutManagerDays = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerViewDays.setLayoutManager(layoutManagerDays);
 
-        LinearLayoutManager layoutManagerServices = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        RecyclerView.LayoutManager layoutManagerServices = new LinearLayoutManager(getContext());
         recyclerViewServices.setLayoutManager(layoutManagerServices);
 
-        AdapterRecyclerViewOwnedPlaces adapter = new AdapterRecyclerViewOwnedPlaces();
+        AdapterRecyclerViewDays adapter = new AdapterRecyclerViewDays();
         recyclerViewDays.setAdapter(adapter);
     }
 
@@ -130,10 +130,10 @@ public class MainConfigureJobFragment extends ObjectConfigurator {
         recyclerViewServices.setAdapter(new FlexibleAdapter<>(services));
     }
 
-    private class AdapterRecyclerViewOwnedPlaces extends RecyclerView.Adapter<AdapterRecyclerViewOwnedPlaces.ViewHolderScheduleDays> {
+    private class AdapterRecyclerViewDays extends RecyclerView.Adapter<AdapterRecyclerViewDays.ViewHolderScheduleDays> {
         private int[] days;
 
-        public AdapterRecyclerViewOwnedPlaces() {
+        public AdapterRecyclerViewDays() {
             days = new int[]{1, 2, 3, 4, 5, 6, 7};
         }
 

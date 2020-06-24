@@ -9,11 +9,11 @@
 
     <TextView
         android:id="@+id/textView"
+        style="@style/extrabold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="128dp"
-        android:fontFamily="@font/productsans_black"
         android:text="Bienvenido\na\nadmin turnos."
         android:textColor="@color/white"
         android:textSize="50sp"
