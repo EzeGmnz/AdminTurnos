@@ -6,7 +6,7 @@ import java.util.List;
 /**
  *
  */
-public interface Job extends Serializable {
+public interface Job extends Serializable, Cloneable {
 
     String getId();
 
@@ -15,4 +15,8 @@ public interface Job extends Serializable {
     List<DaySchedule> getDaySchedules();
 
     DaySchedule getDaySchedule(int dayOfWeek);
+
+    void addDaySchedule(DaySchedule daySchedule);
+
+    Job clone();
 }

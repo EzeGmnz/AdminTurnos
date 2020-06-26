@@ -10,7 +10,6 @@ public class JobAppointmentHolderWrapper {
     private static JobAppointmentHolderWrapper instance;
     private Map<String, AppointmentManager> appointmentManagerList;
 
-
     private JobAppointmentHolderWrapper() {
         this.appointmentManagerList = new HashMap<>();
     }

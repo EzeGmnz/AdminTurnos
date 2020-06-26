@@ -135,7 +135,11 @@ public class ViewJobActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 this.job = (Job) data.getExtras().getSerializable("job");
                 edited = true;
-                updateUI();
+                if (!hasDaySchedules()) {
+                    onBackPressed();
+                } else {
+                    updateUI();
+                }
             } else {
                 if (!hasDaySchedules()) {
                     finish();

@@ -58,6 +58,7 @@
             android:layout_above="@id/labelEnd"
             android:layout_below="@id/labelStart"
             android:layout_margin="8dp"
+            android:gravity="center_horizontal"
             android:orientation="vertical" />
 
         <TextView

@@ -4,6 +4,7 @@ import com.adminturnos.ObjectInterfaces.DaySchedule;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.ObjectInterfaces.Place;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,10 +19,9 @@ public class NormalJob implements Job {
         this.dayScheduleList = daySchedules;
         this.id = id;
         this.place = place;
-    }
-
-    public void setDayScheduleList(List<DaySchedule> dayScheduleList) {
-        this.dayScheduleList = dayScheduleList;
+        if (daySchedules == null) {
+            this.dayScheduleList = new ArrayList<>();
+        }
     }
 
     public String getId() {
@@ -46,6 +46,19 @@ public class NormalJob implements Job {
         }
 
         return null;
+    }
+
+    @Override
+    public void addDaySchedule(DaySchedule daySchedule) {
+        this.dayScheduleList.add(daySchedule);
+    }
+
+    public Job clone() {
+        Job out = new NormalJob(id, place, null);
+        for (DaySchedule ds : dayScheduleList) {
+            out.addDaySchedule(ds.clone());
+        }
+        return out;
     }
 
 }

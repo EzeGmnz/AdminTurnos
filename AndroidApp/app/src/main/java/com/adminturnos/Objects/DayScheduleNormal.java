@@ -1,8 +1,11 @@
 package com.adminturnos.Objects;
 
+import androidx.annotation.NonNull;
+
 import com.adminturnos.ObjectInterfaces.DaySchedule;
 import com.adminturnos.ObjectInterfaces.Provides;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -24,6 +27,9 @@ public class DayScheduleNormal implements DaySchedule {
         this.id = id;
         this.dayOfWeek = dayOfWeek;
         this.providesList = providesList;
+        if (providesList == null) {
+            this.providesList = new ArrayList<>();
+        }
     }
 
     @Override
@@ -57,7 +63,7 @@ public class DayScheduleNormal implements DaySchedule {
     }
 
     @Override
-    public Provides getProvidedService(String id) {
+    public Provides getProvidesForService(String id) {
         for (Provides p : providesList) {
             if (p.getService().getId().equals(id)) {
                 return p;
@@ -65,6 +71,15 @@ public class DayScheduleNormal implements DaySchedule {
         }
 
         return null;
+    }
+
+    @Override
+    public void addProvides(Provides p) {
+        providesList.add(p);
+    }
+
+    public void removeProvides(Provides p) {
+        providesList.remove(p);
     }
 
     @Override
@@ -77,4 +92,13 @@ public class DayScheduleNormal implements DaySchedule {
         return id;
     }
 
+    @NonNull
+    @Override
+    public DayScheduleNormal clone() {
+        DayScheduleNormal out = new DayScheduleNormal(id, dayOfWeek, (Calendar) dayStart.clone(), (Calendar) dayEnd.clone(), pauseStart, pauseEnd, null);
+        for (Provides p : providesList) {
+            out.addProvides(p.clone());
+        }
+        return out;
+    }
 }

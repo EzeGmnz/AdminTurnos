@@ -1,6 +1,8 @@
 package com.adminturnos.Activities.Job.edit;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,33 +11,21 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.adminturnos.Activities.ObjectConfigurator;
-import com.adminturnos.Builder.BuilderListService;
-import com.adminturnos.Database.DatabaseCallback;
-import com.adminturnos.Database.DatabaseDjangoRead;
 import com.adminturnos.ObjectInterfaces.DaySchedule;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.ObjectInterfaces.Provides;
-import com.adminturnos.ObjectInterfaces.Service;
-import com.adminturnos.ObjectViews.ViewService;
 import com.adminturnos.R;
 import com.adminturnos.Values;
 
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import cz.msebera.android.httpclient.Header;
-import eu.davidea.flexibleadapter.FlexibleAdapter;
-
-public class MainConfigureJobFragment extends ObjectConfigurator {
+public class MainConfigureJobFragment extends Fragment {
 
     private static final Map<Integer, String> mapNumberDay = new HashMap<Integer, String>() {{
         put(1, "Dom");
@@ -48,14 +38,10 @@ public class MainConfigureJobFragment extends ObjectConfigurator {
     }};
 
     private Job job;
-    private RecyclerView recyclerViewDays, recyclerViewServices;
-    private boolean servicesPopulated;
-    private List<ViewService> services;
+    private RecyclerView recyclerViewDays;
 
     public MainConfigureJobFragment(Job job) {
-        servicesPopulated = false;
-        this.job = job;
-        getServices();
+        this.job = job.clone();
     }
 
     @Override
@@ -68,66 +54,25 @@ public class MainConfigureJobFragment extends ObjectConfigurator {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.recyclerViewDays = view.findViewById(R.id.recyclerViewDays);
-        this.recyclerViewServices = view.findViewById(R.id.recyclerViewServices);
 
-        services = new ArrayList<>();
-
-        if (job != null) {
-            initUI();
-        }
+        view.findViewById(R.id.btnServiceConfiguration).setOnClickListener(new ListenerBtnServiceConfiguration());
+        initUI();
     }
 
     private void initUI() {
         LinearLayoutManager layoutManagerDays = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerViewDays.setLayoutManager(layoutManagerDays);
+        recyclerViewDays.setAdapter(new AdapterRecyclerViewDays());
 
-        RecyclerView.LayoutManager layoutManagerServices = new LinearLayoutManager(getContext());
-        recyclerViewServices.setLayoutManager(layoutManagerServices);
-
-        AdapterRecyclerViewDays adapter = new AdapterRecyclerViewDays();
-        recyclerViewDays.setAdapter(adapter);
     }
 
-    private void getServices() {
-        if (job != null) {
-            Map<String, String> body = new HashMap<>();
-            body.put("place_id", job.getPlace().getId());
-
-            DatabaseDjangoRead.getInstance().GET(
-                    Values.DJANGO_URL_DOABLE_SERVICES,
-                    body,
-                    new CallbackGetDoableServices()
-            );
-        }
+    public Job getJob() {
+        return job;
     }
 
-    @Override
-    public void setExtras(Bundle bundle) {
-        job = (Job) bundle.getSerializable("job");
-        if (recyclerViewDays != null) {
-            initUI();
-        }
-    }
-
-    @Override
-    public Bundle getData() {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("job", job);
-        return bundle;
-    }
-
-    @Override
-    public boolean validateData() {
-        return true;
-    }
-
-    private void populateServices(JSONObject response) {
-        servicesPopulated = true;
-        List<Service> serviceList = new BuilderListService().build(response);
-        for (Service s : serviceList) {
-            services.add(new ViewService(s));
-        }
-        recyclerViewServices.setAdapter(new FlexibleAdapter<>(services));
+    public void setJob(Job job) {
+        this.job = job;
+        initUI();
     }
 
     private class AdapterRecyclerViewDays extends RecyclerView.Adapter<AdapterRecyclerViewDays.ViewHolderScheduleDays> {
@@ -161,10 +106,10 @@ public class MainConfigureJobFragment extends ObjectConfigurator {
                 holder.labelStart.setText(startStr);
                 holder.labelEnd.setText(endStr);
 
+                holder.servicesContainer.removeAllViews();
                 for (Provides p : daySchedule.getProvides()) {
-                    TextView serviceName = new TextView(getContext());
-                    serviceName.setText(p.getService().getName());
-                    holder.servicesContainer.addView(serviceName);
+                    View serviceView = createViewForService(p);
+                    holder.servicesContainer.addView(serviceView);
                 }
 
             } else {
@@ -173,6 +118,15 @@ public class MainConfigureJobFragment extends ObjectConfigurator {
                 holder.labelStart.setVisibility(View.GONE);
                 holder.labelEnd.setVisibility(View.GONE);
             }
+        }
+
+        private View createViewForService(Provides p) {
+            TextView serviceView = new TextView(getContext());
+            serviceView.setTextColor(getResources().getColor(R.color.white));
+            serviceView.setGravity(Gravity.CENTER_HORIZONTAL);
+            serviceView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            serviceView.setText(p.getService().getName());
+            return serviceView;
         }
 
         private boolean hasScheduleThisDay(int position) {
@@ -199,10 +153,14 @@ public class MainConfigureJobFragment extends ObjectConfigurator {
         }
     }
 
-    private class CallbackGetDoableServices extends DatabaseCallback {
+    private class ListenerBtnServiceConfiguration implements View.OnClickListener {
         @Override
-        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            populateServices(response);
+        public void onClick(View v) {
+            Intent intent = new Intent(getContext(), ServiceConfigActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("job", job.clone());
+            intent.putExtras(bundle);
+            getActivity().startActivityForResult(intent, Values.RC_EDIT_SERVICES);
         }
     }
 }

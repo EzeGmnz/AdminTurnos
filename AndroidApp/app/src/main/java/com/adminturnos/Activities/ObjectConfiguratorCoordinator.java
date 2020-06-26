@@ -2,7 +2,6 @@ package com.adminturnos.Activities;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -22,7 +21,6 @@ public class ObjectConfiguratorCoordinator {
 
     private PagerAdapter adapter;
     private ViewPager viewPager;
-    private Button btnConfirm;
     private ListenerCoordinator listener;
     private Bundle bundle;
 
@@ -40,10 +38,6 @@ public class ObjectConfiguratorCoordinator {
         this.bundle = new Bundle();
 
         viewPager.setAdapter(adapter);
-    }
-
-    public void setInitialExtras(Bundle bundle) {
-        fragments.get(0).setExtras(bundle);
     }
 
     public boolean hasNext() {

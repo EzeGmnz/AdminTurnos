@@ -22,6 +22,11 @@ public interface DaySchedule extends Serializable {
 
     List<Provides> getProvides();
 
-    Provides getProvidedService(String id);
+    Provides getProvidesForService(String id);
 
+    void addProvides(Provides p);
+
+    void removeProvides(Provides p);
+
+    DaySchedule clone();
 }

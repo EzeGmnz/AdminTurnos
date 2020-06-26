@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <ToggleButton
+        android:id="@+id/tD"
+        style="@style/toggleButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:background="@drawable/day_picker_toggle_bg"
+        android:textOff="D"
+        android:textOn="D" />
+
+    <ToggleButton
+        android:id="@+id/tL"
+        style="@style/toggleButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:background="@drawable/day_picker_toggle_bg"
+        android:textOff="L"
+        android:textOn="L" />
+
+    <ToggleButton
+        android:id="@+id/tM"
+        style="@style/toggleButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:background="@drawable/day_picker_toggle_bg"
+        android:textOff="M"
+        android:textOn="M" />
+
+    <ToggleButton
+        android:id="@+id/tMi"
+        style="@style/toggleButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:background="@drawable/day_picker_toggle_bg"
+        android:textOff="M"
+        android:textOn="M" />
+
+    <ToggleButton
+        android:id="@+id/tJ"
+        style="@style/toggleButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:background="@drawable/day_picker_toggle_bg"
+        android:textOff="J"
+        android:textOn="J" />
+
+    <ToggleButton
+        android:id="@+id/tV"
+        style="@style/toggleButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:background="@drawable/day_picker_toggle_bg"
+        android:textOff="V"
+        android:textOn="V" />
+
+    <ToggleButton
+        android:id="@+id/tS"
+        style="@style/toggleButton"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:background="@drawable/day_picker_toggle_bg"
+        android:textOff="S"
+        android:textOn="S" />
+</LinearLayout>

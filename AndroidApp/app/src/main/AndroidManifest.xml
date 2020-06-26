@@ -12,10 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".Activities.Job.edit.ServiceConfigActivity"></activity>
         <activity android:name=".Activities.Job.ViewAppointmentActivity" />
         <activity
             android:name=".Activities.Job.edit.EditJobActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".Activities.JobRequest.NewJobRequestActivity" />
         <activity android:name=".Activities.JobRequest.JobRequestActivity" />
         <activity

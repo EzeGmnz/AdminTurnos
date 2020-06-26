@@ -9,11 +9,17 @@ public interface Provides extends Serializable {
 
     Service getService();
 
-    float getCost();
+    float getPrice();
 
     Calendar getDuration();
 
     int getParallelism();
 
+    void setPrice(float cost);
 
+    Provides clone();
+
+    void setDuration(Calendar c);
+
+    void setParallelism(int parallelism);
 }

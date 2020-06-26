@@ -48,7 +48,7 @@ public class NewPlaceBFragment extends ObjectConfigurator {
         DatabaseDjangoRead.getInstance().GET(
                 Values.DJANGO_URL_JOBTYPES,
                 null,
-                new CallbackGetJobRequest()
+                new CallbackGetJobTypes()
         );
     }
 
@@ -59,7 +59,6 @@ public class NewPlaceBFragment extends ObjectConfigurator {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 adapter = new FlexibleAdapter<>(jobTypeList);
                 recyclerView.setAdapter(adapter);
             }
@@ -69,7 +68,6 @@ public class NewPlaceBFragment extends ObjectConfigurator {
 
     private void initSearchView() {
         this.searchView.setOnQueryTextListener(new ListenerQueryTextJobType());
-
     }
 
     @Override
@@ -120,7 +118,7 @@ public class NewPlaceBFragment extends ObjectConfigurator {
         return true;
     }
 
-    private class CallbackGetJobRequest extends DatabaseCallback {
+    private class CallbackGetJobTypes extends DatabaseCallback {
 
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

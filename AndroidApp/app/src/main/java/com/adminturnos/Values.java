@@ -7,6 +7,7 @@ public interface Values {
     int RC_SIGN_IN_ACTIVITY = 2;
     int RC_NEW_PLACE = 3;
     int RC_EDIT_JOB = 4;
+    int RC_EDIT_SERVICES = 5;
 
     /* Shared Preferences */
     String SHARED_PREF_NAME = "SharedPref";
@@ -32,4 +33,6 @@ public interface Values {
     String DJANGO_URL_SCHEDULE_TEMPLATES = "/android/schedule-templates/";
     String DJANGO_URL_NEW_DAY_SCHEDULE = "/android/profile/new-day-schedule/";
     String DJANGO_URL_DOABLE_SERVICES = "/android/doable-services/";
+    String DJANGO_URL_NEW_PROVIDES = "/android/profile/new-provides/";
+
 }

@@ -64,7 +64,7 @@ public class ViewAppointmentActivity extends AppCompatActivity {
 
         String strStart = String.format("%02d:%02d", start.getDateTime().get(Calendar.HOUR_OF_DAY), start.getDateTime().get(Calendar.MINUTE));
 
-        Provides p = job.getDaySchedule(appointment.getDate().get(Calendar.DAY_OF_WEEK)).getProvidedService(end.getService().getId());
+        Provides p = job.getDaySchedule(appointment.getDate().get(Calendar.DAY_OF_WEEK)).getProvidesForService(end.getService().getId());
         Calendar endTime = (Calendar) end.getDateTime().clone();
         endTime.add(Calendar.HOUR_OF_DAY, p.getDuration().get(Calendar.HOUR_OF_DAY));
         endTime.add(Calendar.MINUTE, p.getDuration().get(Calendar.MINUTE));
@@ -115,7 +115,7 @@ public class ViewAppointmentActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull ViewHolderServiceInstance holder, int position) {
             ServiceInstance si = serviceInstanceList.get(position);
 
-            Provides p = job.getDaySchedule(appointment.getDate().get(Calendar.DAY_OF_WEEK)).getProvidedService(si.getService().getId());
+            Provides p = job.getDaySchedule(appointment.getDate().get(Calendar.DAY_OF_WEEK)).getProvidesForService(si.getService().getId());
             String strStart = String.format("%02d:%02d", si.getDateTime().get(Calendar.HOUR_OF_DAY), si.getDateTime().get(Calendar.MINUTE));
             String strDuration = "";
             if (p.getDuration().get(Calendar.HOUR_OF_DAY) > 0) {
@@ -126,7 +126,7 @@ public class ViewAppointmentActivity extends AppCompatActivity {
 
             holder.labelServiceInstanceStart.setText(strStart);
             holder.labelServiceInstanceName.setText(si.getService().getName());
-            holder.labelServiceInstanceCost.setText("$" + p.getCost());
+            holder.labelServiceInstanceCost.setText("$" + p.getPrice());
             holder.labelServiceInstanceDuration.setText(strDuration);
         }
 

@@ -12,7 +12,6 @@ public class ProvidesNormal implements Provides {
     private float cost;
     private Calendar duration;
     private int parallelism;
-
     public ProvidesNormal(String id, Service service, float cost, Calendar duration, int parallelism) {
         this.id = id;
         this.service = service;
@@ -32,8 +31,13 @@ public class ProvidesNormal implements Provides {
     }
 
     @Override
-    public float getCost() {
+    public float getPrice() {
         return cost;
+    }
+
+    @Override
+    public void setPrice(float cost) {
+        this.cost = cost;
     }
 
     @Override
@@ -42,7 +46,22 @@ public class ProvidesNormal implements Provides {
     }
 
     @Override
+    public void setDuration(Calendar duration) {
+        this.duration = duration;
+    }
+
+    @Override
     public int getParallelism() {
         return parallelism;
+    }
+
+    @Override
+    public void setParallelism(int parallelism) {
+        this.parallelism = parallelism;
+    }
+
+    @Override
+    public ProvidesNormal clone() {
+        return new ProvidesNormal(id, service, cost, (Calendar) duration.clone(), parallelism);
     }
 }

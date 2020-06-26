@@ -307,20 +307,34 @@ class NewDaySchedule(CustomAPIView):
         body = json.loads(request.body)
         job = self.get_object(request, Job, body['job_id'])
 
+        job_day_schedules = DaySchedule.objects.filter(job=job)
+        for ds in job_day_schedules:
+            if str(ds.day_of_week) not in body['days']:
+                ds.delete()
+
         for day in body['days']:
+            day_schedule = DaySchedule.objects.filter(job=job, day_of_week=day)
             config = body['days'][day]
 
             pause_start = config['pause_start'] if 'pause_start' in config else None
             pause_end = config['pause_end'] if 'pause_end' in config else None
 
-            day_schedule = DaySchedule(
-                job=job,
-                day_of_week=int(day),
-                day_start=config['day_start'],
-                day_end=config['day_end'],
-                pause_start=pause_start,
-                pause_end=pause_end,
-            )
+            if len(day_schedule) == 0:
+                day_schedule = DaySchedule(
+                    job=job,
+                    day_of_week=int(day),
+                    day_start=config['day_start'],
+                    day_end=config['day_end'],
+                    pause_start=pause_start,
+                    pause_end=pause_end,
+                )
+            else:
+                day_schedule = day_schedule[0]
+                day_schedule.day_start = config['day_start']
+                day_schedule.day_end = config['day_end']
+                day_schedule.pause_start = pause_start
+                day_schedule.pause_end = pause_end
+
             day_schedule.save()
 
         return self.returnOK()
@@ -333,11 +347,19 @@ class NewProvides(CustomAPIView):
     def post(self, request):
         body = json.loads(request.body)
         job = self.get_object(request, Job, body['job_id'])
-        try:
-            day_schedule = DaySchedule.objects.get(job=job, day_of_week=body['day_of_week'])
 
-            provides_list = []
-            for service_id in body['services']:
+        day_schedule = DaySchedule.objects.get(job=job, day_of_week=body['day_of_week'])
+        provides_in_dayschedule = Provides.objects.filter(day_schedule=day_schedule)
+
+        for provides in provides_in_dayschedule:
+            if str(provides.id) not in body['services']:
+                provides.delete()
+
+        provides_list = []
+        for service_id in body['services']:
+            p = Provides.objects.filter(day_schedule=day_schedule, service_id=service_id)
+
+            if len(p) == 0:
                 p = Provides(
                     job=job,
                     day_schedule=day_schedule,
@@ -347,26 +369,41 @@ class NewProvides(CustomAPIView):
                     parallelism=body['parallelisms'][str(service_id)],
                 )
                 p.full_clean()
-                provides_list.append(p)
+            else:
+                p = p[0]
+                p.cost = body['costs'][str(service_id)]
+                p.duration = body['durations'][str(service_id)],
+                p.parallelism = body['parallelisms'][str(service_id)],
 
-            for x in provides_list:
-                x.save()
+            provides_list.append(p)
 
-        except DaySchedule.DoesNotExist:
-            return self.returnError(400, 'Day schedule does not exist')
+        for x in provides_list:
+            x.save()
 
         return self.returnOK()
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class DropProvides(CustomAPIView):
+class RemoveProvides(CustomAPIView):
     permission_classes = [IsAuthenticated & IsOwner]
 
     def post(self, request):
-        job = self.get_object(request, Job, request.POST.get('job_id'))
-        provides = Provides.objects.filter(job=job, service_id=request.POST.get('service_id'))
-        for p in provides:
-            p.delete()
+        day_schedule = DaySchedule.objects.get(id=request.POST.get('day_schedule_id'))
+        provides = Provides.objects.get(id=request.POST.get('provides_id'))
+        self.get_object(request, Job, day_schedule.job.id)
+        provides.remove()
+
+        return self.returnOK()
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class RemoveDaySchedule(CustomAPIView):
+    permission_classes = [IsAuthenticated & IsOwner]
+
+    def post(self, request):
+        day_schedule = DaySchedule.objects.get(id=request.POST.get('day_schedule_id'))
+        self.get_object(request, Job, day_schedule.job.id)
+        day_schedule.remove()
         return self.returnOK()
 
 
