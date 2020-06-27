@@ -1,6 +1,7 @@
 package com.adminturnos.Activities.NewPlace;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +12,11 @@ import androidx.annotation.Nullable;
 import com.adminturnos.Activities.ObjectConfigurator;
 import com.adminturnos.R;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class NewPlaceAFragment extends ObjectConfigurator {
 
-    TextInputEditText etName, etAddress, etPhone, etCity, etState, etCountry;
+    TextInputEditText etName;
 
     public NewPlaceAFragment() {
 
@@ -32,11 +34,6 @@ public class NewPlaceAFragment extends ObjectConfigurator {
         super.onViewCreated(view, savedInstanceState);
 
         etName = view.findViewById(R.id.editTextName);
-        etAddress = view.findViewById(R.id.editTextAddress);
-        etPhone = view.findViewById(R.id.editTextPhone);
-        etCity = view.findViewById(R.id.editTextCity);
-        etState = view.findViewById(R.id.editTextState);
-        etCountry = view.findViewById(R.id.editTextCountry);
     }
 
     @Override
@@ -47,27 +44,23 @@ public class NewPlaceAFragment extends ObjectConfigurator {
     @Override
     public Bundle getData() {
         String name = etName.getText().toString();
-        String address = etAddress.getText().toString();
-        String phone = etPhone.getText().toString();
-        String city = etCity.getText().toString();
-        String state = etState.getText().toString();
-        String country = etCountry.getText().toString();
 
         Bundle bundle = new Bundle();
-        bundle.putString("street", address);
-        bundle.putString("streetnumber", "");
-        bundle.putString("city", city);
-        bundle.putString("state", state);
-        bundle.putString("country", country);
         bundle.putString("businessname", name);
-        bundle.putString("phonenumber", phone);
-
         return bundle;
     }
 
     @Override
     public boolean validateData() {
-        //TODO
+
+        TextInputLayout layoutName = getView().findViewById(R.id.text_input_layout_name);
+        if (TextUtils.isEmpty(etName.getText())) {
+            layoutName.setError("Este campo es obligatorio");
+            return false;
+        } else {
+            layoutName.setError(null);
+        }
+
         return true;
     }
 

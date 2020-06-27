@@ -1,6 +1,7 @@
 package com.adminturnos.Activities.Job.edit;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +23,7 @@ import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.ObjectInterfaces.Provides;
 import com.adminturnos.R;
 import com.adminturnos.Values;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,6 +47,7 @@ public class EditJobActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setElevation(0);
         getSupportActionBar().setTitle("");
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         this.originalJob = (Job) getIntent().getExtras().getSerializable("job");
         getSupportActionBar().setTitle(originalJob.getPlace().getBusinessName());
@@ -83,10 +87,23 @@ public class EditJobActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (editedJob != null) {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("¿Guardar cambios?")
+                    .setPositiveButton("Guardar", new ListenerSaveChanges())
+                    .setNeutralButton("Descartar", new ListenerDiscardChanges())
+                    .show();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private void returnOK() {
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
-        bundle.putSerializable("job", originalJob);
+        bundle.putSerializable("job", editedJob);
         intent.putExtras(bundle);
         setResult(Activity.RESULT_OK, intent);
 
@@ -212,4 +229,17 @@ public class EditJobActivity extends AppCompatActivity {
         }
     }
 
+    private class ListenerSaveChanges implements DialogInterface.OnClickListener {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            saveJob();
+        }
+    }
+
+    private class ListenerDiscardChanges implements DialogInterface.OnClickListener {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            returnCancel();
+        }
+    }
 }

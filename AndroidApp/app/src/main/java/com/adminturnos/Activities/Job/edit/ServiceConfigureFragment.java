@@ -92,51 +92,61 @@ public class ServiceConfigureFragment extends Fragment {
 
     private void configureJob() {
         if (validateData()) {
-
-            for (Integer day : dayPicker.getSelectedDays()) {
-
-                DaySchedule ds = job.getDaySchedule(day);
-                if (ds == null) {
-                    ds = createDaySchedule(day);
-                    job.addDaySchedule(ds);
-                }
-
-                Provides p = ds.getProvidesForService(service.getId());
-                if (p == null) {
-                    p = createProvides();
-                    ds.addProvides(p);
-                } else {
-                    updateProvides(p);
-                }
-            }
-
-            removeUnselectedDays();
-            removeEmptyDaySchedules();
-
-            listenerBtnConfirm.onConfirmServiceConfiguration();
+            createOrUpdateProvides();
         }
     }
 
-    private void removeEmptyDaySchedules() {
-        List<DaySchedule> toRemove = new ArrayList<>();
-        for (DaySchedule ds : job.getDaySchedules()) {
-            if (ds.getProvides().isEmpty()) {
-                toRemove.add(ds);
-            }
+    private boolean validateData() {
+        if (TextUtils.isEmpty(inputPrice.getText())) {
+
+            tilPrice.setError("Este campo es obligatorio");
+            return false;
+        } else {
+            tilPrice.setError(null);
         }
 
-        for (DaySchedule ds : toRemove) {
-            job.getDaySchedules().remove(ds);
+        if (TextUtils.isEmpty(inputParallelism.getText())) {
+
+            tilParallelism.setError("Este campo es obligatorio");
+            return false;
+        } else {
+            tilParallelism.setError(null);
         }
+
+        if (dayPicker.getSelectedDays().size() == 0) {
+            //TODO show error
+            return false;
+        }
+
+        //TODO show error
+        return timePicker.getTime().get(Calendar.MINUTE) != 0 ||
+                timePicker.getTime().get(Calendar.HOUR_OF_DAY) != 0;
     }
 
-    private void removeUnselectedDays() {
-        for (DaySchedule ds : job.getDaySchedules()) {
+    public void removeService() {
+        dayPicker.clearSelection();
+        finishConfiguration();
+    }
+
+    private void createOrUpdateProvides() {
+        for (Integer day : dayPicker.getSelectedDays()) {
+
+            DaySchedule ds = job.getDaySchedule(day);
+            if (ds == null) {
+                ds = createDaySchedule(day);
+                job.addDaySchedule(ds);
+            }
+
             Provides p = ds.getProvidesForService(service.getId());
-            if (p != null && !dayPicker.getSelectedDays().contains(ds.getDayOfWeek())) {
-                ds.removeProvides(p);
+            if (p == null) {
+                p = createProvides();
+                ds.addProvides(p);
+            } else {
+                updateProvides(p);
             }
         }
+
+        finishConfiguration();
     }
 
     private DaySchedule createDaySchedule(int day) {
@@ -169,26 +179,32 @@ public class ServiceConfigureFragment extends Fragment {
         );
     }
 
-    private boolean validateData() {
-        if (TextUtils.isEmpty(inputPrice.getText())) {
+    private void finishConfiguration() {
+        removeUnselectedDays();
+        removeEmptyDaySchedules();
+        listenerBtnConfirm.onConfirmServiceConfiguration();
+    }
 
-            tilPrice.setError("Olvidaste el precio");
-            return false;
-        } else {
-            tilPrice.setError(null);
+    private void removeEmptyDaySchedules() {
+        List<DaySchedule> toRemove = new ArrayList<>();
+        for (DaySchedule ds : job.getDaySchedules()) {
+            if (ds.getProvides().isEmpty()) {
+                toRemove.add(ds);
+            }
         }
 
-        if (TextUtils.isEmpty(inputParallelism.getText())) {
-
-            tilParallelism.setError("Olvidaste el paralelismo");
-            return false;
-        } else {
-            tilParallelism.setError(null);
+        for (DaySchedule ds : toRemove) {
+            job.getDaySchedules().remove(ds);
         }
+    }
 
-        //TODO display error
-        return timePicker.getTime().get(Calendar.MINUTE) != 0 ||
-                timePicker.getTime().get(Calendar.HOUR_OF_DAY) != 0;
+    private void removeUnselectedDays() {
+        for (DaySchedule ds : job.getDaySchedules()) {
+            Provides p = ds.getProvidesForService(service.getId());
+            if (p != null && !dayPicker.getSelectedDays().contains(ds.getDayOfWeek())) {
+                ds.removeProvides(p);
+            }
+        }
     }
 
     public interface ListenerConfirm {

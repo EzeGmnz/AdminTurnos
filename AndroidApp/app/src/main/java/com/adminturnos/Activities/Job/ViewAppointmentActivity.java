@@ -43,6 +43,11 @@ public class ViewAppointmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_appointment);
 
+        getSupportActionBar().setTitle(appointment.getClient().getName());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setElevation(0);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
         this.appointment = (Appointment) getIntent().getExtras().getSerializable("appointment");
         this.job = (Job) getIntent().getExtras().getSerializable("job");
         this.recyclerViewServiceInstance = findViewById(R.id.recyclerViewServiceInstance);
@@ -50,10 +55,6 @@ public class ViewAppointmentActivity extends AppCompatActivity {
     }
 
     private void initUI() {
-        getSupportActionBar().setTitle(appointment.getClient().getName());
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setElevation(0);
-
         TextView textViewDayIndicator = findViewById(R.id.textViewDayIndicator);
         TextView textViewDayNumberIndicator = findViewById(R.id.textViewDayNumberIndicator);
         TextView labelStartTime = findViewById(R.id.labelStartTime);

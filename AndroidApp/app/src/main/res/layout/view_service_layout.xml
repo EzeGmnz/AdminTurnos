@@ -3,33 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/containerCardView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="100dp"
     android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
     app:cardElevation="4dp">
 
-    <RelativeLayout
-        android:id="@+id/expandable"
+
+    <TextView
+        android:id="@+id/labelName"
         android:layout_width="match_parent"
-        android:layout_height="50dp">
-
-        <TextView
-            android:id="@+id/labelName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:text="Corte Barba"
-            android:textSize="18sp" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_margin="8dp"
-            android:src="@drawable/ic_baseline_arrow_forward_ios_24" />
-
-    </RelativeLayout>
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:text="Corte Barba"
+        android:textSize="18sp" />
 
 </com.google.android.material.card.MaterialCardView>

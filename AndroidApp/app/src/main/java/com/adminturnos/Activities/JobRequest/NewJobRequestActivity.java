@@ -42,6 +42,7 @@ public class NewJobRequestActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setBackgroundDrawable(getDrawable(R.color.white));
         getSupportActionBar().setElevation(0);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         initUI();
     }

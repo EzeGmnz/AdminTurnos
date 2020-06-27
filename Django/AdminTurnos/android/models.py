@@ -21,12 +21,7 @@ class Notification(models.Model):
 class Place(models.Model):
     id = models.BigAutoField(primary_key=True)
     serviceprovider = models.ForeignKey(auth.get_user_model(), on_delete=models.CASCADE)
-    street = models.CharField(max_length=30)
-    streetnumber = models.CharField(max_length=30)
-    apnumber = models.CharField(max_length=30)
-    city = models.CharField(max_length=30)
-    state = models.CharField(max_length=30)
-    country = models.CharField(max_length=30)
+    address = models.CharField(max_length=30)
     businessname = models.CharField(max_length=30)
     phonenumber = models.CharField(max_length=30, blank=True, null=True)
     email = models.CharField(max_length=30)

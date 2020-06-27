@@ -58,11 +58,7 @@ class NewPlace(CustomAPIView):
 
         place = Place()
         place.serviceprovider = request.user
-        place.street = params.get('street')
-        place.streetnumber = params.get('streetnumber')
-        place.city = params.get('city')
-        place.state = params.get('state')
-        place.country = params.get('country')
+        place.address = params.get('address')
         place.businessname = params.get('businessname')
         place.phonenumber = params.get('phonenumber')
         place.email = ""

@@ -122,7 +122,6 @@ public class MainConfigureJobFragment extends Fragment {
 
         private View createViewForService(Provides p) {
             TextView serviceView = new TextView(getContext());
-            serviceView.setTextColor(getResources().getColor(R.color.white));
             serviceView.setGravity(Gravity.CENTER_HORIZONTAL);
             serviceView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             serviceView.setText(p.getService().getName());

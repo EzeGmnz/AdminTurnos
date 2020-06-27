@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ToggleButton;
 
+import androidx.cardview.widget.CardView;
+
 import com.adminturnos.R;
 
 import java.util.ArrayList;
@@ -27,9 +29,7 @@ public class DayPicker {
         parent.addView(dayPickerView);
 
         for (int i = 0; i < dayPickerView.getChildCount(); i++) {
-            ToggleButton toggleButton = (ToggleButton) dayPickerView.getChildAt(i);
-
-
+            ToggleButton toggleButton = (ToggleButton) ((CardView) dayPickerView.getChildAt(i)).getChildAt(0);
             buttons.add(toggleButton);
         }
     }

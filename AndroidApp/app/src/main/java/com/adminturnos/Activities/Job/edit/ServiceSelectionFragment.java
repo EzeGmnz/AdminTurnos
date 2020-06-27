@@ -90,11 +90,6 @@ public class ServiceSelectionFragment extends Fragment {
         this.adapterServices.addListener(new RecyclerViewClickListener());
     }
 
-    private void configureService(int position) {
-        ViewService viewService = adapterServices.getItem(position);
-
-    }
-
     public interface ServiceClickListener {
         void onServiceViewClick(Service service);
     }

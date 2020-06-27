@@ -1,9 +1,12 @@
 package com.adminturnos.Activities.NewPlace;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,63 +15,23 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adminturnos.Activities.ObjectConfigurator;
-import com.adminturnos.Builder.BuilderListJobType;
-import com.adminturnos.Database.DatabaseCallback;
-import com.adminturnos.Database.DatabaseDjangoRead;
-import com.adminturnos.ObjectInterfaces.JobType;
-import com.adminturnos.ObjectViews.ViewJobTypeSelection;
+import com.adminturnos.ObjectViews.ViewAddress;
 import com.adminturnos.R;
-import com.adminturnos.Values;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
 import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 public class NewPlaceBFragment extends ObjectConfigurator {
 
-    private List<ViewJobTypeSelection> jobTypeList;
-
-    private boolean isPopulated;
-    private RecyclerView recyclerView;
-    private FlexibleAdapter<ViewJobTypeSelection> adapter;
-    private SearchView searchView;
+    private SearchView searchViewAddress;
+    private FlexibleAdapter<ViewAddress> adapter;
 
     public NewPlaceBFragment() {
-        getJobTypes();
-        isPopulated = false;
+
     }
 
-    private void getJobTypes() {
-        this.jobTypeList = new ArrayList<>();
-        DatabaseDjangoRead.getInstance().GET(
-                Values.DJANGO_URL_JOBTYPES,
-                null,
-                new CallbackGetJobTypes()
-        );
-    }
-
-    private void populateRecyclerView() {
-        final RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                adapter = new FlexibleAdapter<>(jobTypeList);
-                recyclerView.setAdapter(adapter);
-            }
-        });
-        initSearchView();
-    }
-
-    private void initSearchView() {
-        this.searchView.setOnQueryTextListener(new ListenerQueryTextJobType());
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,14 +44,16 @@ public class NewPlaceBFragment extends ObjectConfigurator {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        this.recyclerView = view.findViewById(R.id.recyclerViewJobTypes);
-        this.searchView = view.findViewById(R.id.searchViewJobTypeSelection);
+        searchViewAddress = view.findViewById(R.id.searchViewAddress);
+        RecyclerView recyclerViewAddress = view.findViewById(R.id.recyclerViewAddress);
 
+        searchViewAddress.setOnQueryTextListener(new ListenerQueryAddress());
 
-        if (jobTypeList.size() > 0) {
-            populateRecyclerView();
-            this.isPopulated = true;
-        }
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerViewAddress.setLayoutManager(layoutManager);
+        adapter = new FlexibleAdapter<ViewAddress>(null);
+        recyclerViewAddress.setAdapter(adapter);
+        adapter.addListener(new OnAddressClickListener());
     }
 
     @Override
@@ -98,64 +63,68 @@ public class NewPlaceBFragment extends ObjectConfigurator {
 
     @Override
     public Bundle getData() {
+
+        String address = searchViewAddress.getQuery().toString();
+
         Bundle bundle = new Bundle();
+        bundle.putString("address", address);
 
-        ArrayList<JobType> checked_jobtypes = new ArrayList<>();
-        for (ViewJobTypeSelection typeView : jobTypeList) {
-            if (typeView.isSelected()) {
-                checked_jobtypes.add(typeView.getJobType());
-            }
-
-        }
-
-        bundle.putSerializable("jobtypes", checked_jobtypes);
         return bundle;
+    }
+
+    private void getAutoCompleteForAddress(String address) {
+        List<String> addressList = new ArrayList<>();
+        addressList.add(address);
+        populateAutoComplete(addressList);
+    }
+
+    private void populateAutoComplete(List<String> addressList) {
+        List<ViewAddress> viewAddressList = new ArrayList<>();
+        for (String a : addressList) {
+            viewAddressList.add(new ViewAddress(a));
+        }
+        adapter.clear();
+        adapter.addItems(0, viewAddressList);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
     public boolean validateData() {
-        //TODO
-        return true;
+
+        //TODO Show error
+        return !TextUtils.isEmpty(searchViewAddress.getQuery());
     }
 
-    private class CallbackGetJobTypes extends DatabaseCallback {
-
-        @Override
-        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            try {
-
-                List<JobType> aux = new BuilderListJobType().build(response);
-
-                for (JobType jobType : aux) {
-                    jobTypeList.add(new ViewJobTypeSelection(jobType));
-                }
-
-                if (!isPopulated && recyclerView != null && getActivity() != null) {
-                    populateRecyclerView();
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+    private void selectAddress(String address) {
+        searchViewAddress.setQuery(address, true);
+        hideKeyboard();
     }
 
-    private class ListenerQueryTextJobType implements SearchView.OnQueryTextListener {
+    private void hideKeyboard() {
+        searchViewAddress.clearFocus();
+        View view = (View) getView().getRootView();
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
+    private class ListenerQueryAddress implements SearchView.OnQueryTextListener {
         @Override
         public boolean onQueryTextSubmit(String query) {
-            return onQueryTextSubmit(query);
+            return onQueryTextChange(query);
         }
 
         @Override
         public boolean onQueryTextChange(String newText) {
-
-            if (adapter.hasNewFilter(newText)) {
-                adapter.setFilter(newText);
-                adapter.filterItems(100);
-            }
-
+            getAutoCompleteForAddress(newText);
             return true;
+        }
+    }
+
+    private class OnAddressClickListener implements FlexibleAdapter.OnItemClickListener {
+        @Override
+        public boolean onItemClick(View view, int position) {
+            selectAddress(adapter.getItem(position).getAddress());
+            return false;
         }
     }
 }

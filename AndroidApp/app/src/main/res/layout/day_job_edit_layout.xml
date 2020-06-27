@@ -3,13 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="130dp"
     android:layout_height="300dp"
-    android:layout_marginStart="8dp"
+    android:layout_marginStart="24dp"
     android:layout_marginTop="8dp"
-    android:layout_marginEnd="8dp"
     android:layout_marginBottom="8dp"
-    app:cardBackgroundColor="@android:color/holo_blue_light"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="0dp">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -18,14 +16,13 @@
 
         <TextView
             android:id="@+id/labelDay"
-            style="@style/extrabold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_margin="8dp"
             android:gravity="center"
             android:text="Dom"
-            android:textColor="@color/white"
+            android:textColor="@color/colorPrimary"
             android:textSize="16sp" />
 
         <TextView
@@ -36,7 +33,6 @@
             android:layout_margin="8dp"
             android:gravity="center"
             android:text="Cerrado"
-            android:textColor="@color/white"
             android:textSize="16sp"
             android:visibility="gone" />
 
@@ -48,8 +44,7 @@
             android:layout_margin="8dp"
             android:gravity="center"
             android:text="08:00"
-            android:textAllCaps="true"
-            android:textColor="@color/white" />
+            android:textAllCaps="true" />
 
         <LinearLayout
             android:id="@+id/recyclerViewServices"
@@ -70,8 +65,7 @@
             android:layout_marginBottom="16dp"
             android:gravity="center"
             android:text="16:00"
-            android:textAllCaps="true"
-            android:textColor="@color/white" />
+            android:textAllCaps="true" />
 
     </RelativeLayout>
 

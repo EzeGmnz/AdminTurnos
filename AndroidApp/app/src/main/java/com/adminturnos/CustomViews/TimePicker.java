@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.adminturnos.R;
@@ -12,14 +13,16 @@ import java.util.Calendar;
 
 public class TimePicker {
 
-    private final static int minuteStep = 30;
-    private TextView labelTime;
+    private final static int MINUTE_STEP = 30;
+    private static final int MAX_HOURS = 3;
+    private TextView labelHour, labelMinute;
     private Calendar calendar;
+    private ImageButton btnAdd, btnRemove;
 
     public TimePicker(ViewGroup parent) {
         calendar = Calendar.getInstance();
-        clear();
         inflateView(parent);
+        clear();
     }
 
     private void inflateView(ViewGroup parent) {
@@ -27,9 +30,11 @@ public class TimePicker {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ViewGroup timePickerView = (ViewGroup) inflater.inflate(R.layout.time_picker_layout, parent, false);
 
-        this.labelTime = timePickerView.findViewById(R.id.labelTime);
+        labelHour = timePickerView.findViewById(R.id.labelHour);
+        labelMinute = timePickerView.findViewById(R.id.labelMinute);
 
-        timePickerView.findViewById(R.id.btnRemove).setOnClickListener(new View.OnClickListener() {
+        btnRemove = timePickerView.findViewById(R.id.btnRemove);
+        btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 decreaseTime();
@@ -37,7 +42,8 @@ public class TimePicker {
             }
         });
 
-        timePickerView.findViewById(R.id.btnAdd).setOnClickListener(new View.OnClickListener() {
+        btnAdd = timePickerView.findViewById(R.id.btnAdd);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addTime();
@@ -49,16 +55,30 @@ public class TimePicker {
     }
 
     private void addTime() {
-        calendar.add(Calendar.MINUTE, minuteStep);
+        calendar.add(Calendar.MINUTE, MINUTE_STEP);
     }
 
     private void decreaseTime() {
-        calendar.add(Calendar.MINUTE, -minuteStep);
+        calendar.add(Calendar.MINUTE, -MINUTE_STEP);
     }
 
     private void updateUI() {
-        String timeStr = String.format("%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
-        labelTime.setText(timeStr);
+        String hrString = calendar.get(Calendar.HOUR_OF_DAY) + "h";
+        String minuteString = calendar.get(Calendar.MINUTE) + "m";
+        labelHour.setText(hrString);
+        labelMinute.setText(minuteString);
+
+        if (calendar.get(Calendar.HOUR_OF_DAY) == 0 && calendar.get(Calendar.MINUTE) == 0) {
+            btnRemove.setVisibility(View.INVISIBLE);
+        } else {
+            btnRemove.setVisibility(View.VISIBLE);
+        }
+
+        if (calendar.get(Calendar.HOUR_OF_DAY) == MAX_HOURS) {
+            btnAdd.setVisibility(View.INVISIBLE);
+        } else {
+            btnAdd.setVisibility(View.VISIBLE);
+        }
     }
 
     public Calendar getTime() {
@@ -73,5 +93,6 @@ public class TimePicker {
     public void clear() {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
+        updateUI();
     }
 }

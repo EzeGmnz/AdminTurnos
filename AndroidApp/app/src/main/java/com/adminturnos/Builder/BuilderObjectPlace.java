@@ -21,7 +21,7 @@ public class BuilderObjectPlace implements ObjectBuilder<Place> {
                 json.getString("id"),
                 customUserImpl,
                 json.getString("businessname"),
-                json.getString("street") + " " + json.getString("streetnumber"));
+                json.getString("address"));
 
         return out;
     }

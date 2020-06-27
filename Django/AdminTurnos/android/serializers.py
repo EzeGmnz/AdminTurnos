@@ -16,7 +16,7 @@ class PlaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Place
-        fields = ['id', 'street', 'streetnumber', 'businessname', 'serviceprovider']
+        fields = ['id', 'address', 'businessname', 'serviceprovider']
 
 
 class JobRequestSerializer(serializers.ModelSerializer):

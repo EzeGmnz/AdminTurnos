@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".Activities.Job.edit.ServiceSelectionFragment">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -15,19 +17,19 @@
         app:cardElevation="4dp">
 
         <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchViewAddress"
+            android:id="@+id/searchViewDoableServices"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:iconifiedByDefault="false"
             app:queryBackground="@color/white"
-            app:queryHint="Dirección" />
+            app:queryHint="Buscar" />
 
     </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewAddress"
+        android:id="@+id/recyclerViewDoableServices"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="32dp" />
+        android:layout_margin="24dp" />
 
 </LinearLayout>

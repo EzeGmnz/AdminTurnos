@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,12 +42,17 @@ public class ViewJobActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_job);
 
         Intent intent = getIntent();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setElevation(0);
-
         job = (Job) intent.getExtras().getSerializable("job");
         edited = false;
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setElevation(0);
+        getSupportActionBar().setTitle(job.getPlace().getBusinessName());
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+
         updateUI();
+
     }
 
     private void updateUI() {
@@ -54,8 +60,6 @@ public class ViewJobActivity extends AppCompatActivity {
         if (hasDaySchedules()) {
             this.viewPager = findViewById(R.id.viewPagerJob);
             this.tabLayout = findViewById(R.id.tabLayoutJob);
-
-            getSupportActionBar().setTitle(job.getPlace().getBusinessName());
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -148,7 +152,7 @@ public class ViewJobActivity extends AppCompatActivity {
         }
     }
 
-    private class AdapterTab extends FragmentStatePagerAdapter {
+    private static class AdapterTab extends FragmentStatePagerAdapter {
         private List<Fragment> fragmentList;
         private List<String> titleList;
 

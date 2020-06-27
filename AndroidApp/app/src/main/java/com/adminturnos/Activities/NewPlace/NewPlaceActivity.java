@@ -44,11 +44,14 @@ public class NewPlaceActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setBackgroundDrawable(getDrawable(R.color.white));
         getSupportActionBar().setElevation(0);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         fragments = new ArrayList<>();
         fragments.add(new NewPlaceAFragment());
         fragments.add(new NewPlaceBFragment());
         fragments.add(new NewPlaceCFragment());
+        fragments.add(new NewPlaceDFragment());
+        fragments.add(new NewPlaceEFragment());
 
         this.btnConfirm = findViewById(R.id.btn_confirm);
     }
@@ -121,11 +124,7 @@ public class NewPlaceActivity extends AppCompatActivity {
     private void createNewPlace() {
         Map<String, String> body = new HashMap<>();
 
-        body.put("street", bundle.getString("street"));
-        body.put("streetnumber", bundle.getString("streetnumber"));
-        body.put("city", bundle.getString("city"));
-        body.put("state", bundle.getString("state"));
-        body.put("country", bundle.getString("country"));
+        body.put("address", bundle.getString("address"));
         body.put("businessname", bundle.getString("businessname"));
         body.put("phonenumber", bundle.getString("phonenumber"));
         body.put("works_here", String.valueOf(bundle.getBoolean("works_here")));
