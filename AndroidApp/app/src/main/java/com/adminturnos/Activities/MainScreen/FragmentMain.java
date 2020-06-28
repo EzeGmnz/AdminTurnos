@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adminturnos.Activities.Job.ViewJobActivity;
+import com.adminturnos.Activities.JobRequest.NewJobRequestActivity;
 import com.adminturnos.Activities.Place.ViewPlaceActivity;
 import com.adminturnos.Builder.BuilderListJob;
 import com.adminturnos.Builder.BuilderListPlace;
@@ -43,8 +44,8 @@ public class FragmentMain extends Fragment {
     private List<Place> ownedPlacesList;
 
     private RecyclerView recyclerViewJob, recyclerViewOwnedPlaces;
-    private RecyclerViewJobsListener recyclerViewJobsListener;
-    private RecyclerViewOwnedPlacesListener recyclerViewOwnedPlacesListener;
+    private OnJobClickListener onJobClickListener;
+    private OnPlaceClickListener recyclerViewOwnedPlacesListener;
 
     public FragmentMain() {
 
@@ -78,7 +79,7 @@ public class FragmentMain extends Fragment {
         ownedPlacesList = new ArrayList<>();
 
         recyclerViewOwnedPlaces = getView().findViewById(R.id.recyclerViewOwnedPlaces);
-        recyclerViewOwnedPlacesListener = new RecyclerViewOwnedPlacesListener();
+        recyclerViewOwnedPlacesListener = new OnPlaceClickListener();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerViewOwnedPlaces.setLayoutManager(layoutManager);
@@ -91,7 +92,7 @@ public class FragmentMain extends Fragment {
         jobList = new ArrayList<>();
 
         recyclerViewJob = getView().findViewById(R.id.recyclerViewJobs);
-        recyclerViewJobsListener = new RecyclerViewJobsListener();
+        onJobClickListener = new OnJobClickListener();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerViewJob.setLayoutManager(layoutManager);
@@ -114,19 +115,71 @@ public class FragmentMain extends Fragment {
         }
     }
 
+    private void populateJobs(JSONObject response) {
+        try {
+
+            jobList.addAll(new BuilderListJob().build(response));
+            if (jobList.size() > 0) {
+                displayHasJobs();
+                adapterJob.notifyDataSetChanged();
+                fetchAppointmentsInBackground();
+            } else {
+                displayNoJobs();
+            }
+
+        } catch (JSONException ignored) {
+
+        }
+    }
+
+    private void populatePlaces(JSONObject response) {
+        try {
+            ownedPlacesList.addAll(new BuilderListPlace().build(response));
+
+            if (ownedPlacesList.size() > 0) {
+                displayHasPlaces();
+                adapterOwnedPlaces.notifyDataSetChanged();
+            } else {
+                displayNoPlaces();
+            }
+
+        } catch (JSONException ignored) {
+
+        }
+    }
+
+    private void displayHasJobs() {
+        recyclerViewJob.setVisibility(View.VISIBLE);
+        getView().findViewById(R.id.cardviewNoJobs).setVisibility(View.GONE);
+    }
+
+    private void displayHasPlaces() {
+        recyclerViewOwnedPlaces.setVisibility(View.VISIBLE);
+        getView().findViewById(R.id.labelOwnedPlaces).setVisibility(View.VISIBLE);
+    }
+
+    private void displayNoJobs() {
+        recyclerViewJob.setVisibility(View.GONE);
+        getView().findViewById(R.id.cardviewNoJobs).setVisibility(View.VISIBLE);
+        getView().findViewById(R.id.cardviewNoJobs).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), NewJobRequestActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void displayNoPlaces() {
+        recyclerViewOwnedPlaces.setVisibility(View.GONE);
+        getView().findViewById(R.id.labelOwnedPlaces).setVisibility(View.GONE);
+    }
+
     private class CallbackGetJobs extends DatabaseCallback {
 
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            try {
-
-                jobList.addAll(new BuilderListJob().build(response));
-                adapterJob.notifyDataSetChanged();
-
-                fetchAppointmentsInBackground();
-            } catch (JSONException ignored) {
-
-            }
+            populateJobs(response);
         }
     }
 
@@ -134,14 +187,7 @@ public class FragmentMain extends Fragment {
 
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            try {
-
-                ownedPlacesList.addAll(new BuilderListPlace().build(response));
-                adapterOwnedPlaces.notifyDataSetChanged();
-
-            } catch (JSONException ignored) {
-
-            }
+            populatePlaces(response);
         }
     }
 
@@ -156,16 +202,15 @@ public class FragmentMain extends Fragment {
         public ViewHolderJob onCreateViewHolder(ViewGroup parent,
                                                 int viewType) {
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.recyclerview_main_items, parent, false);
+                    .inflate(R.layout.main_job_item_layout, parent, false);
 
-            v.setOnClickListener(recyclerViewJobsListener);
+            v.setOnClickListener(onJobClickListener);
             return new ViewHolderJob(v);
         }
 
         @Override
         public void onBindViewHolder(ViewHolderJob holder, int position) {
             holder.textViewBusinessName.setText(jobList.get(position).getPlace().getBusinessName());
-            holder.textViewAddress.setText(jobList.get(position).getPlace().getAddress());
         }
 
         @Override
@@ -176,13 +221,11 @@ public class FragmentMain extends Fragment {
         public class ViewHolderJob extends RecyclerView.ViewHolder {
             public View relativeLayout;
             public TextView textViewBusinessName;
-            public TextView textViewAddress;
 
             public ViewHolderJob(View v) {
                 super(v);
                 this.relativeLayout = v;
                 this.textViewBusinessName = v.findViewById(R.id.textviewBusinessName);
-                this.textViewAddress = v.findViewById(R.id.textviewAddress);
             }
         }
     }
@@ -198,7 +241,7 @@ public class FragmentMain extends Fragment {
         public ViewHolderOwnedPlaces onCreateViewHolder(ViewGroup parent,
                                                         int viewType) {
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.recyclerview_main_items, parent, false);
+                    .inflate(R.layout.main_place_item_layout, parent, false);
 
             v.setOnClickListener(recyclerViewOwnedPlacesListener);
             return new ViewHolderOwnedPlaces(v);
@@ -229,7 +272,7 @@ public class FragmentMain extends Fragment {
         }
     }
 
-    private class RecyclerViewJobsListener implements View.OnClickListener {
+    private class OnJobClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View view) {
@@ -245,7 +288,7 @@ public class FragmentMain extends Fragment {
         }
     }
 
-    private class RecyclerViewOwnedPlacesListener implements View.OnClickListener {
+    private class OnPlaceClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View view) {

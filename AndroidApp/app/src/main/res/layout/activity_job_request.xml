@@ -16,7 +16,7 @@
         android:layout_margin="8dp"
         android:gravity="center"
         android:text="Solicitudes de Trabajo"
-        android:textSize="25sp" />
+        android:textSize="22sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewJobRequests"

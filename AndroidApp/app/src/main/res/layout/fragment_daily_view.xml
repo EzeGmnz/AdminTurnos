@@ -34,7 +34,7 @@
             android:text="19"
             android:textAllCaps="true"
             android:textColor="@color/white"
-            android:textSize="15sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -101,7 +101,6 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/holderdayindicatorNoWork"
             android:layout_width="41dp"
             android:layout_height="50dp"
             android:layout_above="@id/labelNoWorkToday"

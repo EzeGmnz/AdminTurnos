@@ -64,19 +64,23 @@ public class ServiceConfigureFragment extends Fragment {
     }
 
     private void refreshUI() {
-        Provides p = null;
+        Provides p, finalP = null;
         dayPicker.clearSelection();
         for (DaySchedule ds : job.getDaySchedules()) {
             p = ds.getProvidesForService(service.getId());
             if (p != null) {
                 dayPicker.selectDay(ds.getDayOfWeek());
+
+                if (finalP == null) {
+                    finalP = p;
+                }
             }
         }
 
-        if (p != null) {
-            timePicker.setTime(p.getDuration());
-            inputPrice.setText(p.getPrice() + "");
-            inputParallelism.setText(p.getParallelism() + "");
+        if (finalP != null) {
+            timePicker.setTime(finalP.getDuration());
+            inputPrice.setText(finalP.getPrice() + "");
+            inputParallelism.setText(finalP.getParallelism() + "");
         } else {
             timePicker.clear();
             inputPrice.setText("");

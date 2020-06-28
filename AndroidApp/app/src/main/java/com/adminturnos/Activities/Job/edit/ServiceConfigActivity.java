@@ -13,8 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 
+import com.adminturnos.CustomViews.NonSwipeableViewPager;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.ObjectInterfaces.Service;
 import com.adminturnos.R;
@@ -25,7 +25,7 @@ import java.util.List;
 public class ServiceConfigActivity extends AppCompatActivity {
 
     private Job job;
-    private ViewPager viewPager;
+    private NonSwipeableViewPager viewPager;
     private ServiceConfigureFragment serviceConfigureFragment;
     private MenuItem removeServiceMenuItem;
 

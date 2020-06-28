@@ -3,7 +3,6 @@ package com.adminturnos.Activities.Job;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,9 +49,7 @@ public class ViewJobActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(job.getPlace().getBusinessName());
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-
         updateUI();
-
     }
 
     private void updateUI() {
@@ -61,13 +58,13 @@ public class ViewJobActivity extends AppCompatActivity {
             this.viewPager = findViewById(R.id.viewPagerJob);
             this.tabLayout = findViewById(R.id.tabLayoutJob);
 
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
+            viewPager.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     populateContainer();
                 }
             }, 100);
+
         } else {
             startEditJobActivity();
         }

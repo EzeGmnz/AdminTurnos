@@ -1,5 +1,6 @@
 package com.adminturnos.Activities.Job.edit;
 
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,6 +41,7 @@ public class MainConfigureJobFragment extends Fragment {
 
     private Job job;
     private RecyclerView recyclerViewDays;
+    private AdapterRecyclerViewDays adapterRecyclerViewDays;
 
     public MainConfigureJobFragment(Job job) {
         this.job = job.clone();
@@ -62,8 +65,8 @@ public class MainConfigureJobFragment extends Fragment {
     private void initUI() {
         LinearLayoutManager layoutManagerDays = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerViewDays.setLayoutManager(layoutManagerDays);
-        recyclerViewDays.setAdapter(new AdapterRecyclerViewDays());
-
+        adapterRecyclerViewDays = new AdapterRecyclerViewDays();
+        recyclerViewDays.setAdapter(adapterRecyclerViewDays);
     }
 
     public Job getJob() {
@@ -73,6 +76,53 @@ public class MainConfigureJobFragment extends Fragment {
     public void setJob(Job job) {
         this.job = job;
         initUI();
+    }
+
+    private void configStartTime(int day) {
+        final Calendar dayStart = job.getDaySchedule(day).getDayStart();
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                getContext(),
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        dayStart.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        dayStart.set(Calendar.MINUTE, minute);
+                        adapterRecyclerViewDays.notifyDataSetChanged();
+                    }
+                },
+                dayStart.get(Calendar.HOUR_OF_DAY), dayStart.get(Calendar.MINUTE), true
+        );
+        timePickerDialog.setCustomTitle(inflateTitleView("Horario de apertura"));
+        timePickerDialog.show();
+    }
+
+    private void configEndTime(int day) {
+        final Calendar dayEnd = job.getDaySchedule(day).getDayEnd();
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                getContext(),
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        dayEnd.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        dayEnd.set(Calendar.MINUTE, minute);
+                        adapterRecyclerViewDays.notifyDataSetChanged();
+                    }
+                },
+                dayEnd.get(Calendar.HOUR_OF_DAY), dayEnd.get(Calendar.MINUTE), true
+        );
+        timePickerDialog.setCustomTitle(inflateTitleView("Horario de cierre"));
+        timePickerDialog.show();
+    }
+
+    private TextView inflateTitleView(String title) {
+        TextView textViewTitle = new TextView(getContext());
+        textViewTitle.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        textViewTitle.setTextColor(getResources().getColor(R.color.white));
+        textViewTitle.setGravity(Gravity.CENTER);
+        textViewTitle.setText(title);
+        textViewTitle.setPadding(10, 20, 10, 10);
+        textViewTitle.setTextSize(18);
+        return textViewTitle;
     }
 
     private class AdapterRecyclerViewDays extends RecyclerView.Adapter<AdapterRecyclerViewDays.ViewHolderScheduleDays> {
@@ -91,7 +141,7 @@ public class MainConfigureJobFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolderScheduleDays holder, int position) {
+        public void onBindViewHolder(ViewHolderScheduleDays holder, final int position) {
             holder.labelDay.setText(mapNumberDay.get(days[position]));
             if (hasScheduleThisDay(position)) {
                 DaySchedule daySchedule = job.getDaySchedule(days[position]);
@@ -104,7 +154,20 @@ public class MainConfigureJobFragment extends Fragment {
                 String endStr = String.format("%02d:%02d", daySchedule.getDayEnd().get(Calendar.HOUR_OF_DAY), daySchedule.getDayEnd().get(Calendar.MINUTE));
 
                 holder.labelStart.setText(startStr);
+                holder.labelStart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        configStartTime(days[position]);
+                    }
+                });
+
                 holder.labelEnd.setText(endStr);
+                holder.labelEnd.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        configEndTime(days[position]);
+                    }
+                });
 
                 holder.servicesContainer.removeAllViews();
                 for (Provides p : daySchedule.getProvides()) {
@@ -162,4 +225,5 @@ public class MainConfigureJobFragment extends Fragment {
             getActivity().startActivityForResult(intent, Values.RC_EDIT_SERVICES);
         }
     }
+
 }

@@ -62,7 +62,6 @@
                 android:textSize="25sp" />
 
             <ImageView
-                android:id="@+id/arrowImg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_above="@id/labelEndTime"

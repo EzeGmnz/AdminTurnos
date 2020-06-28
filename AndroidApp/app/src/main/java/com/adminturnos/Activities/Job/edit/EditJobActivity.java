@@ -89,15 +89,11 @@ public class EditJobActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (editedJob != null) {
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle("¿Guardar cambios?")
-                    .setPositiveButton("Guardar", new ListenerSaveChanges())
-                    .setNeutralButton("Descartar", new ListenerDiscardChanges())
-                    .show();
-        } else {
-            super.onBackPressed();
-        }
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("¿Guardar cambios?")
+                .setPositiveButton("Guardar", new ListenerSaveChanges())
+                .setNeutralButton("Descartar", new ListenerDiscardChanges())
+                .show();
     }
 
     private void returnOK() {
