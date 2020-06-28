@@ -28,6 +28,16 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp" />
 
+    <TextView
+        android:id="@+id/labelNoJobRequests"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textviewJobRequestInfo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:text="Aún no hay nada por aquí"
+        android:textSize="18sp" />
+
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/btnNewJobRequest"
         android:layout_width="wrap_content"

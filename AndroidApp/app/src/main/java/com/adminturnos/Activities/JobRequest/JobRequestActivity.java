@@ -128,6 +128,34 @@ public class JobRequestActivity extends AppCompatActivity {
         );
     }
 
+    private void populateJobRequests(JSONObject response) {
+        try {
+
+            List<JobRequest> aux = new BuilderListJobRequest().build(response);
+
+            if (aux.size() > 0) {
+                displayHasJobRequests();
+                for (JobRequest jobRequest : aux) {
+                    viewJobRequestList.add(new ViewJobRequest(jobRequest));
+                }
+                populateRecyclerView();
+            } else {
+                displayNoJobRequests();
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void displayHasJobRequests() {
+
+    }
+
+    private void displayNoJobRequests() {
+
+    }
+
     private static class CallbackDecidedJobRequest extends DatabaseCallback {
 
         @Override
@@ -139,20 +167,7 @@ public class JobRequestActivity extends AppCompatActivity {
     private class CallbackGetJobRequests extends DatabaseCallback {
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-
-            try {
-
-                List<JobRequest> aux = new BuilderListJobRequest().build(response);
-
-                for (JobRequest jobRequest : aux) {
-                    viewJobRequestList.add(new ViewJobRequest(jobRequest));
-                }
-
-                populateRecyclerView();
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            populateJobRequests(response);
         }
     }
 
