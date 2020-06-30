@@ -1,6 +1,5 @@
 package com.adminturnos.Activities.Job;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,6 +16,8 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.adminturnos.Activities.Job.edit.EditJobActivity;
+import com.adminturnos.Database.JobRepositoryManagerRemote;
+import com.adminturnos.Listeners.RepositoryGetJobListener;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.R;
 import com.adminturnos.Values;
@@ -28,54 +29,48 @@ import java.util.List;
 
 public class ViewJobActivity extends AppCompatActivity {
     private Job job;
+
+    private AdapterTab adapter;
+
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private FragmentDailyView fragmentDailyView;
     private FragmentMonthlyView fragmentMonthlyView;
-
-    private boolean edited;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_job);
 
-        Intent intent = getIntent();
-        job = (Job) intent.getExtras().getSerializable("job");
-        edited = false;
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setElevation(0);
-        getSupportActionBar().setTitle(job.getPlace().getBusinessName());
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-
-        updateUI();
     }
 
-    private void updateUI() {
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-        if (hasDaySchedules()) {
-            this.viewPager = findViewById(R.id.viewPagerJob);
-            this.tabLayout = findViewById(R.id.tabLayoutJob);
-
-            viewPager.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    populateContainer();
-                }
-            }, 100);
-
-        } else {
-            startEditJobActivity();
-        }
+        String jobId = getIntent().getExtras().getString("jobId");
+        JobRepositoryManagerRemote.getInstance().getJob(jobId, new ListenerGetJob());
     }
 
-    private boolean hasDaySchedules() {
-        return job.getDaySchedules().size() > 0;
+    private void initUI() {
+        getSupportActionBar().setTitle(job.getPlace().getBusinessName());
+        viewPager = findViewById(R.id.viewPagerJob);
+        tabLayout = findViewById(R.id.tabLayoutJob);
+
+        viewPager.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                populateContainer();
+            }
+        }, 100);
     }
 
     private void populateContainer() {
-        AdapterTab adapter = new AdapterTab(getSupportFragmentManager());
+
+        adapter = new AdapterTab(getSupportFragmentManager());
 
         this.fragmentDailyView = new FragmentDailyView(job);
         this.fragmentMonthlyView = new FragmentMonthlyView(job, new ListenerOnDayClicked());
@@ -96,6 +91,11 @@ public class ViewJobActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -109,44 +109,14 @@ public class ViewJobActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (edited) {
-            setResult(RESULT_OK);
-            finish();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
     private void startEditJobActivity() {
         Intent intent = new Intent(this, EditJobActivity.class);
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable("job", job);
+        bundle.putString("jobId", job.getId());
 
         intent.putExtras(bundle);
         startActivityForResult(intent, Values.RC_EDIT_JOB);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Values.RC_EDIT_JOB) {
-            if (resultCode == Activity.RESULT_OK) {
-                this.job = (Job) data.getExtras().getSerializable("job");
-                edited = true;
-                if (!hasDaySchedules()) {
-                    onBackPressed();
-                } else {
-                    updateUI();
-                }
-            } else {
-                if (!hasDaySchedules()) {
-                    finish();
-                }
-            }
-        }
     }
 
     private static class AdapterTab extends FragmentStatePagerAdapter {
@@ -188,6 +158,14 @@ public class ViewJobActivity extends AppCompatActivity {
         public void onMonthDayClicked(Calendar day) {
             fragmentDailyView.setDay(day);
             viewPager.setCurrentItem(0);
+        }
+    }
+
+    private class ListenerGetJob implements RepositoryGetJobListener {
+        @Override
+        public void onFetch(Job j) {
+            job = j;
+            initUI();
         }
     }
 }

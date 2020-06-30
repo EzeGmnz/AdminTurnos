@@ -14,8 +14,6 @@ import androidx.fragment.app.Fragment;
 import com.adminturnos.CustomViews.CalendarDay;
 import com.adminturnos.CustomViews.CalendarDayMonthly;
 import com.adminturnos.Functionality.AppointmentManager;
-import com.adminturnos.Functionality.JobAppointmentHolderWrapper;
-import com.adminturnos.Listeners.ListenerAppointmentHolder;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.R;
 
@@ -56,8 +54,9 @@ public class FragmentMonthlyView extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         weekRowContainer = view.findViewById(R.id.weekRowContainer);
+        appointmentManager = job.getAppointmentManager();
 
-        JobAppointmentHolderWrapper.getInstance().getAppointmentManager(job.getId(), new ListenerGetAppointments());
+        populateWeekRows();
     }
 
     private void populateWeekRows() {
@@ -119,15 +118,6 @@ public class FragmentMonthlyView extends Fragment {
 
     public interface ListenerChangeDay {
         void onMonthDayClicked(Calendar day);
-    }
-
-    private class ListenerGetAppointments implements ListenerAppointmentHolder {
-
-        @Override
-        public void onFetch(AppointmentManager manager) {
-            appointmentManager = manager;
-            populateWeekRows();
-        }
     }
 
     private class ListenerDayClick implements View.OnClickListener {

@@ -8,6 +8,7 @@ import com.adminturnos.ObjectInterfaces.Provides;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 public class DayScheduleNormal implements DaySchedule {
 
@@ -101,4 +102,47 @@ public class DayScheduleNormal implements DaySchedule {
         }
         return out;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DayScheduleNormal that = (DayScheduleNormal) o;
+
+        if (that.getProvides().size() != getProvides().size()) return false;
+
+        boolean foundEqualProvides;
+        for (Provides p1 : providesList) {
+            foundEqualProvides = false;
+            for (Provides p2 : that.getProvides()) {
+                if (p1.equals(p2)) {
+                    foundEqualProvides = true;
+                    break;
+                }
+            }
+
+            if (!foundEqualProvides) {
+                return false;
+            }
+        }
+
+        return dayOfWeek == that.dayOfWeek &&
+                calendarEquals(dayStart, that.dayStart) &&
+                calendarEquals(dayEnd, that.dayEnd) &&
+                calendarEquals(pauseStart, that.pauseStart) &&
+                calendarEquals(pauseEnd, that.pauseEnd) &&
+                Objects.equals(id, that.id);
+    }
+
+    public boolean calendarEquals(Calendar c1, Calendar c2) {
+        if (c1 == null && c2 == null) {
+            return true;
+        } else if (c1 == null || c2 == null) {
+            return false;
+        }
+
+        return c1.get(Calendar.HOUR_OF_DAY) == c2.get(Calendar.HOUR_OF_DAY) &&
+                c1.get(Calendar.MINUTE) == c2.get(Calendar.MINUTE);
+    }
+
 }

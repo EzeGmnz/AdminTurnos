@@ -22,7 +22,7 @@
         android:id="@+id/recyclerViewJobRequests"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/btnNewJobRequest"
+        android:layout_above="@id/noJobsView"
         android:layout_below="@id/textviewJobRequestInfo"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
@@ -39,7 +39,7 @@
         android:textSize="18sp" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/btnNewJobRequest"
+        android:id="@+id/noJobsView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

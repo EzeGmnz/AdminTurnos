@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoWrite;
+import com.adminturnos.Listeners.DatabaseCallback;
 import com.adminturnos.Listeners.ListenerAuthenticator;
 import com.adminturnos.Values;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;

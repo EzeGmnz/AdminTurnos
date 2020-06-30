@@ -1,7 +1,5 @@
 package com.adminturnos.Activities.Job.edit;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -15,6 +13,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.adminturnos.CustomViews.NonSwipeableViewPager;
+import com.adminturnos.Database.JobRepositoryManagerRemote;
+import com.adminturnos.Listeners.RepositoryGetJobListener;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.ObjectInterfaces.Service;
 import com.adminturnos.R;
@@ -25,8 +25,11 @@ import java.util.List;
 public class ServiceConfigActivity extends AppCompatActivity {
 
     private Job job;
+
     private NonSwipeableViewPager viewPager;
     private ServiceConfigureFragment serviceConfigureFragment;
+    private ServiceSelectionFragment serviceSelectionFragment;
+
     private MenuItem removeServiceMenuItem;
 
     @Override
@@ -34,40 +37,31 @@ public class ServiceConfigActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_service_config);
 
-        this.job = ((Job) getIntent().getExtras().getSerializable("job")).clone();
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setElevation(0);
-        getSupportActionBar().setTitle(job.getPlace().getBusinessName());
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
+        final String jobId = getIntent().getExtras().getString("jobId");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                initUI();
+                JobRepositoryManagerRemote.getInstance().getJob(jobId, new ListenerGetJob());
             }
         }, 100);
     }
 
     private void initUI() {
-        this.viewPager = findViewById(R.id.view_pager);
-        this.serviceConfigureFragment = new ServiceConfigureFragment(job, new ListenerConfirmConfig());
+        getSupportActionBar().setTitle(job.getPlace().getBusinessName());
+        viewPager = findViewById(R.id.view_pager);
+
+        serviceConfigureFragment = new ServiceConfigureFragment(job, new ListenerConfirmConfig());
+        serviceSelectionFragment = new ServiceSelectionFragment(job, new ListenerServiceClick());
 
         List<Fragment> fragments = new ArrayList<>();
-        fragments.add(new ServiceSelectionFragment(job, new ListenerServiceClick()));
+        fragments.add(serviceSelectionFragment);
         fragments.add(serviceConfigureFragment);
 
         viewPager.setAdapter(new ServiceConfigPagerAdapter(getSupportFragmentManager(), fragments));
-    }
-
-    private void returnOK() {
-        Intent intent = new Intent();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("job", job);
-        intent.putExtras(bundle);
-        setResult(Activity.RESULT_OK, intent);
-
-        finish();
     }
 
     @Override
@@ -82,7 +76,7 @@ public class ServiceConfigActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (viewPager.getCurrentItem() == 0) {
-            returnOK();
+            finish();
         } else {
             showSelectService();
         }
@@ -145,7 +139,16 @@ public class ServiceConfigActivity extends AppCompatActivity {
 
         @Override
         public void onConfirmServiceConfiguration() {
+
             showSelectService();
+        }
+    }
+
+    private class ListenerGetJob implements RepositoryGetJobListener {
+        @Override
+        public void onFetch(Job j) {
+            job = j;
+            initUI();
         }
     }
 }

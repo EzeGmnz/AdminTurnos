@@ -1,99 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    tools:context=".Activities.MainScreen.FragmentMain">
+    android:orientation="vertical"
+    tools:context=".Activities.MainScreen.FragmentMainJobs">
 
-    <TextView
-        android:id="@+id/textViewLabelJobs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Trabajos"
-        android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <RelativeLayout
-        android:id="@+id/containerJobs"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewLabelJobs">
+        android:layout_height="2dp"
+        android:layout_gravity="center_horizontal" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewJobs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:clipToPadding="false"
-            android:paddingEnd="24dp"
-            android:scrollbarStyle="outsideOverlay" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardviewNoJobs"
-            android:layout_width="250dp"
-            android:layout_height="150dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            android:visibility="invisible"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/textviewBusinessName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Enviar solicitud"
-                    android:textSize="18sp" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:src="@drawable/ic_baseline_search_24"
-                    android:tint="@color/colorPrimary" />
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-    </RelativeLayout>
-
-    <TextView
-        android:id="@+id/labelOwnedPlaces"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Lugares Propios"
-        android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/containerJobs" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewOwnedPlaces"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/recyclerViewJobs"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
         android:clipToPadding="false"
-        android:paddingEnd="16dp"
-        android:paddingBottom="8dp"
-        android:scrollbarStyle="outsideOverlay"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/labelOwnedPlaces" />
+        android:scrollbarStyle="outsideOverlay" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/noJobsView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:src="@drawable/ic_baseline_add_24"
+            android:text="Un nuevo comienzo"
+            android:textAllCaps="false"
+            android:textSize="22sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="center"
+            android:text="¿Algúna solicitud para enviar?"
+            android:textColor="@android:color/tab_indicator_text"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+</LinearLayout>

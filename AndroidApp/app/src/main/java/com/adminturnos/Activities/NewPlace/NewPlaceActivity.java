@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.adminturnos.Activities.ObjectConfigurator;
 import com.adminturnos.Activities.ObjectConfiguratorCoordinator;
-import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoWrite;
+import com.adminturnos.Listeners.DatabaseCallback;
 import com.adminturnos.ObjectInterfaces.JobType;
 import com.adminturnos.R;
 import com.adminturnos.Values;
@@ -151,7 +151,6 @@ public class NewPlaceActivity extends AppCompatActivity {
             json.put("place", placeId);
 
             DatabaseDjangoWrite.getInstance().POSTJSON(
-                    this,
                     Values.DJANGO_URL_PLACE_DOES,
                     json,
                     new CallbackPlaceDoes()

@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adminturnos.Builder.BuilderListJobRequest;
-import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoRead;
 import com.adminturnos.Database.DatabaseDjangoWrite;
+import com.adminturnos.Listeners.DatabaseCallback;
 import com.adminturnos.ObjectInterfaces.JobRequest;
 import com.adminturnos.ObjectViews.ViewJobRequest;
 import com.adminturnos.R;
@@ -51,7 +51,7 @@ public class JobRequestActivity extends AppCompatActivity {
 
     private void initUI() {
 
-        findViewById(R.id.btnNewJobRequest).setOnClickListener(new ClickListenerNewJobRequest());
+        findViewById(R.id.noJobsView).setOnClickListener(new ClickListenerNewJobRequest());
 
         setTitle("");
         getJobRequests();

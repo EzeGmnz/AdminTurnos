@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.adminturnos.Activities.JobRequest.JobRequestActivity;
 import com.adminturnos.Activities.NewPlace.NewPlaceActivity;
+import com.adminturnos.Activities.Place.AdminPlacesActivity;
 import com.adminturnos.Activities.SignIn.ActivitySignIn;
 import com.adminturnos.R;
 import com.adminturnos.UserManagment.AuthenticatorGoogle;
@@ -32,6 +34,7 @@ import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
+    private FragmentMainJobs fragmentMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
     private void checkUserIsAuthenticated() {
         GoogleSignInAccount account = getAuthenticatedUser();
         if (account != null) {
-            startAuthenticatedUI();
+            displayAuthenticatedUI();
         } else {
-            displayUILogIn();
+            startLogInActivity();
         }
     }
 
@@ -66,12 +69,12 @@ public class MainActivity extends AppCompatActivity {
         return account;
     }
 
-    private void displayUILogIn() {
+    private void startLogInActivity() {
         Intent intent = new Intent(this, ActivitySignIn.class);
         startActivityForResult(intent, Values.RC_SIGN_IN_ACTIVITY);
     }
 
-    public void startAuthenticatedUI() {
+    private void displayAuthenticatedUI() {
         SharedPreferences sharedPreferences = getSharedPreferences(Values.SHARED_PREF_NAME, MODE_PRIVATE);
         String accessToken = sharedPreferences.getString(Values.SHARED_PREF_ACCESS_TOKEN, null);
         UserManagment.getInstance().setAccessToken(accessToken);
@@ -79,7 +82,12 @@ public class MainActivity extends AppCompatActivity {
         UserManagment.getInstance().setAuthenticator(new AuthenticatorGoogle(this, null));
 
         setUpDrawer();
-        refreshContent();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refreshContent();
+            }
+        }, 100);
     }
 
     private void setUpDrawer() {
@@ -112,23 +120,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshContent() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_main_screen, new FragmentMain());
-        transaction.commit();
+        if (fragmentMain == null) {
+            fragmentMain = new FragmentMainJobs();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_main_screen, fragmentMain);
+            transaction.commit();
+        } else {
+            fragmentMain.refresh();
+        }
     }
 
     private void signOut() {
         UserManagment.getInstance().signOut(new SignOutListener());
-    }
-
-    private void startNewPlaceActivity() {
-        Intent intent = new Intent(this, NewPlaceActivity.class);
-        startActivityForResult(intent, Values.RC_NEW_PLACE);
-    }
-
-    private void startJobRequestsActivity() {
-        Intent intent = new Intent(this, JobRequestActivity.class);
-        startActivity(intent);
     }
 
     @Override
@@ -151,11 +154,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void startNewPlaceActivity() {
+        Intent intent = new Intent(this, NewPlaceActivity.class);
+        startActivityForResult(intent, Values.RC_NEW_PLACE);
+    }
+
+    private void startJobRequestsActivity() {
+        Intent intent = new Intent(this, JobRequestActivity.class);
+        startActivity(intent);
+    }
+
+    private void startAdminPlacesActivity() {
+        Intent intent = new Intent(this, AdminPlacesActivity.class);
+        startActivity(intent);
+    }
+
     private class SignOutListener implements OnCompleteListener<Void> {
 
         @Override
         public void onComplete(@NonNull Task<Void> task) {
-            displayUILogIn();
+            startLogInActivity();
             UserManagment.getInstance().invalidate();
         }
     }
@@ -170,6 +188,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.nav_job_request:
                     startJobRequestsActivity();
+                    break;
+                case R.id.nav_admin_places:
+                    startAdminPlacesActivity();
                     break;
                 case R.id.nav_sign_out:
                     signOut();

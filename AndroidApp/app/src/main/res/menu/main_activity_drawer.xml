@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/nav_admin_places"
+        android:title="Administrar lugares" />
+
+    <item
         android:id="@+id/nav_job_request"
         android:title="Solicitudes de trabajo" />
 

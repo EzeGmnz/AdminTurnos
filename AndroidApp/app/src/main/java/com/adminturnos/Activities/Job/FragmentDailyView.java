@@ -14,8 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.adminturnos.Functionality.AppointmentManager;
-import com.adminturnos.Functionality.JobAppointmentHolderWrapper;
-import com.adminturnos.Listeners.ListenerAppointmentHolder;
 import com.adminturnos.ObjectInterfaces.Appointment;
 import com.adminturnos.ObjectInterfaces.DaySchedule;
 import com.adminturnos.ObjectInterfaces.Job;
@@ -69,7 +67,8 @@ public class FragmentDailyView extends Fragment {
         this.containerServiceSeparation = view.findViewById(R.id.containerServiceSeparation);
         this.serviceNameContainer = view.findViewById(R.id.serviceNameContainer);
         this.timeLineContainer = view.findViewById(R.id.timeLineContainer);
-        JobAppointmentHolderWrapper.getInstance().getAppointmentManager(job.getId(), new ListenerGetAppointments());
+        appointmentManager = job.getAppointmentManager();
+        populateDay();
     }
 
     public void setDay(Calendar day) {
@@ -261,15 +260,6 @@ public class FragmentDailyView extends Fragment {
         }
 
         return out;
-    }
-
-    private class ListenerGetAppointments implements ListenerAppointmentHolder {
-
-        @Override
-        public void onFetch(AppointmentManager manager) {
-            appointmentManager = manager;
-            populateDay();
-        }
     }
 
     private class ListenerAppointmentClick implements View.OnClickListener {

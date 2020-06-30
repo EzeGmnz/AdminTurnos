@@ -2,6 +2,8 @@ package com.adminturnos.Objects;
 
 import com.adminturnos.ObjectInterfaces.Service;
 
+import java.util.Objects;
+
 /**
  *
  */
@@ -31,4 +33,16 @@ public class ServiceNamed implements Service {
     public String getName() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ServiceNamed that = (ServiceNamed) o;
+        return Objects.equals(jobtype, that.jobtype) &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name);
+    }
+
 }

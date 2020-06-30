@@ -5,6 +5,7 @@ import android.widget.TextView;
 
 import com.adminturnos.ObjectInterfaces.Service;
 import com.adminturnos.R;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
@@ -15,10 +16,16 @@ import eu.davidea.flexibleadapter.items.IFlexible;
 import eu.davidea.viewholders.FlexibleViewHolder;
 
 public class ViewService extends AbstractFlexibleItem<ViewService.ViewHolderService> implements IFilterable<String> {
+    private boolean isProvided;
     private Service service;
 
-    public ViewService(Service service) {
+    public ViewService(Service service, boolean isProvided) {
+        this.isProvided = isProvided;
         this.service = service;
+    }
+
+    public void setProvided(boolean provided) {
+        isProvided = provided;
     }
 
     public Service getService() {
@@ -48,13 +55,24 @@ public class ViewService extends AbstractFlexibleItem<ViewService.ViewHolderServ
     @Override
     public void bindViewHolder(FlexibleAdapter<IFlexible> adapter, ViewHolderService holder, int position, List<Object> payloads) {
         holder.labelName.setText(service.getName());
+
+        if (isProvided) {
+            holder.labelName.setTextColor(holder.labelName.getResources().getColor(R.color.white));
+            holder.cardView.setCardBackgroundColor(holder.cardView.getResources().getColor(R.color.colorPrimary));
+        } else {
+            holder.labelName.setTextColor(holder.labelName.getContext().getResources().getColor(R.color.black));
+            holder.cardView.setCardBackgroundColor(holder.cardView.getResources().getColor(R.color.white));
+        }
     }
 
     public static class ViewHolderService extends FlexibleViewHolder {
         TextView labelName;
+        MaterialCardView cardView;
 
         public ViewHolderService(View view, FlexibleAdapter adapter) {
             super(view, adapter);
+
+            cardView = view.findViewById(R.id.cardViewContainer);
             labelName = view.findViewById(R.id.labelName);
         }
     }

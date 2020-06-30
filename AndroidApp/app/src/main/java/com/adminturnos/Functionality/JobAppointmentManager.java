@@ -1,91 +1,47 @@
 package com.adminturnos.Functionality;
 
-import com.adminturnos.Builder.BuilderListAppointment;
-import com.adminturnos.Database.DatabaseCallback;
-import com.adminturnos.Database.DatabaseDjangoRead;
-import com.adminturnos.Listeners.ListenerAppointmentHolder;
 import com.adminturnos.ObjectInterfaces.Appointment;
-import com.adminturnos.Values;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import cz.msebera.android.httpclient.Header;
 
 public class JobAppointmentManager implements AppointmentManager {
 
     private final String jobId;
-    private ListenerAppointmentHolder listener;
+    private List<Appointment> appointmentList;
 
-    private List<Appointment> appointments;
-
-    public JobAppointmentManager(String jobId, ListenerAppointmentHolder listener) {
+    public JobAppointmentManager(String jobId) {
         this.jobId = jobId;
-        this.listener = listener;
-        this.appointments = new ArrayList<>();
-        fetchAppointments();
-    }
-
-    private void fetchAppointments() {
-        Map<String, String> body = new HashMap<>();
-        body.put("job_id", "" + jobId);
-
-        DatabaseDjangoRead.getInstance().GET(
-                Values.DJANGO_URL_GET_APPOINTMENTS,
-                body,
-                new CallbackGetAppointments()
-        );
-    }
-
-    private void notifyListener() {
-        if (this.listener != null) {
-            this.listener.onFetch(this);
-        }
-    }
-
-    private void populateAppointments(JSONObject response) {
-
-        try {
-            appointments = new BuilderListAppointment().build(response);
-            appointments.sort(new AppointmentComparator());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public List<Appointment> getAppointments() {
-        return appointments;
+        this.appointmentList = new ArrayList<>();
     }
 
     @Override
     public List<Appointment> getAppointmentsInDate(Calendar date) {
         List<Appointment> out = new ArrayList<>();
-        for (Appointment a : appointments) {
+        for (Appointment a : appointmentList) {
             boolean sameDay = a.getDate().get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR) &&
                     a.getDate().get(Calendar.YEAR) == date.get(Calendar.YEAR);
             if (sameDay) {
                 out.add(a);
             }
         }
+        out.sort(new AppointmentComparator());
 
         return out;
     }
 
-    private class CallbackGetAppointments extends DatabaseCallback {
-        @Override
-        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            populateAppointments(response);
-            notifyListener();
-        }
+    @Override
+    public void setAppointmentList(List<Appointment> appointmentList) {
+        this.appointmentList = appointmentList;
     }
 
-    private class AppointmentComparator implements java.util.Comparator<Appointment> {
+    @Override
+    public String getJobId() {
+        return jobId;
+    }
+
+    private static class AppointmentComparator implements java.util.Comparator<Appointment> {
 
         @Override
         public int compare(Appointment o1, Appointment o2) {

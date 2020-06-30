@@ -1,7 +1,6 @@
 package com.adminturnos.Database;
 
-import android.content.Context;
-
+import com.adminturnos.Listeners.DatabaseCallback;
 import com.adminturnos.UserManagment.UserManagment;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
@@ -57,7 +56,7 @@ public class DatabaseDjangoWrite implements DatabaseWrite {
         );
     }
 
-    public void POSTJSON(Context context, String subDirURL, JSONObject json, DatabaseCallback callback) {
+    public void POSTJSON(String subDirURL, JSONObject json, DatabaseCallback callback) {
         StringEntity entity = null;
 
         try {
@@ -69,7 +68,7 @@ public class DatabaseDjangoWrite implements DatabaseWrite {
         String url = database.getUrl() + subDirURL;
 
         client.post(
-                context,
+                null,
                 url,
                 entity,
                 "application/json",

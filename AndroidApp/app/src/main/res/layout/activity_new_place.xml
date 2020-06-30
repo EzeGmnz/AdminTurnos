@@ -21,5 +21,4 @@
         android:background="@color/colorPrimary"
         android:text="" />
 
-
 </RelativeLayout>

@@ -12,7 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activities.Job.edit.ServiceConfigActivity"></activity>
+        <activity android:name=".Activities.Place.AdminPlacesActivity"></activity>
+        <activity android:name=".Activities.Job.edit.ServiceConfigActivity" />
         <activity android:name=".Activities.Job.ViewAppointmentActivity" />
         <activity
             android:name=".Activities.Job.edit.EditJobActivity"

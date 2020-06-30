@@ -13,8 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adminturnos.Builder.BuilderListService;
-import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoRead;
+import com.adminturnos.Listeners.DatabaseCallback;
+import com.adminturnos.ObjectInterfaces.DaySchedule;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.ObjectInterfaces.Service;
 import com.adminturnos.ObjectViews.ViewService;
@@ -76,11 +77,12 @@ public class ServiceSelectionFragment extends Fragment {
         }
     }
 
-    private void populateServices(JSONObject response) {
-        List<Service> serviceList = new BuilderListService().build(response);
+    private void populateServices(List<Service> serviceList) {
+
         List<ViewService> viewServiceList = new ArrayList<>();
+        serviceList.sort(new ComparatorIsServiceProvided());
         for (Service s : serviceList) {
-            viewServiceList.add(new ViewService(s));
+            viewServiceList.add(new ViewService(s, providesService(s)));
         }
 
         adapterServices = new FlexibleAdapter<>(viewServiceList);
@@ -90,6 +92,31 @@ public class ServiceSelectionFragment extends Fragment {
         this.adapterServices.addListener(new RecyclerViewClickListener());
     }
 
+    private boolean providesService(Service s) {
+        for (DaySchedule ds : job.getDaySchedules()) {
+            if (ds.getProvidesForService(s.getId()) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapterServices != null) {
+            checkForUpdates();
+        }
+    }
+
+    public void checkForUpdates() {
+        for (ViewService vs : adapterServices.getCurrentItems()) {
+            vs.setProvided(providesService(vs.getService()));
+        }
+
+        adapterServices.notifyDataSetChanged();
+    }
+
     public interface ServiceClickListener {
         void onServiceViewClick(Service service);
     }
@@ -97,7 +124,7 @@ public class ServiceSelectionFragment extends Fragment {
     private class CallbackGetDoableServices extends DatabaseCallback {
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            populateServices(response);
+            populateServices(new BuilderListService().build(response));
         }
     }
 
@@ -128,5 +155,23 @@ public class ServiceSelectionFragment extends Fragment {
             return false;
         }
 
+    }
+
+    private class ComparatorIsServiceProvided implements java.util.Comparator<Service> {
+
+        @Override
+        public int compare(Service s1, Service s2) {
+            boolean providesServiceS1 = providesService(s1);
+            boolean providesServiceS2 = providesService(s2);
+
+            if (providesServiceS1 && !providesServiceS2) {
+                return -1;
+            }
+            if (providesServiceS2 && !providesServiceS1) {
+                return 1;
+            }
+
+            return 0;
+        }
     }
 }

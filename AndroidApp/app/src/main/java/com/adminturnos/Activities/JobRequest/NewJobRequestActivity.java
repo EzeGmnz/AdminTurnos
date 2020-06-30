@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.adminturnos.Builder.BuilderListPlace;
-import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoRead;
 import com.adminturnos.Database.DatabaseDjangoWrite;
+import com.adminturnos.Listeners.DatabaseCallback;
 import com.adminturnos.ObjectInterfaces.Place;
 import com.adminturnos.ObjectViews.ViewPlace;
 import com.adminturnos.R;

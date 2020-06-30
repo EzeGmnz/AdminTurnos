@@ -1,7 +1,6 @@
 package com.adminturnos.Activities.Job.edit;
 
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,13 +20,12 @@ import com.adminturnos.ObjectInterfaces.DaySchedule;
 import com.adminturnos.ObjectInterfaces.Job;
 import com.adminturnos.ObjectInterfaces.Provides;
 import com.adminturnos.R;
-import com.adminturnos.Values;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainConfigureJobFragment extends Fragment {
+public class DayScheduleConfigFragment extends Fragment {
 
     private static final Map<Integer, String> mapNumberDay = new HashMap<Integer, String>() {{
         put(1, "Dom");
@@ -43,8 +41,8 @@ public class MainConfigureJobFragment extends Fragment {
     private RecyclerView recyclerViewDays;
     private AdapterRecyclerViewDays adapterRecyclerViewDays;
 
-    public MainConfigureJobFragment(Job job) {
-        this.job = job.clone();
+    public DayScheduleConfigFragment(Job job) {
+        this.job = job;
     }
 
     @Override
@@ -58,8 +56,14 @@ public class MainConfigureJobFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         this.recyclerViewDays = view.findViewById(R.id.recyclerViewDays);
 
-        view.findViewById(R.id.btnServiceConfiguration).setOnClickListener(new ListenerBtnServiceConfiguration());
+
         initUI();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapterRecyclerViewDays.notifyDataSetChanged();
     }
 
     private void initUI() {
@@ -67,10 +71,6 @@ public class MainConfigureJobFragment extends Fragment {
         recyclerViewDays.setLayoutManager(layoutManagerDays);
         adapterRecyclerViewDays = new AdapterRecyclerViewDays();
         recyclerViewDays.setAdapter(adapterRecyclerViewDays);
-    }
-
-    public Job getJob() {
-        return job;
     }
 
     public void setJob(Job job) {
@@ -212,17 +212,6 @@ public class MainConfigureJobFragment extends Fragment {
                 this.labelStart = v.findViewById(R.id.labelStart);
                 this.labelEnd = v.findViewById(R.id.labelEnd);
             }
-        }
-    }
-
-    private class ListenerBtnServiceConfiguration implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(getContext(), ServiceConfigActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("job", job.clone());
-            intent.putExtras(bundle);
-            getActivity().startActivityForResult(intent, Values.RC_EDIT_SERVICES);
         }
     }
 

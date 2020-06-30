@@ -1,6 +1,5 @@
 package com.adminturnos.Activities.Job.edit;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,32 +11,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.adminturnos.Database.DatabaseCallback;
-import com.adminturnos.Database.DatabaseDjangoWrite;
-import com.adminturnos.ObjectInterfaces.DaySchedule;
+import com.adminturnos.Database.JobRepositoryManagerRemote;
+import com.adminturnos.Listeners.RepositoryGetJobListener;
 import com.adminturnos.ObjectInterfaces.Job;
-import com.adminturnos.ObjectInterfaces.Provides;
 import com.adminturnos.R;
 import com.adminturnos.Values;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Calendar;
-
-import cz.msebera.android.httpclient.Header;
 
 public class EditJobActivity extends AppCompatActivity {
 
     private Job originalJob;
     private Job editedJob;
-    private MainConfigureJobFragment mainConfigureJobFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,22 +36,22 @@ public class EditJobActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("");
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-        this.originalJob = (Job) getIntent().getExtras().getSerializable("job");
-        getSupportActionBar().setTitle(originalJob.getPlace().getBusinessName());
-
+        final String jobId = getIntent().getExtras().getString("jobId");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                initUI();
+                JobRepositoryManagerRemote.getInstance().getJob(jobId, new ListenerGetJob());
             }
         }, 100);
     }
 
     private void initUI() {
-        mainConfigureJobFragment = new MainConfigureJobFragment(originalJob);
+        getSupportActionBar().setTitle(originalJob.getPlace().getBusinessName());
+        findViewById(R.id.btnServiceConfiguration).setOnClickListener(new ListenerBtnServiceConfiguration());
+        DayScheduleConfigFragment dayScheduleConfigFragment = new DayScheduleConfigFragment(editedJob);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, mainConfigureJobFragment);
+        transaction.replace(R.id.container, dayScheduleConfigFragment);
         transaction.commit();
     }
 
@@ -83,12 +70,20 @@ public class EditJobActivity extends AppCompatActivity {
     }
 
     private void returnCancel() {
-        setResult(Activity.RESULT_CANCELED);
+        JobRepositoryManagerRemote.getInstance().saveJob(originalJob, null);
         finish();
     }
 
     @Override
     public void onBackPressed() {
+        if (hasJobChanged()) {
+            showSaveDialog();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private void showSaveDialog() {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("¿Guardar cambios?")
                 .setPositiveButton("Guardar", new ListenerSaveChanges())
@@ -96,14 +91,8 @@ public class EditJobActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void returnOK() {
-        Intent intent = new Intent();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("job", editedJob);
-        intent.putExtras(bundle);
-        setResult(Activity.RESULT_OK, intent);
-
-        finish();
+    private boolean hasJobChanged() {
+        return !editedJob.equals(originalJob);
     }
 
     @Override
@@ -120,109 +109,9 @@ public class EditJobActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Values.RC_EDIT_SERVICES) {
-            if (resultCode == RESULT_OK) {
-                editedJob = (Job) data.getSerializableExtra("job");
-                mainConfigureJobFragment.setJob(editedJob);
-            }
-        }
-    }
-
     private void saveJob() {
-        editedJob = mainConfigureJobFragment.getJob();
-        saveDaySchedules();
-    }
-
-    private void saveDaySchedules() {
-        JSONObject body = new JSONObject();
-
-        try {
-            body.put("job_id", editedJob.getId());
-
-            JSONObject days = new JSONObject();
-            for (DaySchedule d : editedJob.getDaySchedules()) {
-                String dayStart = d.getDayStart().get(Calendar.HOUR_OF_DAY) + ":" + d.getDayStart().get(Calendar.MINUTE) + ":00";
-                String dayEnd = d.getDayEnd().get(Calendar.HOUR_OF_DAY) + ":" + d.getDayEnd().get(Calendar.MINUTE) + ":00";
-
-                String pauseEnd = null, pauseStart = null;
-                if (d.getPauseStart() != null) {
-                    pauseStart = d.getPauseStart().get(Calendar.HOUR_OF_DAY) + ":" + d.getPauseStart().get(Calendar.MINUTE) + ":00";
-                    pauseEnd = d.getPauseEnd().get(Calendar.HOUR_OF_DAY) + ":" + d.getPauseEnd().get(Calendar.MINUTE) + ":00";
-                }
-
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("day_start", dayStart);
-                jsonObject.put("day_end", dayEnd);
-                jsonObject.put("pause_start", pauseStart);
-                jsonObject.put("pause_end", pauseEnd);
-                days.put(d.getDayOfWeek() + "", jsonObject);
-            }
-            body.put("days", days);
-
-            DatabaseDjangoWrite.getInstance().POSTJSON(
-                    this,
-                    Values.DJANGO_URL_NEW_DAY_SCHEDULE,
-                    body,
-                    new CallbackSaveDaySchedule()
-            );
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void saveProvides() {
-        try {
-            for (DaySchedule ds : editedJob.getDaySchedules()) {
-                JSONObject body = new JSONObject();
-                body.put("job_id", originalJob.getId());
-
-                body.put("day_of_week", ds.getDayOfWeek());
-                JSONArray servicesArray = new JSONArray();
-                JSONObject costsJson = new JSONObject();
-                JSONObject durationsJson = new JSONObject();
-                JSONObject parallelismsJson = new JSONObject();
-
-                for (Provides p : ds.getProvides()) {
-                    String duration = p.getDuration().get(Calendar.HOUR_OF_DAY) + ":" + p.getDuration().get(Calendar.MINUTE) + ":00";
-                    servicesArray.put(p.getService().getId());
-                    costsJson.put(p.getService().getId(), p.getPrice());
-                    durationsJson.put(p.getService().getId(), duration);
-                    parallelismsJson.put(p.getService().getId(), p.getParallelism());
-                }
-
-                body.put("services", servicesArray);
-                body.put("costs", costsJson);
-                body.put("durations", durationsJson);
-                body.put("parallelisms", parallelismsJson);
-
-                DatabaseDjangoWrite.getInstance().POSTJSON(
-                        this,
-                        Values.DJANGO_URL_NEW_PROVIDES,
-                        body,
-                        new DatabaseCallback() {
-                            @Override
-                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                // TODO
-                            }
-                        }
-                );
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private class CallbackSaveDaySchedule extends DatabaseCallback {
-
-        @Override
-        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-            saveProvides();
-            returnOK();
-        }
+        JobRepositoryManagerRemote.getInstance().saveJobToStorage(editedJob.getId());
+        finish();
     }
 
     private class ListenerSaveChanges implements DialogInterface.OnClickListener {
@@ -236,6 +125,28 @@ public class EditJobActivity extends AppCompatActivity {
         @Override
         public void onClick(DialogInterface dialog, int which) {
             returnCancel();
+        }
+    }
+
+    private class ListenerBtnServiceConfiguration implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Bundle bundle = new Bundle();
+            bundle.putString("jobId", editedJob.getId());
+
+            Intent intent = new Intent(getApplicationContext(), ServiceConfigActivity.class);
+            intent.putExtras(bundle);
+
+            startActivityForResult(intent, Values.RC_EDIT_SERVICES);
+        }
+    }
+
+    private class ListenerGetJob implements RepositoryGetJobListener {
+        @Override
+        public void onFetch(Job job) {
+            originalJob = job.clone();
+            editedJob = job;
+            initUI();
         }
     }
 }

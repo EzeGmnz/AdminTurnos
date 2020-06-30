@@ -2,6 +2,8 @@ package com.adminturnos.Objects;
 
 import com.adminturnos.ObjectInterfaces.CustomUser;
 
+import java.util.Objects;
+
 /**
  *
  */
@@ -40,4 +42,16 @@ public class CustomUserImpl implements CustomUser {
     public String getEmail() {
         return email;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomUserImpl that = (CustomUserImpl) o;
+        return Objects.equals(givenName, that.givenName) &&
+                Objects.equals(familyName, that.familyName) &&
+                Objects.equals(email, that.email) &&
+                Objects.equals(id, that.id);
+    }
+
 }

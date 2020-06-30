@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.adminturnos.Activities.ObjectConfigurator;
 import com.adminturnos.Builder.BuilderListJobType;
-import com.adminturnos.Database.DatabaseCallback;
 import com.adminturnos.Database.DatabaseDjangoRead;
+import com.adminturnos.Listeners.DatabaseCallback;
 import com.adminturnos.ObjectInterfaces.JobType;
 import com.adminturnos.ObjectViews.ViewJobTypeSelection;
 import com.adminturnos.R;

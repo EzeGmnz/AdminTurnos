@@ -18,14 +18,14 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textviewBusinessName"
+            android:id="@+id/labelBusinessName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Lo del S"
             android:textSize="25sp" />
 
         <TextView
-            android:id="@+id/textviewAddress"
+            android:id="@+id/labelAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Paraguay 555"

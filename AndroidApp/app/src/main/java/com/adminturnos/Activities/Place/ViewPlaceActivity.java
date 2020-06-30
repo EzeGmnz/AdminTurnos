@@ -33,8 +33,8 @@ public class ViewPlaceActivity extends AppCompatActivity {
 
     private void updateUI() {
         setTitle("");
-        TextView textviewBusinessName = findViewById(R.id.textviewBusinessName);
-        TextView textviewAddress = findViewById(R.id.textviewAddress);
+        TextView textviewBusinessName = findViewById(R.id.labelBusinessName);
+        TextView textviewAddress = findViewById(R.id.labelAddress);
 
         textviewBusinessName.setText(place.getBusinessName());
         textviewAddress.setText(place.getAddress());
