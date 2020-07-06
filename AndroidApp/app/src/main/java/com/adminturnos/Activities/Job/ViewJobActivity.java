@@ -30,8 +30,6 @@ import java.util.List;
 public class ViewJobActivity extends AppCompatActivity {
     private Job job;
 
-    private AdapterTab adapter;
-
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private FragmentDailyView fragmentDailyView;
@@ -63,17 +61,17 @@ public class ViewJobActivity extends AppCompatActivity {
         viewPager.postDelayed(new Runnable() {
             @Override
             public void run() {
-                populateContainer();
+                initViewPager();
             }
         }, 100);
     }
 
-    private void populateContainer() {
+    private void initViewPager() {
 
-        adapter = new AdapterTab(getSupportFragmentManager());
+        AppointmentViewsAdapter adapter = new AppointmentViewsAdapter(getSupportFragmentManager());
 
-        this.fragmentDailyView = new FragmentDailyView(job);
-        this.fragmentMonthlyView = new FragmentMonthlyView(job, new ListenerOnDayClicked());
+        fragmentDailyView = new FragmentDailyView(job);
+        fragmentMonthlyView = new FragmentMonthlyView(job, new ListenerOnDayClicked());
 
         adapter.addFragment(fragmentDailyView, "Diario");
         adapter.addFragment(fragmentMonthlyView, "Mensual");
@@ -119,11 +117,11 @@ public class ViewJobActivity extends AppCompatActivity {
         startActivityForResult(intent, Values.RC_EDIT_JOB);
     }
 
-    private static class AdapterTab extends FragmentStatePagerAdapter {
+    private static class AppointmentViewsAdapter extends FragmentStatePagerAdapter {
         private List<Fragment> fragmentList;
         private List<String> titleList;
 
-        public AdapterTab(@NonNull FragmentManager fm) {
+        public AppointmentViewsAdapter(@NonNull FragmentManager fm) {
             super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
             this.fragmentList = new ArrayList<>();
             this.titleList = new ArrayList<>();

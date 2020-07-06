@@ -2,6 +2,7 @@ package com.adminturnos.Activities.MainScreen;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.adminturnos.Activities.JobRequest.NewJobRequestActivity;
@@ -25,8 +26,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class FragmentMainJobs extends Fragment {
-    private JobFragmentPagerAdapter adapterJob;
-    private List<JobViewFragment> jobViewFragmentList;
+    private List<Job> jobList;
     private ViewPager viewPager;
 
     @Override
@@ -39,7 +39,6 @@ public class FragmentMainJobs extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        jobViewFragmentList = new ArrayList<>();
         viewPager = getView().findViewById(R.id.recyclerViewJobs);
         getJobs();
     }
@@ -48,27 +47,33 @@ public class FragmentMainJobs extends Fragment {
         JobRepositoryManagerRemote.getInstance().getJobs(new GetJobsListener());
     }
 
-    private void populateJobs(List<Job> jobList) {
-        jobViewFragmentList.clear();
-        if (jobList.size() > 0) {
-
-            jobList.sort(new JobTodayComparator());
-            for (Job j : jobList) {
-                jobViewFragmentList.add(new JobViewFragment(j));
-            }
-            displayHasJobs();
-
+    private void populateJobs() {
+        if (hasJobs()) {
+            initViewPager();
+            displayHasJobsUI();
         } else {
             displayNoJobs();
         }
     }
 
-    private void displayHasJobs() {
-        adapterJob = new JobFragmentPagerAdapter(getChildFragmentManager(), jobViewFragmentList);
-        viewPager.setAdapter(adapterJob);
-        adapterJob.notifyDataSetChanged();
+    private boolean hasJobs() {
+        return jobList.size() > 0;
+    }
 
+    private void initViewPager() {
+        jobList.sort(new JobTodayComparator());
+        JobFragmentPagerAdapter adapterJob = new JobFragmentPagerAdapter(getChildFragmentManager());
+
+        for (Job j : jobList) {
+            adapterJob.addFragment(new JobViewFragment(j));
+        }
+
+        viewPager.setAdapter(adapterJob);
+    }
+
+    private void displayHasJobsUI() {
         ((TabLayout) getView().findViewById(R.id.tabLayout)).setupWithViewPager(viewPager);
+
         viewPager.setVisibility(View.VISIBLE);
         getView().findViewById(R.id.noJobsView).setVisibility(View.GONE);
     }
@@ -90,23 +95,27 @@ public class FragmentMainJobs extends Fragment {
         getJobs();
     }
 
-    private static class JobFragmentPagerAdapter extends FragmentPagerAdapter {
-
+    private static class JobFragmentPagerAdapter extends FragmentStatePagerAdapter {
         private List<JobViewFragment> fragmentList;
 
-        public JobFragmentPagerAdapter(FragmentManager fm, List<JobViewFragment> frags) {
+        public JobFragmentPagerAdapter(FragmentManager fm) {
             super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-            fragmentList = frags;
+            fragmentList = new ArrayList<>();
         }
 
+        public void addFragment(JobViewFragment jobViewFragment) {
+            fragmentList.add(jobViewFragment);
+        }
+
+        @NonNull
         @Override
         public Fragment getItem(int position) {
             return fragmentList.get(position);
         }
 
         @Override
-        public int getItemPosition(Object object) {
-            return POSITION_NONE;
+        public Parcelable saveState() {
+            return null;
         }
 
         @Override
@@ -134,8 +143,9 @@ public class FragmentMainJobs extends Fragment {
     private class GetJobsListener implements RepositoryGetJobListListener {
 
         @Override
-        public void onFetch(List<Job> jobList) {
-            populateJobs(jobList);
+        public void onFetch(List<Job> list) {
+            jobList = list;
+            populateJobs();
         }
     }
 }
