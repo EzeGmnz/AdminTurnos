@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkUserIsAuthenticated() {
         GoogleSignInAccount account = getAuthenticatedUser();
         if (account != null) {
+            initUserConfig();
             displayAuthenticatedUI();
         } else {
             startLogInActivity();
@@ -74,13 +75,15 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, Values.RC_SIGN_IN_ACTIVITY);
     }
 
-    private void displayAuthenticatedUI() {
+    private void initUserConfig() {
         SharedPreferences sharedPreferences = getSharedPreferences(Values.SHARED_PREF_NAME, MODE_PRIVATE);
         String accessToken = sharedPreferences.getString(Values.SHARED_PREF_ACCESS_TOKEN, null);
         UserManagment.getInstance().setAccessToken(accessToken);
         //TODO
         UserManagment.getInstance().setAuthenticator(new AuthenticatorGoogle(this, null));
+    }
 
+    private void displayAuthenticatedUI() {
         setUpDrawer();
         new Handler().postDelayed(new Runnable() {
             @Override

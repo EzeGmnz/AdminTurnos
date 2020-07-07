@@ -88,15 +88,20 @@ public class AuthenticatorGoogle implements Authenticator {
         body.put("id_token", idToken);
 
         DatabaseDjangoWrite.getInstance().POST(Values.DJANGO_URL_CONVERT_TOKEN, body, new CallbackExchangeTokenId());
+        DatabaseDjangoWrite.getInstance().invalidate();
+    }
+
+    private void saveAccessToken(JSONObject response) throws JSONException {
+        String accessToken = response.getString("access_token");
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(Values.SHARED_PREF_NAME, MODE_PRIVATE);
+        sharedPreferences.edit().putString(Values.SHARED_PREF_ACCESS_TOKEN, accessToken).apply();
     }
 
     private class CallbackExchangeTokenId extends DatabaseCallback {
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
-
-                SharedPreferences sharedPreferences = activity.getSharedPreferences(Values.SHARED_PREF_NAME, MODE_PRIVATE);
-                sharedPreferences.edit().putString(Values.SHARED_PREF_ACCESS_TOKEN, response.getString("access_token")).apply();
+                saveAccessToken(response);
                 listener.onComplete(Activity.RESULT_OK);
             } catch (JSONException e) {
                 listener.onComplete(Activity.RESULT_OK);

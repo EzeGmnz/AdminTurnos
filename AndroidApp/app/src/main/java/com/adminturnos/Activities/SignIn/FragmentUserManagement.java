@@ -44,7 +44,7 @@ public class FragmentUserManagement extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        view.findViewById(R.id.google_sign_in_button).setOnClickListener(new OnClickListenerGoogleSignUp());
+        view.findViewById(R.id.google_sign_in_button).setOnClickListener(new OnClickListenerGoogleSignIn());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class FragmentUserManagement extends Fragment {
         UserManagment.getInstance().getAuthenticator().onActivityResult(data);
     }
 
-    private class OnClickListenerGoogleSignUp implements View.OnClickListener {
+    private class OnClickListenerGoogleSignIn implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {

@@ -56,6 +56,7 @@ public class DatabaseDjangoWrite implements DatabaseWrite {
         );
     }
 
+    @Override
     public void POSTJSON(String subDirURL, JSONObject json, DatabaseCallback callback) {
         StringEntity entity = null;
 
@@ -74,6 +75,11 @@ public class DatabaseDjangoWrite implements DatabaseWrite {
                 "application/json",
                 callback
         );
+    }
+
+    @Override
+    public void invalidate() {
+        instance = null;
     }
 
 }
