@@ -1,1 +1,1 @@
-'web: gunicorn adminturnos.wsgi --log-file -' 
+web: gunicorn adminturnos.wsgi --log-file -
