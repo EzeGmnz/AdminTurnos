@@ -27,7 +27,8 @@ DEBUG = True
 
 AUTH_USER_MODEL = 'restauth.CustomUser'
 
-ALLOWED_HOSTS = ['www.adminturnos.com', '0.0.0.0', '192.168.1.50', 'localhost']
+#ALLOWED_HOSTS = ['www.adminturnos.com', '0.0.0.0', '192.168.1.50', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
 GOOGLE_OAUTH_CLIENTID = '237762704075-uokqack5o2rdqd2ju15uprcc2ttkoo5j.apps.googleusercontent.com'
 
