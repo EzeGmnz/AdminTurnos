@@ -1,1 +1,1 @@
-web: gunicorn Django/adminturnos/adminturnos.wsgi --log-file -
+web: gunicorn Django/AdminTurnos/adminturnos.wsgi --log-file -
